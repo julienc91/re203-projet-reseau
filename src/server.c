@@ -86,6 +86,8 @@ static void app(void)
             continue;
          }
 
+	 printf("New client connected : %s\n", buffer);
+
          /* what is the new maximum fd ? */
          max = csock > max ? csock : max;
 
