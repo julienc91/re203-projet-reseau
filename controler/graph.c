@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "graph.h"
 #include <graphviz/gvc.h>
-#include <agraph.h>
+#include <graphviz/agraph.h>
 
 
 Agraph_t* graph__open(char * filename){
@@ -27,4 +27,3 @@ int graph__getWeight(Agraph_t* graph, Agedge_t* edge);
 
 void graph__addEdge(Agraph_t* graph, Agnode_t* n1, Agnode_t* n2, int weight);
 void graph__removeEdge(Agraph_t* graph, Agedge_t* edge);
-
