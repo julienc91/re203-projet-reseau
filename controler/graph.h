@@ -1,7 +1,7 @@
 #ifndef __GRAPH_H_
 #define __GRAPH_H_
 
-#include<gvc.h>
+#include <graphviz/gvc.h>
 
 Agraph_t* graph__open(char* filename);
 void graph__close(Agraph_t* graph);
