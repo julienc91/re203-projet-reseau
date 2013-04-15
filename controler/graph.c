@@ -1,7 +1,8 @@
 #include <stdio.h>
-#include "graph.h"
-#include <graphviz/gvc.h>
-#include <agraph.h>
+#include <graphviz/types.h>
+#include <graphviz/graph.h>
+#include "graph_.h"
+
 
 
 Agraph_t* graph__open(char * filename){
