@@ -31,22 +31,24 @@ typedef struct in_addr IN_ADDR;
 #define NB_CLIENTS 	100
 
 #define BUF_SIZE	1024
+#define CONNECTION_ERROR -1
 
-/* client */
+
+/* * * * client * * * */
 typedef struct
 {
   SOCKET sock;
   char id[BUF_SIZE];
 }Client;
 
-/* events */
+/* * * * events * * * */
 typedef struct network_s network;
-typedef void (*input_event_function)      (network *);
+typedef void (*input_event_function)      (network *, char *);
 typedef void (*connection_event_function) (network *, Client *, char *);
-typedef void (*deconnection_event_function) (network *, Client *);
+typedef void (*disconnection_event_function) (network *, Client *);
 typedef void (*message_event_function)    (network *, Client *, char *);
 
-/* network */
+/* * * * network * * * */
 struct network_s{
   SOCKET server;
   unsigned int max;              // max socket id (cf. select)
@@ -57,19 +59,20 @@ struct network_s{
   // events
   input_event_function        input_event;
   connection_event_function   connection_event;
-  deconnection_event_function deconnection_event;
+  disconnection_event_function disconnection_event;
   message_event_function      message_event;
 };
 
-/* windows compatibility */
+/* * * * windows compatibility * * * */
 static void init(void);
 static void end(void);
 
-/* public functions */
-static network *new_network    (unsigned int port);
-static void     free_network   (network *net);
-static void     update_network (network *net);
-static void     connect_network(network *net, 
+/* * * * public functions * * * */
+static network *network_open   (unsigned int port);
+static void     network_close  (network *net);
+static void     network_update (network *net);
+static Client  *network_connect(network *net, 
 				const char *address,
 				const unsigned int port);
+static void     network_send   (Client *, const char *message);
 #endif
