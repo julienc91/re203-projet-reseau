@@ -10,12 +10,14 @@
 /* private functions */
 
 
-static int  init_server_connection(unsigned int port);
-static int  init_client_connection(const char *address, const unsigned int port);
-static int  read_client(SOCKET sock, char *buffer);
-static void write_client(SOCKET sock, const char *buffer);
-static void send_message_to_all_clients(Client *clients, Client client, int actual, const char *buffer, char from_server);
-static void remove_client(Client *clients, int to_remove, int *actual);
+static int     init_server_connection (unsigned int port);
+static int     init_client_connection (const char *address, const unsigned int port);
+static int     read_client            (SOCKET sock, char *buffer);
+static void    write_client           (SOCKET sock, const char *buffer);
+static void    broadcast              (Client *clients, Client client,int actual,
+				       const char *buffer, char from_server);
+static Client *add_client             (network *net, Client *c);
+static void    remove_client          (Client *clients, int to_remove, int *actual);
 
 /* * * * * * * * * * */
 
@@ -43,7 +45,7 @@ static void end(void)
 
 
 
-network *new_network(unsigned int port){
+static network *network_open(unsigned int port){
   network *net = malloc(sizeof(*net));
   
   net->server = init_server_connection(port);
@@ -52,7 +54,7 @@ network *new_network(unsigned int port){
   net->clients = malloc(sizeof(*(net->clients)) * NB_CLIENTS);
 }
 
-void free_network(network *net){
+static void network_close(network *net){
   closesocket(net->server);
   int i = 0;
   for(i = 0; i < net->nb_clients; i++){
@@ -62,7 +64,15 @@ void free_network(network *net){
   free(net);
 }
 
-void update_network(network *net){
+static Client *network_connect(network *net, const char *address, const unsigned int port){
+  Client c;
+  c.sock = init_client_connection(address, port);
+  return add_client(net, &c);
+}
+
+
+
+static void network_update(network *net){
   char buffer[BUF_SIZE];
 
   fd_set rdfs;
@@ -121,13 +131,8 @@ void update_network(network *net){
       /* strncpy(c.name, buffer, BUF_SIZE - 1); */
       net->connection_event(net, &c, buffer);
 
-      /* what is the new maximum fd ? */
-      net->max = csock > net->max ? csock : net->max;
-
+      add_client(net, &c);
       FD_SET(csock, &rdfs);
-
-      net->clients[net->nb_clients] = c;
-      (net->nb_clients)++;
     }
   else
     {
@@ -145,7 +150,7 @@ void update_network(network *net){
 		  /* gérer la déconnexion d'un client */
                   /* strncpy(buffer, client.name, BUF_SIZE - 1); */
                   /* strncat(buffer, " disconnected !", BUF_SIZE - strlen(buffer) - 1); */
-                  //send_message_to_all_clients(clients, client, actual, buffer, 1);
+                  //broadcast(clients, client, actual, buffer, 1);
 		  net->deconnection_event(net, &client);
 
 		  // close socket
@@ -157,7 +162,7 @@ void update_network(network *net){
 	      else
 		{
 		  /* gérer la réception du message */
-		  //send_message_to_all_clients(clients, client, actual, buffer, 0);
+		  //broadcast(clients, client, actual, buffer, 0);
 		  net->message_event(net, &client, buffer);
 		}
 	      break;
@@ -167,7 +172,15 @@ void update_network(network *net){
 }
 
 
+static Client *add_client(network *net, Client *c){
+  /* what is the new maximum fd ? */
+  net->max = c->sock > net->max ? c->sock : net->max;
+  
+  net->clients[net->nb_clients] = *c;
+  (net->nb_clients)++;
 
+  return &(net->clients[net->nb_clients]);
+}
 
 static void remove_client(Client *clients, int to_remove, int *actual)
 {
@@ -177,7 +190,7 @@ static void remove_client(Client *clients, int to_remove, int *actual)
   (*actual)--;
 }
 
-static void send_message_to_all_clients(Client *clients, Client sender, int actual, const char *buffer, char from_server)
+static void broadcast(Client *clients, Client sender, int actual, const char *buffer, char from_server)
 {
   int i = 0;
   char message[BUF_SIZE];
@@ -293,14 +306,13 @@ int main(int argc, char **argv)
 {
   init();
 
-  network *net = new_network(25565);
+  network *net = network_open(25565);
 
   while(1){
-    update_network(net);
-    //    connect_network(address, port);
+    network_update(net);
   }
 
-  free_network(net);
+  network_close(net);
 
 
   end();
