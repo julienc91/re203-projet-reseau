@@ -6,6 +6,8 @@
 
 char *str_sub (const char *s, unsigned int start, unsigned int end);
 
+
+
 void mess__init(struct Message** mess)
 {
 	*mess = malloc(sizeof(struct Message));
@@ -18,10 +20,9 @@ void mess__init(struct Message** mess)
 }
 
 
-//fait l'allocation de mess_escp.
 /*
  *
- * A utiliser loprs de l'envoi, première chose à faire dans autre sens : appeller unescape.
+ * A utiliser lors de l'envoi, première chose à faire dans autre sens : appeller unescape.
  */
 char* mess__escape(char* mess_src)
 {
@@ -55,6 +56,26 @@ char* mess__escape(char* mess_src)
 	return mess_escp;
 }
 
+/** à utiliser lors de la réception*/
+char* mess__unescape(char* mess_src)
+{
+	int count = 0, n = strlen(mess_src);
+	char* mess_unescp = malloc(n * sizeof(char)); // TODO: à affiner
+
+	for(int i = 0; i <= n; i++)
+	{
+		if((mess_src[i] == '\\' && i+1 <= n && mess_src[i+1] == '\\') ||
+			(mess_src[i] == '\\' && i+1 <= n && mess_src[i+1] == '*') )
+		{
+			++i;
+		}
+
+		mess_unescp[count] = mess_src[i];
+		++count;
+	}
+
+	return mess_unescp;
+}
 // fait l'allocation de mess_dest
 void mess__parse(struct Message* mess_dest, char* mess_src, size_t len)
 {
@@ -331,6 +352,7 @@ int main(int argc, char * argv[])
 	mess__parse(m, truc, 4);
 
 	char* bidule = mess__escape("j'aime l*a queue \\ 7 * 3*");
-	printf("\n\noriginal: %s\néchappé: %s\n", "j'aime l*a queue \\ 7 * 3*", bidule);
+	char* chose = mess__unescape(bidule);
+	printf("\n\noriginal: %s\néchappé: %s\noriginal: %s\n", "j'aime l*a queue \\ 7 * 3*", bidule, chose);
 	return 0;
 }
