@@ -6,7 +6,14 @@
 
 char *str_sub (const char *s, unsigned int start, unsigned int end);
 
+char* strcopy(const char* src)
+{
+	int n = strlen(src) +1;
+	char* str = malloc(n  * sizeof(char));
 
+	strcpy(str, src);
+	return str;
+}
 
 void mess__init(struct Message** mess)
 {
@@ -15,11 +22,25 @@ void mess__init(struct Message** mess)
 	(*mess)->s_parameter = NULL;
 	(*mess)->node1 = NULL;
 	(*mess)->node2 = NULL;
-	(*mess)->n_parameter1 = -1;
+	(*mess)->n_parameter = -1;
 	(*mess)->accept = NOT;
 }
 
+int mess__getWeight(struct Message* mess)
+{
+	return mess->n_parameter;
+}
 
+int mess__getTTL(struct Message* mess)
+{
+	return mess->n_parameter;
+}
+
+
+int mess__getAcceptance(struct Message* mess)
+{
+	return mess->accept;
+}
 /*
  *
  * A utiliser lors de l'envoi, première chose à faire dans autre sens : appeller unescape.
@@ -77,8 +98,9 @@ char* mess__unescape(char* mess_src)
 	return mess_unescp;
 }
 // fait l'allocation de mess_dest
-void mess__parse(struct Message* mess_dest, char* mess_src, size_t len)
+struct Message* mess__parse(char* mess_src)
 {
+	struct Message* mess_dest;
 	mess__init(&mess_dest);
 
 	static char* regex_strtable[] =
@@ -120,11 +142,13 @@ void mess__parse(struct Message* mess_dest, char* mess_src, size_t len)
 		if(trex_match(trex_table[i], mess_src))
 		{
 			printf("\n\nLigne: %d\n", i);
+			trex_free(trex_table[i]);
 			break;
 		}
+		trex_free(trex_table[i]);
 	}
 
-	char * tmp;
+	char * tmp = malloc((strlen(mess_src) + 1)* sizeof(char));
 	switch(i)
 	{
 		case 0:
@@ -142,24 +166,24 @@ void mess__parse(struct Message* mess_dest, char* mess_src, size_t len)
 			mess_dest->type = ADDLINK;
 			strtok(mess_src, " ");
 			strtok(NULL, " ");
-			mess_dest->node1 = strtok(NULL, " ");
-			mess_dest->node2 = strtok(NULL, " ");
-			mess_dest->n_parameter1 = atoi(strtok(NULL, " "));
+			mess_dest->node1 = strcopy(strtok(NULL, " "));
+			mess_dest->node2 = strcopy(strtok(NULL, " "));
+			mess_dest->n_parameter = atoi(strtok(NULL, " "));
 			break;
 		case 4:
 			mess_dest->type = UPDATELINK;
 			strtok(mess_src, " ");
 			strtok(NULL, " ");
-			mess_dest->node1 = strtok(NULL, " ");
-			mess_dest->node2 = strtok(NULL, " ");
-			mess_dest->n_parameter1 = atoi(strtok(NULL, " "));
+			mess_dest->node1  = strcopy(strtok(NULL, " "));
+			mess_dest->node2  = strcopy(strtok(NULL, " "));
+			mess_dest->n_parameter = atoi(strtok(NULL, " "));
 			break;
 		case 5:
 			mess_dest->type = DELLINK;
 			strtok(mess_src, " ");
 			strtok(NULL, " ");
-			mess_dest->node1 = strtok(NULL, " ");
-			mess_dest->node2 = strtok(NULL, " ");
+			mess_dest->node1  = strcopy(strtok(NULL, " "));
+			mess_dest->node2  = strcopy(strtok(NULL, " "));
 			break;
 		case 6:
 			mess_dest->type = DISCONNECT;
@@ -169,16 +193,19 @@ void mess__parse(struct Message* mess_dest, char* mess_src, size_t len)
 			strcpy(tmp, mess_src);
 			strtok(tmp, " ");
 
-			mess_dest->node1 = strtok(NULL, " ");
-			mess_dest->s_parameter = strstr(mess_src, mess_dest->node1) + strlen(mess_dest->node1) + 2;
-			mess_dest->s_parameter[strlen(mess_dest->s_parameter) - 1] = 0;
+			mess_dest->node1  = strcopy(strtok(NULL, " "));
+
+			char * ptr = strstr(mess_src, mess_dest->node1) + strlen(mess_dest->node1) + 2;
+			mess_dest->s_parameter = malloc((1 + strlen(ptr)) * sizeof(char));
+			strcpy(mess_dest->s_parameter, ptr);
+			mess_dest->s_parameter[strlen(ptr) - 1] = 0;
 
 			printf("N:%s\nMess:%s\n\n",  mess_dest->node1, mess_dest->s_parameter);
 			break;
 		case 8:
 			mess_dest->type = ROUTE;
 			strtok(mess_src, " ");
-			mess_dest->node1 = strtok(NULL, " ");
+			mess_dest->node1  = strcopy(strtok(NULL, " "));
 
 			break;
 		case 9:
@@ -191,9 +218,9 @@ void mess__parse(struct Message* mess_dest, char* mess_src, size_t len)
 			strtok(NULL, " ");
 			// cas as id...
 			strtok(NULL, " ");
-			mess_dest->node1 = strtok(NULL, " ");
+			mess_dest->node1  = strcopy(strtok(NULL, " "));
 			strtok(NULL, " ");
-			mess_dest->n_parameter1 = atoi(strtok(NULL, " "));
+			mess_dest->n_parameter = atoi(strtok(NULL, " "));
 
 			break;
 		case 11:
@@ -202,7 +229,7 @@ void mess__parse(struct Message* mess_dest, char* mess_src, size_t len)
 			strtok(mess_src, " ");
 			strtok(NULL, " ");
 			strtok(NULL, " ");
-			mess_dest->n_parameter1 = atoi(strtok(NULL, " "));
+			mess_dest->n_parameter = atoi(strtok(NULL, " "));
 
 			break;
 		case 12:
@@ -211,7 +238,7 @@ void mess__parse(struct Message* mess_dest, char* mess_src, size_t len)
 		case 13:
 			mess_dest->type = GREETING;
 			strtok(mess_src, " ");
-			mess_dest->node1 = strtok(NULL, " ");
+			mess_dest->node1  = strcopy(strtok(NULL, " "));
 			break;
 		case 14:
 			mess_dest->type = BYE;
@@ -223,7 +250,7 @@ void mess__parse(struct Message* mess_dest, char* mess_src, size_t len)
 			mess_dest->type = NEIGHBORHOOD;
 			strtok(mess_src, " ");
 			strtok(NULL, " ");
-			mess_dest->s_parameter = strtok(NULL, " ");
+			mess_dest->s_parameter  = strcopy(strtok(NULL, " "));
 			break;
 		case 17:
 			mess_dest->type = NEIGHBORHOOD;
@@ -239,7 +266,7 @@ void mess__parse(struct Message* mess_dest, char* mess_src, size_t len)
 		case 20:
 			mess_dest->type = VECTOR;
 			strtok(mess_src, " ");
-			mess_dest->s_parameter = strtok(NULL, " ");
+			mess_dest->s_parameter  = strcopy(strtok(NULL, " "));
 			break;
 		case 21:
 			mess_dest->type = VECTOR;
@@ -253,13 +280,13 @@ void mess__parse(struct Message* mess_dest, char* mess_src, size_t len)
 			strtok(tmp, " ");
 
 			strtok(NULL, " ");
-			mess_dest->node1 = strtok(NULL, " ");
+			mess_dest->node1  = strcopy(strtok(NULL, " "));
 			strtok(NULL, " ");
-			mess_dest->node2 = strtok(NULL, " ");
+			mess_dest->node2  = strcopy(strtok(NULL, " "));
 			strtok(NULL, " ");
 
 			char * tmp2 = strtok(NULL, " ");
-			mess_dest->n_parameter1 = atoi(tmp2);
+			mess_dest->n_parameter = atoi(tmp2);
 
 			mess_dest->s_parameter = strstr(mess_src, tmp2) + strlen(tmp2) + 2;
 
@@ -270,9 +297,9 @@ void mess__parse(struct Message* mess_dest, char* mess_src, size_t len)
 
 			strtok(mess_src, " ");
 			strtok(NULL, " ");
-			mess_dest->node1 = strtok(NULL, " ");
+			mess_dest->node1  = strcopy(strtok(NULL, " "));
 			strtok(NULL, " ");
-			mess_dest->node2 = strtok(NULL, " ");
+			mess_dest->node2  = strcopy(strtok(NULL, " "));
 
 			break;
 		case 24:
@@ -281,36 +308,38 @@ void mess__parse(struct Message* mess_dest, char* mess_src, size_t len)
 
 			strtok(mess_src, " ");
 			strtok(NULL, " ");
-			mess_dest->node1 = strtok(NULL, " ");
+			mess_dest->node1  = strcopy(strtok(NULL, " "));
 			strtok(NULL, " ");
-			mess_dest->node2 = strtok(NULL, " ");
+			mess_dest->node2  = strcopy(strtok(NULL, " "));
 			break;
 		case 25: //ping src \\w* dst \\w* ttl \\d*
 			mess_dest->type = PING;
 
 			strtok(mess_src, " ");
 			strtok(NULL, " ");
-			mess_dest->node1 = strtok(NULL, " ");
+			mess_dest->node1  = strcopy(strtok(NULL, " "));
 			strtok(NULL, " ");
-			mess_dest->node2 = strtok(NULL, " ");
+			mess_dest->node2  = strcopy(strtok(NULL, " "));
 			strtok(NULL, " ");
-			mess_dest->n_parameter1 = atoi(strtok(NULL, " "));
+			mess_dest->n_parameter = atoi(strtok(NULL, " "));
 
 			break;
 		case 26:
 			mess_dest->type = PONG;
 			strtok(mess_src, " ");
 			strtok(NULL, " ");
-			mess_dest->node1 = strtok(NULL, " ");
+			mess_dest->node1  = strcopy(strtok(NULL, " "));
 			strtok(NULL, " ");
-			mess_dest->node2 = strtok(NULL, " ");
+			mess_dest->node2  = strcopy(strtok(NULL, " "));
 			strtok(NULL, " ");
-			mess_dest->n_parameter1 = atoi(strtok(NULL, " "));
+			mess_dest->n_parameter = atoi(strtok(NULL, " "));
 			break;
 		default:
 			break;
 	}
 
+	free(tmp);
+	return mess_dest;
 }
 
 
@@ -342,17 +371,38 @@ char *str_sub (const char *s, unsigned int start, unsigned int end)
 	return new_s;
 }
 
+void mess__free(struct Message** mess)
+{
+	if((*mess)->s_parameter != NULL)
+	{
+		free((*mess)->s_parameter);
+	}
+	if((*mess)->node1 != NULL)
+	{
+		free((*mess)->node1);
+	}
+	if((*mess)->node2 != NULL)
+	{
+		free((*mess)->node2);
+	}
 
+	free((*mess));
+}
 int main(int argc, char * argv[])
 {
-	struct Message * m;
+
 	//mess__parse(m, argv[1], 4);
 	char * truc = malloc(sizeof(char)*100);
 	strcpy(truc, "message n12 \"salut les copains!\"");
-	mess__parse(m, truc, 4);
+	struct Message * m = mess__parse( truc);
 
 	char* bidule = mess__escape("j'aime l*a queue \\ 7 * 3*");
 	char* chose = mess__unescape(bidule);
 	printf("\n\noriginal: %s\néchappé: %s\noriginal: %s\n", "j'aime l*a queue \\ 7 * 3*", bidule, chose);
+
+	free(truc);
+	free(bidule);
+	free(chose);
+	mess__free(&m);
 	return 0;
 }

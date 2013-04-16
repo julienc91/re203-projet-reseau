@@ -55,9 +55,9 @@ struct Message
 	enum MessageType type;
 	char *s_parameter;
 	char *node1, *node2;
-	int n_parameter1, n_parameter2;
+	int n_parameter;
 	enum Acceptance accept;
 };
 
 void mess__init(struct Message** mess);
-void mess__parse(struct Message* mess_dest, char* mess_src, size_t len);
+struct Message* mess__parse(char* mess_src);
