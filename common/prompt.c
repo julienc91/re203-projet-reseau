@@ -1,11 +1,11 @@
 #include "prompt.h"
-#include "../messages.h"
+#include "messages.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-pthread_t* promp__start(void)
+pthread_t* prompt__start(void)
 {
 	pthread_t* prompt_thread = malloc(sizeof(pthread_t));
 	pthread_create(prompt_thread, NULL, prompt__main_thread, NULL);
@@ -26,10 +26,4 @@ void* prompt__main_thread(void* v)
 	}
 
 	return NULL;
-}
-
-int main(void)
-{
-	pthread_t* prompt_th = promp__start();
-	pthread_join(*prompt_th, NULL);
 }
