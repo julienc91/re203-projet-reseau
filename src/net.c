@@ -11,6 +11,7 @@
 
 
 static int  init_server_connection(unsigned int port);
+static int  init_client_connection(const char *address, const unsigned int port);
 static int  read_client(SOCKET sock, char *buffer);
 static void write_client(SOCKET sock, const char *buffer);
 static void send_message_to_all_clients(Client *clients, Client client, int actual, const char *buffer, char from_server);
@@ -89,6 +90,7 @@ void update_network(network *net){
   /* something from standard input : i.e keyboard */
   if(FD_ISSET(STDIN_FILENO, &rdfs))
     {
+      net->input_event(net);
       /* stop process when type on keyboard */
       return;
     }
@@ -111,19 +113,20 @@ void update_network(network *net){
 	  return;
 	}
 
+      Client c;
+      c.sock = csock;
+
       // TODO : traiter la connexion du client
       /* printf("New client connected : %s\n", buffer); */
-
+      /* strncpy(c.name, buffer, BUF_SIZE - 1); */
+      net->connection_event(net, &c, buffer);
 
       /* what is the new maximum fd ? */
       net->max = csock > net->max ? csock : net->max;
 
       FD_SET(csock, &rdfs);
 
-      //         Client c = { csock };
-      // strncpy(c.name, buffer, BUF_SIZE - 1);
-      net->clients[net->nb_clients].sock = csock;
-      //	 net->clients[net->nb_clients].id   = ;
+      net->clients[net->nb_clients] = c;
       (net->nb_clients)++;
     }
   else
@@ -135,23 +138,27 @@ void update_network(network *net){
 	  if(FD_ISSET(net->clients[i].sock, &rdfs))
             {
 	      Client client = net->clients[i];
-	      int c = read_client(net->clients[i].sock, buffer);
+	      int c = read_client(client.sock, buffer);
 	      /* client disconnected */
 	      if(c == 0)
 		{
-                  closesocket(net->clients[i].sock);
-                  remove_client(net->clients, i, &(net->nb_clients));
-
 		  /* gérer la déconnexion d'un client */
                   /* strncpy(buffer, client.name, BUF_SIZE - 1); */
                   /* strncat(buffer, " disconnected !", BUF_SIZE - strlen(buffer) - 1); */
                   //send_message_to_all_clients(clients, client, actual, buffer, 1);
-		  
+		  net->deconnection_event(net, &client);
+
+		  // close socket
+                  closesocket(client.sock);
+		  // update array
+                  remove_client(net->clients, i, &(net->nb_clients));
+
 		}
 	      else
 		{
 		  /* gérer la réception du message */
 		  //send_message_to_all_clients(clients, client, actual, buffer, 0);
+		  net->message_event(net, &client, buffer);
 		}
 	      break;
             }
@@ -221,7 +228,7 @@ static int init_server_connection(unsigned int port)
   return sock;
 }
 
-static int init_server_connection(const char *address, const unsigned int port)
+static int init_client_connection(const char *address, const unsigned int port)
 {
    SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
    SOCKADDR_IN sin = { 0 };
@@ -278,6 +285,10 @@ static void write_client(SOCKET sock, const char *buffer)
     }
 }
 
+
+
+/* * * * * * * * * * * TESTS * * * * * * * * * * */
+
 int main(int argc, char **argv)
 {
   init();
@@ -286,7 +297,7 @@ int main(int argc, char **argv)
 
   while(1){
     update_network(net);
-    connect_network(address, port);
+    //    connect_network(address, port);
   }
 
   free_network(net);
