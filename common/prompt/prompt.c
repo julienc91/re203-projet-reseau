@@ -5,37 +5,31 @@
 #include <stdlib.h>
 #include <string.h>
 
-void promp_start(void)
+pthread_t* promp__start(void)
 {
+	pthread_t* prompt_thread = malloc(sizeof(pthread_t));
+	pthread_create(prompt_thread, NULL, prompt__main_thread, NULL);
+
+	return prompt_thread;
+}
+
+void* prompt__main_thread(void* v)
+{
+	v = v; // pour warnings
 	char * s = malloc(256);
 	struct Message* m;
 	while((s = fgets(s, 255, stdin)) != NULL)
 	{
 		s[strlen(s) - 1] = 0;
 		m = mess__parse(s);
-
-		printf("Message: %d %d %d\n", m->type, m->n_parameter, m->accept);
-
-		if(m->s_parameter != NULL)
-		{
-			printf("s_param: %s\n", m->s_parameter);
-		}
-		if(m->node1 != NULL)
-		{
-			printf("node1: %s\n", m->node1);
-		}
-		if(m->node2 != NULL)
-		{
-			printf("node2: %s\n", m->node2);
-		}
-
-		printf("\n\n");
+		mess__debug(m);
 	}
+
+	return NULL;
 }
-
-
 
 int main(void)
 {
-	promp_start();
+	pthread_t* prompt_th = promp__start();
+	pthread_join(*prompt_th, NULL);
 }

@@ -130,7 +130,7 @@ struct Message* mess__parse(char* mess_src)
 	TRex* trex_table[30];
 	int i;
 	int match = 0;
-	printf("Message source: \"%s\"\n", mess_src);
+
 	for(i = 0; i < 27; i++) // trouver le moyen de staticifier ça
 	{
 		trex_table[i] = trex_compile(regex_strtable[i], NULL);
@@ -197,7 +197,6 @@ struct Message* mess__parse(char* mess_src)
 			strcpy(mess_dest->s_parameter, ptr);
 			mess_dest->s_parameter[strlen(ptr) - 1] = 0;
 
-			printf("N:%s\nMess:%s\n\n",  mess_dest->node1, mess_dest->s_parameter);
 			break;
 		case 8:
 			mess_dest->type = ROUTE;
@@ -210,10 +209,8 @@ struct Message* mess__parse(char* mess_src)
 			break;
 		case 10:
 			mess_dest->type = LOGIN;
-			//log in as ID port p
 			strtok(mess_src, " ");
 			strtok(NULL, " ");
-			// cas as id...
 			strtok(NULL, " ");
 			mess_dest->node1  = strcopy(strtok(NULL, " "));
 			strtok(NULL, " ");
@@ -269,9 +266,8 @@ struct Message* mess__parse(char* mess_src)
 			mess_dest->type = VECTOR;
 			mess_dest->accept = OK;
 			break;
-		case 22: //"packet src \\w* dst \\w* ttl \\d* .*",
+		case 22:
 			mess_dest->type = PACKET;
-
 
 			strcpy(tmp, mess_src);
 			strtok(tmp, " ");
@@ -309,7 +305,7 @@ struct Message* mess__parse(char* mess_src)
 			strtok(NULL, " ");
 			mess_dest->node2  = strcopy(strtok(NULL, " "));
 			break;
-		case 25: //ping src \\w* dst \\w* ttl \\d*
+		case 25:
 			mess_dest->type = PING;
 
 			strtok(mess_src, " ");
@@ -383,6 +379,27 @@ int main(int argc, char * argv[])
 }
 */
 
+
+void mess__debug(struct Message* m)
+{
+	printf("Message: %d %d %d\n", m->type, m->n_parameter, m->accept);
+
+	if(m->s_parameter != NULL)
+	{
+		printf("s_param: %s\n", m->s_parameter);
+	}
+	if(m->node1 != NULL)
+	{
+		printf("node1: %s\n", m->node1);
+	}
+	if(m->node2 != NULL)
+	{
+		printf("node2: %s\n", m->node2);
+	}
+
+	printf("\n\n");
+}
+
 //*///*/*/*////*/
 /* Utilitaires */
 //*///*/*/*////*/
@@ -396,7 +413,7 @@ char *str_sub (const char *s, unsigned int start, unsigned int end)
 		new_s = malloc (sizeof (*new_s) * (end - start + 2));
 		if (new_s != NULL)
 		{
-			int i;
+			unsigned int i;
 
 			for (i = start; i <= end; i++)
 			{

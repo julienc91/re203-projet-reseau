@@ -70,3 +70,6 @@ char* mess__unescape(char* mess_src);
 int mess__getAcceptance(struct Message* mess);
 int mess__getTTL(struct Message* mess);
 int mess__getWeight(struct Message* mess);
+
+
+void mess__debug(struct Message* m);
