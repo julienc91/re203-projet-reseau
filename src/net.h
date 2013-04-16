@@ -39,13 +39,26 @@ typedef struct
   char id[BUF_SIZE];
 }Client;
 
-typedef struct{
+typedef struct network_s network;
+typedef void (*input_event_function)      (network *);
+typedef void (*connection_event_function) (network *, Client *, char *);
+typedef void (*deconnection_event_function) (network *, Client *);
+typedef void (*message_event_function)    (network *, Client *, char *);
+
+
+struct network_s{
   SOCKET server;
   unsigned int max;              // max socket id (cf. select)
   Client *clients;               // array of clients
   unsigned int nb_clients;       // index for the array
   //unsigned int allocated_clients;
-} network;
+
+  // events
+  input_event_function        input_event;
+  connection_event_function   connection_event;
+  deconnection_event_function deconnection_event;
+  message_event_function      message_event;
+};
 
 static void init(void);
 static void end(void);
