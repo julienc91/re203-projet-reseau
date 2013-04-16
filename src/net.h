@@ -32,20 +32,21 @@ typedef struct in_addr IN_ADDR;
 
 #define BUF_SIZE	1024
 
-
+/* client */
 typedef struct
 {
   SOCKET sock;
   char id[BUF_SIZE];
 }Client;
 
+/* events */
 typedef struct network_s network;
 typedef void (*input_event_function)      (network *);
 typedef void (*connection_event_function) (network *, Client *, char *);
 typedef void (*deconnection_event_function) (network *, Client *);
 typedef void (*message_event_function)    (network *, Client *, char *);
 
-
+/* network */
 struct network_s{
   SOCKET server;
   unsigned int max;              // max socket id (cf. select)
@@ -60,12 +61,15 @@ struct network_s{
   message_event_function      message_event;
 };
 
+/* windows compatibility */
 static void init(void);
 static void end(void);
 
-
-network *new_network   (unsigned int port);
-void     free_network  (network *net);
-void     update_network(network *net);
-
+/* public functions */
+static network *new_network    (unsigned int port);
+static void     free_network   (network *net);
+static void     update_network (network *net);
+static void     connect_network(network *net, 
+				const char *address,
+				const unsigned int port);
 #endif
