@@ -4,44 +4,58 @@
 #include "../trex/trex.h"
 #include "messages.h"
 
-char *str_sub (const char *s, unsigned int start, unsigned int end)
-{
-	char *new_s = NULL;
-
-	if (s != NULL && start < end)
-	{
-		new_s = malloc (sizeof (*new_s) * (end - start + 2));
-		if (new_s != NULL)
-		{
-			int i;
-
-			for (i = start; i <= end; i++)
-			{
-				new_s[i-start] = s[i];
-			}
-			new_s[i-start] = '\0';
-		}
-		else
-		{
-			fprintf (stderr, "Memoire insuffisante\n");
-			exit (EXIT_FAILURE);
-		}
-	}
-	return new_s;
-}
+char *str_sub (const char *s, unsigned int start, unsigned int end);
 
 void mess__init(struct Message** mess)
 {
 	*mess = malloc(sizeof(struct Message));
 	(*mess)->type = NONE;
-	(*mess)->s_parameter = 0;
-	(*mess)->node1 = 0;
-	(*mess)->node2 = 0;
-	(*mess)->weight = -1;
-	(*mess)->ttl = -1;
-	(*mess)->ok = 0;
+	(*mess)->s_parameter = NULL;
+	(*mess)->node1 = NULL;
+	(*mess)->node2 = NULL;
+	(*mess)->n_parameter1 = -1;
+	(*mess)->accept = NOT;
 }
 
+
+//fait l'allocation de mess_escp.
+/*
+ *
+ * A utiliser loprs de l'envoi, première chose à faire dans autre sens : appeller unescape.
+ */
+char* mess__escape(char* mess_src)
+{
+	int count = 0, i;
+	for(i = 0; mess_src[i] != 0; i++)
+	{
+		if(mess_src[i] == '*' || mess_src[i] == '\\')
+		{
+			count++;
+		}
+	}
+	int n = i; // taille de mess_src moins un caractère
+
+	char* mess_escp = malloc((n + 1 + count) * sizeof(char));
+
+	count = 0;
+	for(int i = 0; i <= n; i++)
+	{
+		if((mess_src[i] == '*' || mess_src[i] == '\\') && i != n-1)
+		{
+			mess_escp[count++] = '\\';
+			mess_escp[count] = mess_src[i];
+		}
+		else
+		{
+			mess_escp[count] = mess_src[i];
+		}
+		++count;
+	}
+
+	return mess_escp;
+}
+
+// fait l'allocation de mess_dest
 void mess__parse(struct Message* mess_dest, char* mess_src, size_t len)
 {
 	mess__init(&mess_dest);
@@ -89,7 +103,7 @@ void mess__parse(struct Message* mess_dest, char* mess_src, size_t len)
 		}
 	}
 
-
+	char * tmp;
 	switch(i)
 	{
 		case 0:
@@ -131,7 +145,6 @@ void mess__parse(struct Message* mess_dest, char* mess_src, size_t len)
 			break;
 		case 7:
 			mess_dest->type = MESSAGE;
-			char * tmp;
 			strcpy(tmp, mess_src);
 			strtok(tmp, " ");
 
@@ -187,41 +200,125 @@ void mess__parse(struct Message* mess_dest, char* mess_src, size_t len)
 			break;
 		case 16:
 			mess_dest->type = NEIGHBORHOOD;
+			strtok(mess_src, " ");
+			strtok(NULL, " ");
+			mess_dest->s_parameter = strtok(NULL, " ");
 			break;
 		case 17:
 			mess_dest->type = NEIGHBORHOOD;
+			mess_dest->accept = OK;
 			break;
 		case 18:
 			mess_dest->type = LINK;
 			break;
 		case 19:
 			mess_dest->type = LINK;
+			mess_dest->accept = OK;
 			break;
 		case 20:
 			mess_dest->type = VECTOR;
+			strtok(mess_src, " ");
+			mess_dest->s_parameter = strtok(NULL, " ");
 			break;
 		case 21:
 			mess_dest->type = VECTOR;
+			mess_dest->accept = OK;
 			break;
-		case 22:
+		case 22: //"packet src \\w* dst \\w* ttl \\d* .*",
 			mess_dest->type = PACKET;
+
+
+			strcpy(tmp, mess_src);
+			strtok(tmp, " ");
+
+			strtok(NULL, " ");
+			mess_dest->node1 = strtok(NULL, " ");
+			strtok(NULL, " ");
+			mess_dest->node2 = strtok(NULL, " ");
+			strtok(NULL, " ");
+
+			char * tmp2 = strtok(NULL, " ");
+			mess_dest->n_parameter1 = atoi(tmp2);
+
+			mess_dest->s_parameter = strstr(mess_src, tmp2) + strlen(tmp2) + 2;
+
 			break;
 		case 23:
 			mess_dest->type = PACKET;
+			mess_dest->accept = OK;
+
+			strtok(mess_src, " ");
+			strtok(NULL, " ");
+			mess_dest->node1 = strtok(NULL, " ");
+			strtok(NULL, " ");
+			mess_dest->node2 = strtok(NULL, " ");
+
 			break;
 		case 24:
 			mess_dest->type = PACKET;
+			mess_dest->accept = TOOFAR;
+
+			strtok(mess_src, " ");
+			strtok(NULL, " ");
+			mess_dest->node1 = strtok(NULL, " ");
+			strtok(NULL, " ");
+			mess_dest->node2 = strtok(NULL, " ");
 			break;
-		case 25:
+		case 25: //ping src \\w* dst \\w* ttl \\d*
 			mess_dest->type = PING;
+
+			strtok(mess_src, " ");
+			strtok(NULL, " ");
+			mess_dest->node1 = strtok(NULL, " ");
+			strtok(NULL, " ");
+			mess_dest->node2 = strtok(NULL, " ");
+			strtok(NULL, " ");
+			mess_dest->n_parameter1 = atoi(strtok(NULL, " "));
+
 			break;
 		case 26:
 			mess_dest->type = PONG;
+			strtok(mess_src, " ");
+			strtok(NULL, " ");
+			mess_dest->node1 = strtok(NULL, " ");
+			strtok(NULL, " ");
+			mess_dest->node2 = strtok(NULL, " ");
+			strtok(NULL, " ");
+			mess_dest->n_parameter1 = atoi(strtok(NULL, " "));
 			break;
 		default:
 			break;
 	}
 
+}
+
+
+
+
+char *str_sub (const char *s, unsigned int start, unsigned int end)
+{
+	char *new_s = NULL;
+
+	if (s != NULL && start < end)
+	{
+		new_s = malloc (sizeof (*new_s) * (end - start + 2));
+		if (new_s != NULL)
+		{
+			int i;
+
+			for (i = start; i <= end; i++)
+			{
+				new_s[i-start] = s[i];
+			}
+			new_s[i-start] = '\0';
+		}
+		else
+		{
+			fprintf (stderr, "Memoire insuffisante\n");
+			exit (EXIT_FAILURE);
+		}
+	}
+	return new_s;
 }
 
 
@@ -232,5 +329,8 @@ int main(int argc, char * argv[])
 	char * truc = malloc(sizeof(char)*100);
 	strcpy(truc, "message n12 \"salut les copains!\"");
 	mess__parse(m, truc, 4);
+
+	char* bidule = mess__escape("j'aime l*a queue \\ 7 * 3*");
+	printf("\n\noriginal: %s\néchappé: %s\n", "j'aime l*a queue \\ 7 * 3*", bidule);
 	return 0;
 }

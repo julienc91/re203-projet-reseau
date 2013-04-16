@@ -1,4 +1,12 @@
 #include <stddef.h>
+
+enum Acceptance
+{
+	NOT,
+	OK,
+	TOOFAR
+};
+
 enum MessageType
 {
 	//Controleur
@@ -48,7 +56,7 @@ struct Message
 	char *s_parameter;
 	char *node1, *node2;
 	int n_parameter1, n_parameter2;
-	int ok;
+	enum Acceptance accept;
 };
 
 void mess__init(struct Message** mess);
