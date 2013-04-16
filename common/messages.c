@@ -129,17 +129,20 @@ struct Message* mess__parse(char* mess_src)
 
 	TRex* trex_table[30];
 	int i;
-	for(i = 0; i < 26; i++) // trouver le moyen de staticifier ça
+	int match = 0;
+	printf("Message source: \"%s\"\n", mess_src);
+	for(i = 0; i < 27; i++) // trouver le moyen de staticifier ça
 	{
 		trex_table[i] = trex_compile(regex_strtable[i], NULL);
 		if(trex_match(trex_table[i], mess_src))
 		{
-			printf("\n\nLigne: %d\n", i);
+			match = 1;
 			trex_free(trex_table[i]);
 			break;
 		}
 		trex_free(trex_table[i]);
 	}
+	if(match == 0) i = -1;
 
 	char * tmp = malloc((strlen(mess_src) + 1)* sizeof(char));
 	switch(i)
@@ -154,6 +157,7 @@ struct Message* mess__parse(char* mess_src)
 			break;
 		case 2:
 			mess_dest->type = SHOW;
+			printf("eyho");
 			break;
 		case 3:
 			mess_dest->type = ADDLINK;
@@ -281,7 +285,7 @@ struct Message* mess__parse(char* mess_src)
 			char * tmp2 = strtok(NULL, " ");
 			mess_dest->n_parameter = atoi(tmp2);
 
-			mess_dest->s_parameter = strstr(mess_src, tmp2) + strlen(tmp2) + 2;
+			mess_dest->s_parameter = strstr(mess_src, tmp2) + strlen(tmp2) + 1;
 
 			break;
 		case 23:
@@ -328,6 +332,9 @@ struct Message* mess__parse(char* mess_src)
 			mess_dest->n_parameter = atoi(strtok(NULL, " "));
 			break;
 		default:
+			mess_dest->type = NONE;
+			fprintf(stderr, "ERREUR: Message invalide.\n");
+
 			break;
 	}
 
@@ -354,7 +361,7 @@ void mess__free(struct Message** mess)
 
 	free((*mess));
 }
-
+/*
 int main(int argc, char * argv[])
 {
 
@@ -374,7 +381,7 @@ int main(int argc, char * argv[])
 	mess__free(&m);
 	return 0;
 }
-
+*/
 
 //*///*/*/*////*/
 /* Utilitaires */
