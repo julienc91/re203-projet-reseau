@@ -60,4 +60,13 @@ struct Message
 };
 
 void mess__init(struct Message** mess);
+void mess__free(struct Message** mess);
+
 struct Message* mess__parse(char* mess_src);
+
+char* mess__escape(char* mess_src);
+char* mess__unescape(char* mess_src);
+
+int mess__getAcceptance(struct Message* mess);
+int mess__getTTL(struct Message* mess);
+int mess__getWeight(struct Message* mess);

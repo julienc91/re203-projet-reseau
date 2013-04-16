@@ -344,6 +344,47 @@ struct Message* mess__parse(char* mess_src)
 
 
 
+void mess__free(struct Message** mess)
+{
+	if((*mess)->s_parameter != NULL)
+	{
+		free((*mess)->s_parameter);
+	}
+	if((*mess)->node1 != NULL)
+	{
+		free((*mess)->node1);
+	}
+	if((*mess)->node2 != NULL)
+	{
+		free((*mess)->node2);
+	}
+
+	free((*mess));
+}
+
+int main(int argc, char * argv[])
+{
+
+	//mess__parse(m, argv[1], 4);
+	char * truc = malloc(sizeof(char)*100);
+	strcpy(truc, "message n12 \"salut les copains!\"");
+	struct Message * m = mess__parse( truc);
+
+	char* bidule = mess__escape("j'aime l*a queue \\ 7 * 3*");
+	char* chose = mess__unescape(bidule);
+	printf("\n\noriginal: %s\néchappé: %s\noriginal: %s\n", "j'aime au//ssi l*a chatte \\ 7 * 3*", bidule, chose);
+
+	free(truc);
+	free(bidule);
+	free(chose);
+	mess__free(&m);
+	return 0;
+}
+
+
+//*///*/*/*////*/
+/* Utilitaires */
+//*///*/*/*////*/
 
 char *str_sub (const char *s, unsigned int start, unsigned int end)
 {
@@ -371,38 +412,11 @@ char *str_sub (const char *s, unsigned int start, unsigned int end)
 	return new_s;
 }
 
-void mess__free(struct Message** mess)
+char* strcopy(const char* src)
 {
-	if((*mess)->s_parameter != NULL)
-	{
-		free((*mess)->s_parameter);
-	}
-	if((*mess)->node1 != NULL)
-	{
-		free((*mess)->node1);
-	}
-	if((*mess)->node2 != NULL)
-	{
-		free((*mess)->node2);
-	}
+	int n = strlen(src) +1;
+	char* str = malloc(n  * sizeof(char));
 
-	free((*mess));
-}
-int main(int argc, char * argv[])
-{
-
-	//mess__parse(m, argv[1], 4);
-	char * truc = malloc(sizeof(char)*100);
-	strcpy(truc, "message n12 \"salut les copains!\"");
-	struct Message * m = mess__parse( truc);
-
-	char* bidule = mess__escape("j'aime l*a queue \\ 7 * 3*");
-	char* chose = mess__unescape(bidule);
-	printf("\n\noriginal: %s\néchappé: %s\noriginal: %s\n", "j'aime l*a queue \\ 7 * 3*", bidule, chose);
-
-	free(truc);
-	free(bidule);
-	free(chose);
-	mess__free(&m);
-	return 0;
+	strcpy(str, src);
+	return str;
 }
