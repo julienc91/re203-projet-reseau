@@ -6,14 +6,7 @@
 
 char *str_sub (const char *s, unsigned int start, unsigned int end);
 
-char* strcopy(const char* src)
-{
-	int n = strlen(src) +1;
-	char* str = malloc(n  * sizeof(char));
-
-	strcpy(str, src);
-	return str;
-}
+char* strcopy(const char* src);
 
 void mess__init(struct Message** mess)
 {
@@ -370,9 +363,10 @@ int main(int argc, char * argv[])
 	strcpy(truc, "message n12 \"salut les copains!\"");
 	struct Message * m = mess__parse( truc);
 
-	char* bidule = mess__escape("j'aime l*a queue \\ 7 * 3*");
+	char* origin = "j'aime au//ssi l*a chatte \\ 7 * 3*";
+	char* bidule = mess__escape(origin);
 	char* chose = mess__unescape(bidule);
-	printf("\n\noriginal: %s\néchappé: %s\noriginal: %s\n", "j'aime au//ssi l*a chatte \\ 7 * 3*", bidule, chose);
+	printf("\n\noriginal: %s\néchappé: %s\noriginal: %s\n", origin, bidule, chose);
 
 	free(truc);
 	free(bidule);
