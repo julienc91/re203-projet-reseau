@@ -1,4 +1,4 @@
 *.o
-common
-controler
-router
+common/common
+controler/controler
+router/router
