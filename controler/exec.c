@@ -43,11 +43,8 @@ void exec__prompt_message(struct Message *m)
 
 		case ADDLINK:
 			// actions sur graphe
-			n1 = agfindnode(graph, m->node1);		
-			printf("n1\n");	
-			n2 = agfindnode(graph, m->node2);
-			printf("n2\n");	
-			graph__addEdge(graph, n1, n2, mess__getWeight(m));
+
+			graph__addEdge(graph, agfindnode(graph, m->node1), agfindnode(graph, m->node2), mess__getWeight(m));
 			//actions sur réseau
 
 			//affichage
