@@ -1,7 +1,7 @@
 #include "prompt.h"
 #include "messages.h"
 
-#include <stdio.h>
+#include <stdio.h>/*
 int main(void)
 {
 	pthread_t* prompt_th = prompt__start(NULL);
@@ -15,3 +15,4 @@ int main(void)
 	pthread_join(*prompt_th, NULL);
 
 }
+*/
