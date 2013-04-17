@@ -5,7 +5,9 @@
 \usepackage[utf8]{inputenc}
 \usepackage[francais]{babel}
 \usepackage[T1]{fontenc}
-%\usepackage{tikz-uml}
+\usepackage{tikz}
+\usepackage{tikz-uml}
+\usepackage{gantt}
 \usepackage{relsize}
 \usepackage{color}
 \definecolor{dkgreen}{rgb}{0,0.6,0}
@@ -19,23 +21,23 @@
 \usepackage{graphicx}
 
 \lstset{
-language=C++,
-basicstyle=\footnotesize,
-backgroundcolor=\color{white},
-keywordstyle=\color{red},
-commentstyle=\color{dkgreen},
-stringstyle=\color{mauve},
-numberstyle=\color{red},
-morekeywords={string},
-frame=BL,
-aboveskip=1em,
-belowskip=2em,
+  language=C++,
+  basicstyle=\footnotesize,
+  backgroundcolor=\color{white},
+  keywordstyle=\color{red},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  numberstyle=\color{red},
+  morekeywords={string},
+  frame=BL,
+  aboveskip=1em,
+  belowskip=2em,
 }
 \lstset{
   literate={ù}{{\`u}}1
-           {é}{{\'e}}1
-           {è}{{\'e}}1
-           {à}{{\`a}}1
+  {é}{{\'e}}1
+  {è}{{\'e}}1
+  {à}{{\`a}}1
 }
 
 
@@ -52,7 +54,7 @@ belowskip=2em,
 \pagestyle{fancy}
 \rhead{RE203 - Projet de Réseau}
 
-%\acrodef{LABRI}{Laboratoire Bordelais de Recherche en Informatique}
+% \acrodef{LABRI}{Laboratoire Bordelais de Recherche en Informatique}
 
 \begin{document}
 
@@ -74,13 +76,6 @@ belowskip=2em,
 
 \clearpage
 
-% Etat d'avancement
-% Architecture générale
-% Diagramme de séquence des communications
-%  => contrôleur <-> routeur
-%  => routeur <-> routeur
-% Diagramme de Gant
-
 \section*{Introduction}
 
 L'objectif du projet est de réaliser un programme capable de simuler un réseau. Il se base sur deux composantes principales: les routeurs et le contrôleur. Le résultat final devra se présenter sous la forme de deux programmes distincts, car ceux-ci ne communiqueront que par le réseau, de sorte que leur code source ne doit pas influencer. Pour ce faire, il a été imposé de développer en utilisant deux langages distincts, le langage C, ainsi qu'un langage orienté objet. D'un commun accord au sein du groupe, c'est le langage C++ qui a été choisi pour coder les routeurs, tandis que le C servira à la réalisation du contrôleur.
@@ -99,9 +94,9 @@ Il faut cependant noter que son rôle est purement théorique, puisque dans la p
 
 Plusieurs modules distincts composent le contrôleur, chacun ayant ses propres besoins en matière de structures de données:
 \begin{itemize}
-  \item une invite de commande pour communiquer avec l'utilisateur et afficher les résultats des différentes requêtes entre lui et les routeurs;
-  \item la gestion du réseau sous forme d'un graphe initialisé à partir d'un fichier au format \textit{dot}\footnote{http://www.graphviz.org/content/dot-language};
-  \item un moyen de communiquer via le réseau avec les routeurs.
+\item une invite de commande pour communiquer avec l'utilisateur et afficher les résultats des différentes requêtes entre lui et les routeurs;
+\item la gestion du réseau sous forme d'un graphe initialisé à partir d'un fichier au format \textit{dot}\footnote{http://www.graphviz.org/content/dot-language};
+\item un moyen de communiquer via le réseau avec les routeurs.
 \end{itemize}
 
 La communication sur le réseau se fait à l'aide de la bibliothèque C \texttt{sys/socket.h}, complète et largement utilisée. La gestion des graphes, quant à elle, utilise la bibliothèque C \texttt{graphviz/graph.h} fournie avec l'ensemble d'outils \textit{Graphviz}. Le principal avantage est qu'elle permet très facilement le passage d'un fichier au format \textit{it} à une structure de graphe, et inversement.
@@ -123,9 +118,9 @@ Les routeurs du projet simulent les routeurs d'un réseau réels. La principale 
 
 De même que le contrôleur, le programme du routeur se décompose en plusieurs parties distinctes:
 \begin{itemize}
-  \item une invite de commande pour afficher le résultat des échanges avec le contrôleur et les autres routeurs, ainsi que pour communiquer avec l'utilisateur;
-  \item la gestion de leur table de routage;
-  \item un moyen de communiquer via le réseau avec le contrôleur et les routeurs voisins.
+\item une invite de commande pour afficher le résultat des échanges avec le contrôleur et les autres routeurs, ainsi que pour communiquer avec l'utilisateur;
+\item la gestion de leur table de routage;
+\item un moyen de communiquer via le réseau avec le contrôleur et les routeurs voisins.
 \end{itemize}
 
 Pour des raisons d'optimisation en complexité, la table de routage est implémentée à l'aide de la classe \texttt{map} de la bibliothèque C++ standard.
@@ -136,7 +131,35 @@ Pour des raisons d'optimisation en complexité, la table de routage est impléme
 
 \section{Fonctionnement}
 
+% Diagramme de séquence des communications
+% => contrôleur <-> routeur
+% => routeur <-> routeur
+
 \section{Nos objectifs pour la suite du projet}
+
+\begin{gantt}{10}{9}
+  \begin{ganttitle}
+    \numtitle{1}{1}{9}{1}
+  \end{ganttitle}
+  \ganttbar{Définition de l'architecture générale}{0}{1}
+  \ganttbar{Mise en place des sockets}{1}{3}
+  \ganttbar{Gestion des graphes}{1}{2}
+  \ganttbar{Prompt}{1}{2}
+  \ganttbar{Messages}{2}{1}
+  \ganttbar{Tests}{4}{1}
+  \ganttbar{Contrôleur}{5}{2}
+  \ganttbar{Routeur}{6}{2}
+  \ganttbar{Tests}{8}{1}
+
+  % \ganttbarcon{another consecutive task}{8}{2}
+  % \ganttmilestone[color=cyan]{Milestone with color!}{4}
+  % \ganttbar{another task}{2}{2}
+  % \ganttbar[color=cyan]{another coloured task}{4}{4}
+  % \ganttbar{another task}{4}{2}
+  % \ganttcon{4}{5}{4}{7}
+  % \ganttmilestonecon{A connected Milestone}{7}
+  % \ganttbarcon{another consecutive task}{8}{2}
+\end{gantt}
 
 
 \end{document}
