@@ -10,6 +10,11 @@
 #include <stdio.h>
 int main(void)
 {
+
+    aginit();
+	Agraph_t * graph = graph__open("topo.dot");
+
+
 	pthread_t* prompt_th = prompt__start(exec__prompt_message);
 
 /*
@@ -17,9 +22,10 @@ int main(void)
 	char* bidule = mess__escape(origin);
 	char* chose = mess__unescape(bidule);
 
-	printf("\n\noriginal: %s\néchappé: %s\noriginal: %s\n", origin, bidule, chose);*/
+	printf("\n\noriginal: %s\néchappé: %s\noriginal: %s\n", origin, bidule, chose);
+*/
 	pthread_join(*prompt_th, NULL);
 
-	//Agraph_t * graph = graph__open("topo.txt");
+
 
 }
