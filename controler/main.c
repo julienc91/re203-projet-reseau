@@ -1,13 +1,25 @@
-#include <stdio.h>
 #include <graphviz/types.h>
 #include <graphviz/graph.h>
 #include "graph_.h"
 
-//#include <graphviz/gvc.h>
-//#include <agraph.h>
 
-int main(int argc, char * argv[]){
-    Agraph_t * graph = graph__open("topo.txt");
+#include "../common/prompt.h"
+#include "../common/messages.h"
+#include "exec.h"
 
-    return 1;
+#include <stdio.h>
+int main(void)
+{
+	pthread_t* prompt_th = prompt__start(exec__prompt_message);
+
+/*
+	char* origin = "j'aim\\e b\\ien\\* les\\\\ copains \\ 7 * 3*";
+	char* bidule = mess__escape(origin);
+	char* chose = mess__unescape(bidule);
+
+	printf("\n\noriginal: %s\néchappé: %s\noriginal: %s\n", origin, bidule, chose);*/
+	pthread_join(*prompt_th, NULL);
+
+	//Agraph_t * graph = graph__open("topo.txt");
+
 }

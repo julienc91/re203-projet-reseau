@@ -3,8 +3,6 @@
 #include <graphviz/graph.h>
 #include "graph_.h"
 
-
-
 Agraph_t* graph__open(char * filename){
     FILE * fd = fopen(filename, "r");
     Agraph_t * g = agread(fd);
