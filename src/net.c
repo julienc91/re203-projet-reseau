@@ -1,4 +1,4 @@
-#include "net.h"
+#include "../src/net.h"
 
 #include <stdio.h>
 #include <stdlib.h>
