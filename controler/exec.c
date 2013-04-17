@@ -87,7 +87,7 @@ void exec__prompt_message(struct Message *m)
 			break;
 
 		default:
-			printf("ERREUR: Action non reconnue");
+			printf("ERREUR: Action non reconnue\n");
 			break;
 	}
 }
@@ -124,7 +124,7 @@ void exec__sock_message(struct Message *m, Agraph_t *graph)
 			break;
 
 		default:
-			printf("ERREUR: Action non reconnue");
+			printf("ERREUR: Action non reconnue\n");
 			break;
 	}
 }

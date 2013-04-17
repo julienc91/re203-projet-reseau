@@ -2,7 +2,6 @@
 //~ #include <graphviz/graph.h>
 #include "graph_.h"
 
-
 #include "../common/prompt.h"
 #include "../common/messages.h"
 #include "exec.h"
