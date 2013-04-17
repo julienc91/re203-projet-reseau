@@ -1,3 +1,6 @@
+#ifndef __MESSAGES_H_
+#define __MESSAGES_H_
+
 #include <stddef.h>
 
 enum Acceptance
@@ -73,3 +76,4 @@ int mess__getWeight(struct Message* mess);
 
 
 void mess__debug(struct Message* m);
+#endif
