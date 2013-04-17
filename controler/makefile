@@ -3,6 +3,8 @@ OBJ= $(SRC:.c=.o)
 COMMONOBJ = prompt.o messages.o
 all: common controler
 
+
+
 trex.o: ../trex/trex.c
 	$(CC) -o $@ -c $< $(CFLAGS)
 

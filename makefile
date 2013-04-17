@@ -1,5 +1,5 @@
 export CFLAGS= -g -std=c99
-export LDFLAGS=-lpthread
+export LDFLAGS=-lpthread -lgraph -lcdt
 export CC=gcc
 
 SRCA=$(wildcard common/*.c)
