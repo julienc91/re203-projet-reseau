@@ -3,7 +3,7 @@ void exec__prompt_message(struct Message* m)
 {
 	if(m == NULL)
 	{
-		return 0;
+		return;
 	}
 
 	switch(m->type)

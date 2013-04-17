@@ -382,22 +382,29 @@ int main(int argc, char * argv[])
 
 void mess__debug(struct Message* m)
 {
-	printf("Message: %d %d %d\n", m->type, m->n_parameter, m->accept);
+	if(m != NULL)
+	{
+		printf("Message: %d %d %d\n", m->type, m->n_parameter, m->accept);
 
-	if(m->s_parameter != NULL)
-	{
-		printf("s_param: %s\n", m->s_parameter);
-	}
-	if(m->node1 != NULL)
-	{
-		printf("node1: %s\n", m->node1);
-	}
-	if(m->node2 != NULL)
-	{
-		printf("node2: %s\n", m->node2);
-	}
+		if(m->s_parameter != NULL)
+		{
+			printf("s_param: %s\n", m->s_parameter);
+		}
+		if(m->node1 != NULL)
+		{
+			printf("node1: %s\n", m->node1);
+		}
+		if(m->node2 != NULL)
+		{
+			printf("node2: %s\n", m->node2);
+		}
 
-	printf("\n\n");
+		printf("\n\n");
+	}
+	else
+	{
+		printf("MESSAGE NUL RECU\n");
+	}
 }
 
 //*///*/*/*////*/

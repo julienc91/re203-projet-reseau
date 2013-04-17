@@ -1,7 +1,14 @@
+export CFLAGS= -g -std=c99
+export LDFLAGS=-lpthread -lgraph -lcdt
+export CC=gcc
+
+
 SRC= $(wildcard *.c)
 OBJ= $(SRC:.c=.o)
 COMMONOBJ = prompt.o messages.o
 all: common controler
+
+
 
 trex.o: ../trex/trex.c
 	$(CC) -o $@ -c $< $(CFLAGS)
