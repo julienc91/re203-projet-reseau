@@ -1,0 +1,119 @@
+\documentclass[a4paper,11pt]{article}
+
+
+\usepackage{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[francais]{babel}
+\usepackage[T1]{fontenc}
+%\usepackage{tikz-uml}
+\usepackage{relsize}
+\usepackage{color}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\usepackage{listings}
+\usepackage{float}
+\usepackage{kpfonts}
+
+\usepackage{graphicx}
+
+\lstset{
+language=C++,
+basicstyle=\footnotesize,
+backgroundcolor=\color{white},
+keywordstyle=\color{red},
+commentstyle=\color{dkgreen},
+stringstyle=\color{mauve},
+numberstyle=\color{red},
+morekeywords={string},
+frame=BL,
+aboveskip=1em,
+belowskip=2em,
+}
+\lstset{
+  literate={ù}{{\`u}}1
+           {é}{{\'e}}1
+           {è}{{\'e}}1
+           {à}{{\`a}}1
+}
+
+
+\lstdefinelanguage{tikzuml}{language=[LaTeX]TeX, classoffset=0, morekeywords={umlbasiccomponent, umlprovidedinterface, umlrequiredinterface, umldelegateconnector, umlassemblyconnector, umlVHVassemblyconnector, umlHVHassemblyconnector, umlnote, umlusecase, umlactor, umlinherit, umlassoc, umlVHextend, umlinclude, umlstateinitial, umlbasicstate, umltrans, umlstatefinal, umlVHtrans, umlHVtrans, umldatabase, umlmulti, umlobject, umlfpart, umlcreatecall, umlclass, umlvirt, umlunicompo, umlimport, umlaggreg}, classoffset=1, morekeywords={umlcomponent, umlsystem, umlstate, umlseqdiag, umlcall, umlcallself, umlfragment, umlpackage}, classoffset=0,  sensitive=true, morecomment=[l]{\%}}
+
+\geometry{margin=2.5cm}
+\geometry{headheight=15pt}
+
+\usepackage{fancyhdr}
+\usepackage{fancyvrb}
+\usepackage{float}
+\usepackage[footnote,smaller]{acronym}
+
+\pagestyle{fancy}
+\rhead{RE203 - Projet de Réseau}
+
+%\acrodef{LABRI}{Laboratoire Bordelais de Recherche en Informatique}
+
+\begin{document}
+
+\begin{titlepage}
+  \begin{center}
+
+    \textsc{\LARGE RE203 - Projet de Réseau}\\[2cm]
+    \textsc{\large Rapport Intermédiaire}\\[3cm]
+    Maxime \textsc{Bellier} \ \ \ Jean-Michaël \textsc{Celerier}\\
+    Julien \textsc{Chaumont} \ \ \ Bazire \textsc{Houssin} \ \ \ Sylvain \textsc{Vaglica}\\[1cm]
+    \textsc{Groupe 3}\\[1.5cm]
+    \textsc{\large 23/04/2013 }\\[1.5cm]
+    \includegraphics[width=8cm]{logo.png}
+
+  \end{center}
+  \vspace{3cm}
+
+\end{titlepage}
+
+\clearpage
+
+\section*{Introduction}
+
+L'objectif du projet est de réaliser un programme capable de simuler un réseau. Il se base sur deux composantes principales: les routeurs et le contrôleur. Le résultat final devra se présenter sous la forme de deux programmes distincts, car ceux-ci ne communiqueront que par le réseau, de sorte que leur code source ne doit pas influencer. Pour ce faire, il a été imposé de développer en utilisant deux langages distincts, le langage C, ainsi qu'un langage orienté objet. D'un commun accord au sein du groupe, c'est le langage C++ qui a été choisi pour coder les routeurs, tandis que le C servira à la réalisation du contrôleur.
+
+Contrôleur et routeurs, ainsi que l'état d'avancement de leur implémentation, seront détaillés dans la suite de ce premier rapport.
+
+\section{Le contrôleur}
+
+\subsection{Son rôle}
+
+Le contrôleur, comme son nom l'indique, a pour mission du superviser l'intégralité du réseau. C'est à lui de l'initialiser, à partir d'une topologie donnée par l'utilisateur, et de maintenir la communication avec les routeurs pour mettre à jour ses informations et les transmettre.
+
+Il faut cependant noter que son rôle est purement théorique, puisque dans la plupart des réseaux réels, ce sont aux routeurs de communiquer entre eux pour mettre à jour leurs connaissances sur le réseau. Dans le cadre du projet, cette mise à jour des connaissances des routeurs se fait justement auprès du contrôleur qui, lui, doit avoir la connaissance de la totalité du réseau. Pour ce faire, les routeurs se connectant ou se déconnectant du réseau doivent se signaler auprès du contrôleur avant d'effectuer l'action.
+
+\subsection{Structure}
+
+Plusieurs modules distincts composent le contrôleur, chacun ayant ses propres besoins en matière de structures de données:
+\begin{itemize}
+  \item une invite de commande pour communiquer avec l'utilisateur et afficher les résultats des différentes requêtes entre lui et les routeurs;
+  \item la gestion du réseau sous forme d'un graphe initialisé à partir d'un fichier au format \textit{dot}\footnote{http://www.graphviz.org/content/dot-language};
+  \item un moyen de communiquer via le réseau avec les routeurs.
+\end{itemize}
+
+La communication sur le réseau se fait à l'aide de la bibliothèque C \texttt{sys/socket.h}, complète et largement utilisée. La gestion des graphes, quant à elle, utilise la bibliothèque C \texttt{graphviz/graph.h} fournie avec l'ensemble d'outils \textit{Graphviz}. Le principal avantage est qu'elle permet très facilement le passage d'un fichier au format \textit{it} à une structure de graphe, et inversement.
+
+\subsection{Implémentation}
+
+
+
+\section{Les routeurs}
+
+\subsection{Leur rôle}
+
+Les routeurs du projet simulent les routeurs d'un réseau réels. La principale différence est la connexion permanente qu'ils doivent maintenir avec le contrôleur. Leurs connaissances sur leur partie du réseau sont régulièrement actualisées par un appel de mise à jour au contrôleur. Parallèlement, ils sont connectés à leurs voisins et maintiennent une table de routage interne.
+
+\subsection{Implémentation}
+
+
+
+\section{Nos objectifs pour la suite du projet}
+
+
+\end{document}
