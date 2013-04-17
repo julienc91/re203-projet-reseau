@@ -23,13 +23,23 @@ int graph__save(Agraph_t * graph, char * filename){
     int i = agwrite(graph, f);
     fclose(f);
     return i;
-
-
 }
 
-void graph__setWeight(Agraph_t* graph, Agedge_t* edge, int weight);
-int graph__getWeight(Agraph_t* graph, Agedge_t* edge);
+void graph__setWeight(Agraph_t* graph, Agedge_t* edge, int weight){
+    edge->u->weight = weight;
+}
 
-void graph__addEdge(Agraph_t* graph, Agnode_t* n1, Agnode_t* n2, int weight);
-void graph__removeEdge(Agraph_t* graph, Agedge_t* edge);
+int graph__getWeight(Agraph_t* graph, Agedge_t* edge){
+    return edge->u->weight;
+}
+
+
+void graph__addEdge(Agraph_t* graph, Agnode_t* n1, Agnode_t* n2, int weight){
+    Aedge_t *e = agedge(graph, n1, n2);
+    e->u->weight = weight;
+}
+
+int graph__removeEdge(Agraph_t* graph, Agedge_t* edge){
+    return agdelete(graph, (void *)edge);
+}
 
