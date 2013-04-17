@@ -74,6 +74,13 @@ belowskip=2em,
 
 \clearpage
 
+% Etat d'avancement
+% Architecture générale
+% Diagramme de séquence des communications
+%  => contrôleur <-> routeur
+%  => routeur <-> routeur
+% Diagramme de Gant
+
 \section*{Introduction}
 
 L'objectif du projet est de réaliser un programme capable de simuler un réseau. Il se base sur deux composantes principales: les routeurs et le contrôleur. Le résultat final devra se présenter sous la forme de deux programmes distincts, car ceux-ci ne communiqueront que par le réseau, de sorte que leur code source ne doit pas influencer. Pour ce faire, il a été imposé de développer en utilisant deux langages distincts, le langage C, ainsi qu'un langage orienté objet. D'un commun accord au sein du groupe, c'est le langage C++ qui a été choisi pour coder les routeurs, tandis que le C servira à la réalisation du contrôleur.
@@ -99,9 +106,12 @@ Plusieurs modules distincts composent le contrôleur, chacun ayant ses propres b
 
 La communication sur le réseau se fait à l'aide de la bibliothèque C \texttt{sys/socket.h}, complète et largement utilisée. La gestion des graphes, quant à elle, utilise la bibliothèque C \texttt{graphviz/graph.h} fournie avec l'ensemble d'outils \textit{Graphviz}. Le principal avantage est qu'elle permet très facilement le passage d'un fichier au format \textit{it} à une structure de graphe, et inversement.
 
+Plus bas niveau, afin d'améliorer la complexité générale du programme, des tables de hachage sont utilisées. A cet effet, la bibliothèque C standard ne contenant pas de telle structure de données, l'implémentation utilisée se base sur une bibliothque C tierce publiée sous licence GPL\footnote{Le code source est consultable à cette adresse: \texttt{https://github.com/ankurs/Hash-Table/}}. Leur utilisation sera détaillée dans la partie \ref{implementation_controleur}.
+
 \subsection{Implémentation}
+\label{implementation_controleur}
 
-
+\subsection{Etat actuel de l'avancement}
 
 \section{Les routeurs}
 
@@ -109,9 +119,22 @@ La communication sur le réseau se fait à l'aide de la bibliothèque C \texttt{
 
 Les routeurs du projet simulent les routeurs d'un réseau réels. La principale différence est la connexion permanente qu'ils doivent maintenir avec le contrôleur. Leurs connaissances sur leur partie du réseau sont régulièrement actualisées par un appel de mise à jour au contrôleur. Parallèlement, ils sont connectés à leurs voisins et maintiennent une table de routage interne.
 
+\subsection{Structure}
+
+De même que le contrôleur, le programme du routeur se décompose en plusieurs parties distinctes:
+\begin{itemize}
+  \item une invite de commande pour afficher le résultat des échanges avec le contrôleur et les autres routeurs, ainsi que pour communiquer avec l'utilisateur;
+  \item la gestion de leur table de routage;
+  \item un moyen de communiquer via le réseau avec le contrôleur et les routeurs voisins.
+\end{itemize}
+
+Pour des raisons d'optimisation en complexité, la table de routage est implémentée à l'aide de la classe \texttt{map} de la bibliothèque C++ standard.
+
 \subsection{Implémentation}
 
+\subsection{Etat actuel de l'avancement}
 
+\section{Fonctionnement}
 
 \section{Nos objectifs pour la suite du projet}
 
