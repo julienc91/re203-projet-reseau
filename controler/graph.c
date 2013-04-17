@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <graphviz/types.h>
-#include <graphviz/graph.h>
+//~ #include <graphviz/types.h>
+//~ #include <graphviz/graph.h>
 #include "graph_.h"
 
 Agraph_t* graph__open(char * filename){
@@ -11,8 +11,6 @@ Agraph_t* graph__open(char * filename){
     }
 
     Agraph_t * g = agread(fd);
-
-
     fclose(fd);
 
     return g;
