@@ -1,0 +1,4 @@
+*.o
+common/common
+controler/controler
+router/router

@@ -53,7 +53,7 @@ hash_table_t * hash_table_new(hash_table_mode_t mode)
 {
     INFO("Creating a new hash table");
     hash_table_t *table = calloc(1, hash_table_s);
-    if (!table) 
+    if (!table)
     {
         INFO("No Memory while allocating hash_table");
         return NULL;
@@ -255,7 +255,7 @@ int hash_table_remove(hash_table_t * table, void * key, size_t key_len)
                 }
                 hash_table_element_delete(table, temp);
                 INFO("Deleted a key-value pair from the hash table");
-                table->key_count--;                
+                table->key_count--;
                 return 0;
             }
             prev=temp;
@@ -304,7 +304,7 @@ void * hash_table_lookup(hash_table_t * table, void * key, size_t key_len)
         }
     }
     LOG("Key not found at hash %d", (int)hash);
-    return NULL; // key not found   
+    return NULL; // key not found
 }
 
 /**
@@ -341,14 +341,14 @@ int hash_table_has_key(hash_table_t * table, void * key, size_t key_len)
         }
     }
     LOG("Key not found with hash -> %d", (int)hash);
-    return 0; // key not found   
+    return 0; // key not found
 }
 
 /**
  * Function to return all the keys in a given hash table
  * @param table hash table from which key are to be reterived
  * @param keys a void** pointer where keys are filled in (memory allocated internally and must be freed)
- * @return total number of keys filled in keys 
+ * @return total number of keys filled in keys
  */
 size_t hash_table_get_keys(hash_table_t * table, void ** keys)
 {
@@ -374,7 +374,7 @@ size_t hash_table_get_keys(hash_table_t * table, void ** keys)
             }
             #ifdef DEBUG
             LOG("found %d key(s) at hash -> %d", (int)num, (int)i);
-            #endif 
+            #endif
         }
     }
     return count;
@@ -384,15 +384,15 @@ size_t hash_table_get_keys(hash_table_t * table, void ** keys)
  * Function to get all elements (key - value pairs) from the given hash table
  * @param table hash table from which elements have to be retrieved
  * @param elements a pointer to an array of hash_table_element_t pointer (malloced by function)
- * @returns 1 when no memory 
- * @returns count of elements 
+ * @returns 1 when no memory
+ * @returns count of elements
  */
 size_t hash_table_get_elements(hash_table_t * table, hash_table_element_t *** elements)
 {
     size_t i = 0;
     size_t count = 0;
     (*elements) = (hash_table_element_t **) calloc(table->key_count, sizeof(hash_table_element_t *));
-    if (!*elements) 
+    if (!*elements)
     {
         INFO("No Memory to allocate elements array");
         return 1;
@@ -416,7 +416,7 @@ size_t hash_table_get_elements(hash_table_t * table, hash_table_element_t *** el
             }
             #ifdef DEBUG
             LOG("found %d key(s) at hash -> %d", (int)num, (int)i);
-            #endif 
+            #endif
         }
     }
     return count;
@@ -426,7 +426,7 @@ size_t hash_table_get_elements(hash_table_t * table, hash_table_element_t *** el
  * Function that returns a hash value for a given key and key_len
  * @param key pointer to the key
  * @param key_len length of the key
- * @param max_key max value of the hash to be returned by the function 
+ * @param max_key max value of the hash to be returned by the function
  * @returns hash value belonging to [0, max_key)
  */
 uint16_t hash_table_do_hash(void * key, size_t key_len, uint16_t max_key)
@@ -458,7 +458,7 @@ int hash_table_resize(hash_table_t *table, size_t len)
     size_t count;
     // FIXME traversing the elements twice, change it some time soon
     count = hash_table_get_elements(table, &elements);
-    if (!count) 
+    if (!count)
     {
         INFO("Got No Elements from the hash table");
         return -1;
