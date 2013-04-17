@@ -50,8 +50,9 @@ typedef void (*message_event_function)    (network *, Client *, char *);
 
 /* * * * network * * * */
 struct network_s{
+  short status; // opened / closed
   SOCKET server;
-  unsigned int max;              // max socket id (cf. select)
+  int max;              // max socket id (cf. select)
   Client *clients;               // array of clients
   unsigned int nb_clients;       // index for the array
   //unsigned int allocated_clients;
@@ -64,15 +65,22 @@ struct network_s{
 };
 
 /* * * * windows compatibility * * * */
-static void init(void);
-static void end(void);
+void init(void);
+void end(void);
 
 /* * * * public functions * * * */
-static network *network_open   (unsigned int port);
-static void     network_close  (network *net);
-static void     network_update (network *net);
-static Client  *network_connect(network *net, 
-				const char *address,
-				const unsigned int port);
-static void     network_send   (Client *, const char *message);
+network *network_open       (unsigned int port);
+void     network_close      (network *net);
+int      network_is_opened  (network *net);
+void     network_free       (network *net);
+void     network_update     (network *net);
+Client  *network_connect    (network *net, 
+			     const char *address,
+			     const unsigned int port);
+void     network_disconnect (network *net, Client *c);
+void     network_send       (Client *, const char *message);
+void     network_broadcast  (network *net, const char *message);
+
+int      client_compare     (Client *a, Client *b);
+
 #endif

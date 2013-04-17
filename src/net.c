@@ -5,7 +5,8 @@
 #include <errno.h>
 #include <string.h>
 
-
+#define NETWORK_OPENED 1
+#define NETWORK_CLOSED 0
 
 /* private functions */
 
@@ -14,15 +15,15 @@ static int     init_server_connection (unsigned int port);
 static int     init_client_connection (const char *address, const unsigned int port);
 static int     read_client            (SOCKET sock, char *buffer);
 static void    write_client           (SOCKET sock, const char *buffer);
-static void    broadcast              (Client *clients, Client client,int actual,
-				       const char *buffer, char from_server);
 static Client *add_client             (network *net, Client *c);
-static void    remove_client          (Client *clients, int to_remove, int *actual);
+static int     get_client_id          (network *net, Client *c);
+static void    remove_client          (network *net, Client *c);
+void           broadcast              (Client *clients, Client client,int actual,
+				       const char *buffer, char from_server);
 
 /* * * * * * * * * * */
 
-
-static void init(void)
+void init(void)
 {
 #ifdef WIN32
   WSADATA wsa;
@@ -36,7 +37,7 @@ static void init(void)
 }
 
 
-static void end(void)
+void end(void)
 {
 #ifdef WIN32
   WSACleanup();
@@ -45,26 +46,39 @@ static void end(void)
 
 
 
-static network *network_open(unsigned int port){
+network *network_open(unsigned int port){
   network *net = malloc(sizeof(*net));
   
+  net->status = NETWORK_OPENED;
   net->server = init_server_connection(port);
   net->nb_clients = 0;
   net->max = net->server;
   net->clients = malloc(sizeof(*(net->clients)) * NB_CLIENTS);
+
+  return net;
 }
 
-static void network_close(network *net){
+void network_close(network *net){
   closesocket(net->server);
-  int i = 0;
+  unsigned int i = 0;
   for(i = 0; i < net->nb_clients; i++){
     closesocket(net->clients[i].sock);
   }
+ 
+  net->status = NETWORK_CLOSED;
+}
+
+int network_is_opened (network *net){
+  return (net->status == NETWORK_OPENED);
+}
+
+void network_free(network *net){
+  if (network_is_opened(net)) network_close(net);
   free(net->clients);
   free(net);
 }
 
-static Client *network_connect(network *net, const char *address, const unsigned int port){
+Client *network_connect(network *net, const char *address, const unsigned int port){
   Client c;
   c.sock = init_client_connection(address, port);
 
@@ -72,13 +86,29 @@ static Client *network_connect(network *net, const char *address, const unsigned
   return add_client(net, &c);
 }
 
-static void network_send(Client *c, const char *message){
+void network_disconnect (network *net, Client *c){
+  // close socket
+  closesocket(c->sock);
+  // update array
+  remove_client(net, c);
+}
+
+void network_send(Client *c, const char *message){
   write_client (c->sock, message);
 }
 
+void network_broadcast  (network *net, const char *message){
+  unsigned int i;
+  for (i = 0; i < net->nb_clients; i++){
+    network_send(&(net->clients[i]), message);
+  }
+}
 
 
-static void network_update(network *net){
+void network_update(network *net){
+  if (net == NULL) return;
+  if (!network_is_opened(net)) return;
+
   char buffer[BUF_SIZE];
 
   fd_set rdfs;
@@ -91,98 +121,82 @@ static void network_update(network *net){
   FD_SET(net->server, &rdfs);
 
   /* add socket of each client */
-  int i;
-  for(i = 0; i < net->nb_clients; i++)
-    {
-      FD_SET(net->clients[i].sock, &rdfs);
-    }
+  unsigned int i;
+  for(i = 0; i < net->nb_clients; i++){
+    FD_SET(net->clients[i].sock, &rdfs);
+  }
 
-  if(select(net->max + 1, &rdfs, NULL, NULL, NULL) == -1)
-    {
-      perror("select()");
-      exit(errno);
-    }
+  if(select(net->max + 1, &rdfs, NULL, NULL, NULL) == -1){
+    perror("select()");
+    exit(errno);
+  }
 
   /* something from standard input : i.e keyboard */
-  if(FD_ISSET(STDIN_FILENO, &rdfs))
-    {
-      int c;
-      char *buf = buffer;
-      while ((c = getchar()) != '\n' && c != EOF){*(buf++) = c;}
-      *buf = '\0';
-      net->input_event(net, buffer);
-      fflush(stdin); // force flush
+  if(FD_ISSET(STDIN_FILENO, &rdfs)){
+    int c;
+    char *buf = buffer;
+    while ((c = getchar()) != '\n' && c != EOF){*(buf++) = c;}
+    *buf = '\0';
+    net->input_event(net, buffer);
+    fflush(stdin); // force flush
 
-      /* stop process when type on keyboard */
+    /* stop process when type on keyboard */
+    return;
+  }
+  else if(FD_ISSET(net->server, &rdfs)){
+    /* new client */
+    SOCKADDR_IN csin = { 0 };
+    size_t sinsize = sizeof csin;
+    int csock = accept(net->server, (SOCKADDR *)&csin, (socklen_t *)&sinsize);
+    if(csock == SOCKET_ERROR){
+      perror("accept()");
       return;
     }
-  else if(FD_ISSET(net->server, &rdfs))
-    {
-      /* new client */
-      SOCKADDR_IN csin = { 0 };
-      size_t sinsize = sizeof csin;
-      int csock = accept(net->server, (SOCKADDR *)&csin, (socklen_t *)&sinsize);
-      if(csock == SOCKET_ERROR)
-	{
-	  perror("accept()");
-	  return;
-	}
 
-      /* after connecting the client sends something */
-      if(read_client(csock, buffer) == -1)
-	{
-	  /* disconnected */
-	  return;
-	}
-
-      Client c;
-      c.sock = csock;
-
-      // TODO : traiter la connexion du client
-      /* printf("New client connected : %s\n", buffer); */
-      /* strncpy(c.name, buffer, BUF_SIZE - 1); */
-      net->connection_event(net, &c, buffer);
-
-      add_client(net, &c);
-      FD_SET(csock, &rdfs);
+    /* after connecting the client sends something */
+    if(read_client(csock, buffer) == -1){
+      /* disconnected */
+      return;
     }
-  else
-    {
-      int i;
-      for(i = 0; i < net->nb_clients; i++)
-	{
-	  /* a client is talking */
-	  if(FD_ISSET(net->clients[i].sock, &rdfs))
-            {
-	      Client client = net->clients[i];
-	      int c = read_client(client.sock, buffer);
-	      /* client disconnected */
-	      if(c == 0)
-		{
-		  /* gérer la déconnexion d'un client */
-                  /* strncpy(buffer, client.name, BUF_SIZE - 1); */
-                  /* strncat(buffer, " disconnected !", BUF_SIZE - strlen(buffer) - 1); */
-                  //broadcast(clients, client, actual, buffer, 1);
-		  net->disconnection_event(net, &client);
 
-		  // close socket
-                  closesocket(client.sock);
-		  // update array
-                  remove_client(net->clients, i, &(net->nb_clients));
+    Client c;
+    c.sock = csock;
 
-		}
-	      else
-		{
-		  /* gérer la réception du message */
-		  //broadcast(clients, client, actual, buffer, 0);
-		  net->message_event(net, &client, buffer);
-		}
-	      break;
-            }
+    // client connection
+    net->connection_event(net, &c, buffer);
+
+    add_client(net, &c);
+    FD_SET(csock, &rdfs);
+  }
+  else{
+    unsigned int i;
+    for(i = 0; i < net->nb_clients; i++){
+      /* a client is talking */
+      if(FD_ISSET(net->clients[i].sock, &rdfs)){
+	Client client = net->clients[i];
+	int c = read_client(client.sock, buffer);
+	/* client disconnected */
+	if(c == 0){
+	  net->disconnection_event(net, &client);
+	  network_disconnect(net, &client);
 	}
+	else{
+	  /* message received */
+	  net->message_event(net, &client, buffer);
+	}
+	break;
+      }
     }
+  }
 }
 
+static int get_client_id (network *net, Client *c){
+  unsigned int i;
+  for (i = 0; i < net->nb_clients; i++){
+    if (client_compare(c, &(net->clients[i]))) return i;
+  }
+  return -1;
+}
 
 static Client *add_client(network *net, Client *c){
   /* what is the new maximum fd ? */
@@ -194,16 +208,22 @@ static Client *add_client(network *net, Client *c){
   return &(net->clients[net->nb_clients - 1]);
 }
 
-static void remove_client(Client *clients, int to_remove, int *actual)
-{
-  /* we remove the client in the array */
-  memmove(clients + to_remove, clients + to_remove + 1, (*actual - to_remove - 1) * sizeof(Client));
-  /* number client - 1 */
-  (*actual)--;
+static void remove_client(network *net, Client *c){
+  // get client id
+  int to_remove = get_client_id(net, c);
+  if (to_remove < 0){
+    fprintf(stderr, "Error: remove_client\n");
+    return;
+  }
+
+  // free memory
+  memmove(net->clients + to_remove, net->clients + to_remove + 1, (net->nb_clients - to_remove - 1) * sizeof(Client));
+ 
+  // change nb of clients
+  (net->nb_clients)--;
 }
 
-static void broadcast(Client *clients, Client sender, int actual, const char *buffer, char from_server)
-{
+void broadcast(Client *clients, Client sender, int actual, const char *buffer, char from_server){
   int i = 0;
   char message[BUF_SIZE];
   message[0] = 0;
@@ -223,7 +243,7 @@ static void broadcast(Client *clients, Client sender, int actual, const char *bu
     }
 }
 
-static int init_server_connection(unsigned int port)
+int init_server_connection(unsigned int port)
 {
   SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
   SOCKADDR_IN sin = { 0 };
@@ -255,38 +275,37 @@ static int init_server_connection(unsigned int port)
 
 static int init_client_connection(const char *address, const unsigned int port)
 {
-   SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
-   printf("sock == %d\n", sock);
-   SOCKADDR_IN sin = { 0 };
-   struct hostent *hostinfo;
+  SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
+  SOCKADDR_IN sin = { 0 };
+  struct hostent *hostinfo;
 
-   if(sock == INVALID_SOCKET)
-   {
+  if(sock == INVALID_SOCKET)
+    {
       perror("socket()");
       //exit (errno);
       return CONNECTION_ERROR;
-   }
+    }
 
-   hostinfo = gethostbyname(address);
-   if (hostinfo == NULL)
-   {
+  hostinfo = gethostbyname(address);
+  if (hostinfo == NULL)
+    {
       fprintf (stderr, "Unknown host %s.\n", address);
       //exit(EXIT_FAILURE);
       return CONNECTION_ERROR;
-   }
+    }
 
-   sin.sin_addr = *(IN_ADDR *) hostinfo->h_addr;
-   sin.sin_port = htons(port);
-   sin.sin_family = AF_INET;
+  sin.sin_addr = *(IN_ADDR *) hostinfo->h_addr;
+  sin.sin_port = htons(port);
+  sin.sin_family = AF_INET;
 
-   if(connect(sock,(SOCKADDR *) &sin, sizeof(SOCKADDR)) == SOCKET_ERROR)
-   {
+  if(connect(sock,(SOCKADDR *) &sin, sizeof(SOCKADDR)) == SOCKET_ERROR)
+    {
       perror("connect()");
       //exit(errno);
       return CONNECTION_ERROR;
-   }
+    }
 
-   return sock;
+  return sock;
 }
 
 static int read_client(SOCKET sock, char *buffer)
@@ -296,11 +315,11 @@ static int read_client(SOCKET sock, char *buffer)
   if((n = recv(sock, buffer, BUF_SIZE - 1, 0)) < 0)
     {
       perror("recv()");
-      /* if recv error we disonnect the client */
+      /* if recv error we disconnect the client in the update function */
       n = 0;
     }
 
-  buffer[n] = 0;
+  buffer[n] = '\0';
 
   return n;
 }
@@ -314,65 +333,77 @@ static void write_client(SOCKET sock, const char *buffer)
     }
 }
 
+int      client_compare     (Client *a, Client *b){
+  if (a == NULL && b == NULL) return 1;
+  if (a == NULL || b == NULL) return 0;
+  return ((a->sock == b->sock) && (strcmp(a->id, b->id) == 0));
+}
 
 
-/* * * * * * * * * * * TESTS * * * * * * * * * * */
+/*
+
+// * * * * * * * * * * * TESTS * * * * * * * * * * *
 void input_event      (network *net, char *buffer){ 
-  printf("<input event: %s>\n", buffer);
+printf("<input event: %s>\n", buffer);
 }
 
 void connection_event (network *net, Client *c, char *buffer){ 
-  printf("<connection on socket %d : %s>\n", c->sock, buffer);
+printf("<connection on socket %d : %s>\n", c->sock, buffer);
 }
 
 void disconnection_event (network *net, Client *c){ 
-  printf("<disconnection from socket %d>\n", c->sock);
+printf("<disconnection from socket %d>\n", c->sock);
 }
 
 void message_event    (network *net, Client *c, char *buffer){ 
-  printf("<message from socket %d : %s>\n", c->sock, buffer);
+printf("<message from socket %d : %s>\n", c->sock, buffer);
 }
+
+
 
 int main(int argc, char **argv)
 {
-  if (argc != 3){
-    fprintf(stderr, "Usage: %s <port serveur> <port connexion>\n", argv[0]);
-    return EXIT_FAILURE;
-  }
-  unsigned int port = atoi(argv[1]);
- 
-  init(); // windows compatibility
-
-  /* * * * ouverture serveur * * * */
-  network *net = network_open(atoi(argv[1]));
-
-  /* * * * evenements * * * */
-  net->input_event = input_event;
-  net->connection_event = connection_event;
-  net->disconnection_event = disconnection_event;
-  net->message_event = message_event;
-
-  /* * * * connexion sortante * * ** */
-  printf("Connection to localhost on port %d...\n",port);
-  Client *c = network_connect(net, "localhost", port);
-
-  if (!c){
-    fprintf(stderr, "Connection failed.\n");
-  }else{
-    printf("Connected on socket %d.\n", c->sock);
-    network_send(c, "log in");
-  }
-
-  /* * * * gestion serveur * * * */
-  while(1){
-    network_update(net);
-  }
-
-  /* * * * fermeture serveur * * * */
-  network_close(net);
-
-
-  end(); // windows compatibility
-
-  return EXIT_SUCCESS;
+if (argc != 3){
+fprintf(stderr, "Usage: %s <port serveur> <port connexion>\n", argv[0]);
+return EXIT_FAILURE;
 }
+unsigned int port = atoi(argv[1]);
+ 
+init(); // windows compatibility
+
+// * * * * ouverture serveur * * * *
+network *net = network_open(atoi(argv[1]));
+
+// * * * * evenements * * * *
+net->input_event = input_event;
+net->connection_event = connection_event;
+net->disconnection_event = disconnection_event;
+net->message_event = message_event;
+
+// * * * * connexion sortante * * * *
+printf("Connection to localhost on port %d...\n",port);
+Client *c = network_connect(net, "localhost", port);
+
+if (!c){
+fprintf(stderr, "Connection failed.\n");
+}else{
+printf("Connected on socket %d.\n", c->sock);
+network_send(c, "log in");
+}
+
+// * * * * gestion serveur * * * *
+while(1){
+network_update(net);
+}
+
+// * * * * fermeture serveur * * * *
+network_close(net);
+
+
+end(); // windows compatibility
+
+return EXIT_SUCCESS;
+}
+
+//*/
+

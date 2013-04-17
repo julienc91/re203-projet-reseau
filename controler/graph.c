@@ -5,7 +5,14 @@
 
 Agraph_t* graph__open(char * filename){
     FILE * fd = fopen(filename, "r");
+    if(fd == NULL){
+        perror("fopen");
+        exit(0);
+    }
+
     Agraph_t * g = agread(fd);
+
+
     fclose(fd);
 
     return g;
@@ -24,20 +31,20 @@ int graph__save(Agraph_t * graph, char * filename){
 }
 
 void graph__setWeight(Agraph_t* graph, Agedge_t* edge, int weight){
-    edge->u->weight = weight;
+    edge->u.weight = weight;
 }
 
 int graph__getWeight(Agraph_t* graph, Agedge_t* edge){
-    return edge->u->weight;
+    return edge->u.weight;
 }
 
 
 void graph__addEdge(Agraph_t* graph, Agnode_t* n1, Agnode_t* n2, int weight){
-    Aedge_t *e = agedge(graph, n1, n2);
-    e->u->weight = weight;
+    Agedge_t *e = agedge(graph, n1, n2);
+    e->u.weight = weight;
 }
 
-int graph__removeEdge(Agraph_t* graph, Agedge_t* edge){
-    return agdelete(graph, (void *)edge);
+void graph__removeEdge(Agraph_t* graph, Agedge_t* edge){
+    agdelete(graph, edge);
 }
 
