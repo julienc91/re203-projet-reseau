@@ -184,6 +184,8 @@ struct Message* mess__parse(char* mess_src)
 			break;
 		case 6:
 			mess_dest->type = DISCONNECT;
+			strtok(mess_src, " ");
+			mess_dest->node1  = strcopy(strtok(NULL, " "));
 			break;
 		case 7:
 			mess_dest->type = MESSAGE;
