@@ -1,6 +1,12 @@
 #include "display.h"
 #include "graph_.h"
 #include <unistd.h>
+#include "exec.h"
+
+void exec__init()
+{
+	net = network_open(12345); 
+}
 
 void exec__prompt_message(struct Message *m)
 {
@@ -97,7 +103,7 @@ void exec__prompt_message(struct Message *m)
 }
 
 
-void exec__sock_message(struct Message *m, Agraph_t *graph)
+void exec__sock_message(struct Message *m)
 {
 	if(m == NULL)
 	{

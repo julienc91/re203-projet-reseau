@@ -1,11 +1,9 @@
 #include <stdio.h>
 #include "graph_.h"
-#include "sock_table.h"
 
 void graph__init(void)
 {
 	aginit();
-	init_table();
 }
 
 Agraph_t* graph__open(char * filename){

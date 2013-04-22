@@ -13,7 +13,7 @@ typedef struct{
 
 static Agraph_t *graph;
 
-void graph_init(void);
+void graph__init(void);
 Agraph_t* graph__open(char* filename);
 void graph__close(Agraph_t* graph);
 

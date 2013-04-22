@@ -1,5 +1,5 @@
 #ifndef _SOCK_TABLE_H
-
+#define _SOCK_TABLE_H
 #include "../src/net.h"
 #include "hashtable.h"
 
