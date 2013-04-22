@@ -10,6 +10,7 @@ void exec__prompt_message(struct Message *m)
 	}
 
 	Agnode_t *n1, *n2;
+	Agedge_t *e;
 
 	switch(m->type)
 	{
@@ -17,6 +18,7 @@ void exec__prompt_message(struct Message *m)
 			// actions sur graphe
 			graph = graph__open(mess__unescape(m->s_parameter));
 			//actions sur réseau
+			
 
 			//affichage
 			disp__loaded(agnnodes(graph)); // calculer nombre de noeuds chargés
@@ -43,7 +45,6 @@ void exec__prompt_message(struct Message *m)
 
 		case ADDLINK:
 			// actions sur graphe
-
 			graph__addEdge(graph, agfindnode(graph, m->node1), agfindnode(graph, m->node2), mess__getWeight(m));
 			//actions sur réseau
 
@@ -75,7 +76,13 @@ void exec__prompt_message(struct Message *m)
 
 		case DISCONNECT:
 			// actions sur graphe
-
+			n1 = agfindnode(graph, m->node1);
+			e = agfstedge(graph, n1);
+			while(e!=NULL)
+			{
+				agdelete(graph,e);
+				e = agfstedge(graph, n1);
+			}
 			//actions sur réseau
 
 			//affichage
@@ -104,14 +111,13 @@ void exec__sock_message(struct Message *m, Agraph_t *graph)
 			{
 
 			}
-
 			//actions sur le graphe
 
 			//envoyer greeting
 			break;
 
 		case POLL:
-			// si il y a eu un changement de voisinnage, renvoyer la topologie
+			// si il y a eu un changement de voisinage, renvoyer la topologie
 
 			// sinon, renvoyer neighborhood ok
 			break;

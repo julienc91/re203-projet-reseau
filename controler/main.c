@@ -12,7 +12,7 @@
 int main(void)
 {
 	//~ Agraph_t *graph;
-    aginit();
+    graph_init();
     
     /*
 	Agraph_t *graph = graph__open("topo.dot");

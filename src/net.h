@@ -5,7 +5,7 @@
 
 #include <winsock2.h>
 
-#elif defined (linux)
+#elif defined (__linux__)
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -84,6 +84,5 @@ void     network_broadcast  (network *net, const char *message);
 int      client_compare     (Client *a, Client *b);
 void     client_set_id      (Client *c, const char *id);
 char    *client_get_id      (Client *c);
-
 
 #endif
