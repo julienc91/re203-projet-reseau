@@ -27,7 +27,7 @@ void disconnection_event (network *net, Client *c){
   printf("<disconnection from socket %d>\n", c->sock);
 }
 
-void message_event    (network *net, Client *c, char *buffer){ 
+void message_event (network *net, Client *c, char *buffer){ 
   printf("<message from '%s', socket %d : %s>\n", c->id, c->sock, buffer);
 
   struct Message *m = mess__parse(buffer);
@@ -42,10 +42,7 @@ void message_event    (network *net, Client *c, char *buffer){
   }
 }
 
-
-mess__free(m);
-}
-
+//~ mess__free(m);
 
 int main(int argc, char **argv){
   if (argc != 4){
