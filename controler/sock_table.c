@@ -4,12 +4,12 @@
 static hash_table_t *T;
 
 
-void init_table(){
+void table__init(){
 
     T = hash_table_new(MODE_ALLREF);
 }
 
-void add_socket(char * key, Client * c){
+void table__add_socket(char * key, Client * c){
 
     if(!HT_HAS_KEY(T, key))
         HT_ADD(T, key, c);
@@ -17,12 +17,12 @@ void add_socket(char * key, Client * c){
         fprintf(stderr, "Key %s already exists\n", key);
 }
 
-void delete_sockect(char * key){
+void table__delete_socket(char * key){
 
     HT_REMOVE(T, key);
 }
 
-void modify_key(char * old_key, char * new_key){
+void table__modify_key(char * old_key, char * new_key){
     Client * c = (Client *)HT_LOOKUP(T, old_key);
     if (c != NULL){
         if(!HT_HAS_KEY(T, new_key)){
@@ -37,15 +37,15 @@ void modify_key(char * old_key, char * new_key){
 }
 
 
-Client * get_socket(char * key){
+Client * table__get_socket(char * key){
     return (Client *)HT_LOOKUP(T, key);
 }
 
-int has_socket(char * key){
+int table__has_socket(char * key){
     return HT_HAS_KEY(T, key);
 }
 
-void delete_table(){
+void table__delete(){
 
     hash_table_delete(T);
 }
