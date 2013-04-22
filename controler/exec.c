@@ -3,9 +3,10 @@
 #include <unistd.h>
 #include "exec.h"
 
-void exec__init()
+void exec__init(void)
 {
-	net = network_open(12345); 
+	net = network_open(12345);
+	//ajouter le chargement du fichier de config 
 }
 
 void exec__prompt_message(struct Message *m)
@@ -24,8 +25,6 @@ void exec__prompt_message(struct Message *m)
 			// actions sur graphe
 			graph = graph__open(mess__unescape(m->s_parameter));
 			//actions sur réseau
-			
-
 			//affichage
 			disp__loaded(agnnodes(graph)); // calculer nombre de noeuds chargés
 			break;
@@ -72,7 +71,6 @@ void exec__prompt_message(struct Message *m)
 		case DELLINK:
 			// actions sur graphe
 			graph__removeEdge(graph, agfindedge(graph,agfindnode(graph, m->node1), agfindnode(graph, m->node2)));
-
 			//actions sur réseau
 
 			//affichage
@@ -113,12 +111,16 @@ void exec__sock_message(struct Message *m)
 	switch(m->type)
 	{
 		case LOGIN:
-			if(m->node1 != NULL) //cas ou on ne donne pas le noeud, en assigner un
+			if(m->node1 == NULL) //cas ou on ne donne pas le noeud, en assigner un
 			{
-
+				
+			}
+			else //cas ou le noeud est donne, on verifie si il n'est pas deja utilise
+			{
+				
 			}
 			//actions sur le graphe
-
+			/*NONE*/
 			//envoyer greeting
 			break;
 
