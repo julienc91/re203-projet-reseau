@@ -5,7 +5,7 @@
 
 #include <winsock2.h>
 
-#elif defined (linux)
+#elif defined(__linux__)
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -74,7 +74,7 @@ void     network_close      (network *net);
 int      network_is_opened  (network *net);
 void     network_free       (network *net);
 void     network_update     (network *net);
-Client  *network_connect    (network *net, 
+Client  *network_connect    (network *net,
 			     const char *address,
 			     const unsigned int port);
 void     network_disconnect (network *net, Client *c);
