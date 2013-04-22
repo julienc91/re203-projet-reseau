@@ -104,7 +104,7 @@ struct Message* mess__parse(char* mess_src)
 		"add link \\w* \\w* \\d*",
 		"update link \\w* \\w* \\d*",
 		"del link \\w* \\w*",
-		"disconnect",
+		"disconnect \\w*",
 		"message \\w* \".*\"",
 		"route \\w*",
 		"routetable",
@@ -128,20 +128,20 @@ struct Message* mess__parse(char* mess_src)
 		"ping \\w*"
 	};
 
-	TRex* trex_table[30];
+	TRex* trex_current_regex;
 	int i;
 	int match = 0;
 
 	for(i = 0; i < 28; i++) // trouver le moyen de staticifier ça
 	{
-		trex_table[i] = trex_compile(regex_strtable[i], NULL);
-		if(trex_match(trex_table[i], mess_src))
+		trex_current_regex = trex_compile(regex_strtable[i], NULL);
+		if(trex_match(trex_current_regex, mess_src))
 		{
 			match = 1;
-			trex_free(trex_table[i]);
+			trex_free(trex_current_regex);
 			break;
 		}
-		trex_free(trex_table[i]);
+		trex_free(trex_current_regex);
 	}
 	if(match == 0) i = -1;
 
