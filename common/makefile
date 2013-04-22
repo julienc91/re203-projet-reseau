@@ -7,7 +7,7 @@ trex.o: ../trex/trex.c
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 common: $(OBJ) trex.o
-	$(CC) -lpthread $^ -o $@  $(LDFLAGS)
+	$(CC) -g -lpthread $^ -o $@  $(LDFLAGS)
 
 %.o: %.c
-	$(CC) -std=c99 -o $@ -c $< $(CFLAGS)
+	$(CC) -g -std=c99 -o $@ -c $< $(CFLAGS)
