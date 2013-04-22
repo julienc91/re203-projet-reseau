@@ -2,7 +2,7 @@
 #define __CONFIG_H
 enum SoftwareType { ROUTER, CONTROLLER };
 
-typedef union Configuration
+typedef struct Configuration
 {
 	enum SoftwareType type;
 	char controllerAddress[20];

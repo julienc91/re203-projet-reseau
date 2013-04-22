@@ -37,7 +37,32 @@ Configuration* config__readController(void)
 
 Configuration* config__readRouter(void)
 {
+	FILE * pFile;
+	pFile = fopen ("router.cfg","r");
+	if (pFile != NULL)
+	{
+		Configuration* conf = malloc(sizeof(Configuration));
+		conf->type = ROUTER;
 
+		char * line = NULL;
+		size_t len = 0;
+		if(conf == NULL)
+		{
+			fprintf(stderr, "ERREUR : malloc\n");
+			return NULL;
+		}
+
+		while (getline(&line, &len, pFile) != -1)
+		{
+			config__readLine(conf, line);
+		}
+		if (line)
+			free(line);
+	}
+	else
+	{
+		fprintf(stderr, "ERREUR : Ouverture de router.cfg impossible\n");
+	}
 }
 
 void config__readLine(Configuration* conf, char* mess_src)
@@ -148,7 +173,10 @@ void config__readLine(Configuration* conf, char* mess_src)
 		case 11:
 			//lignes vides
 		default:
-			fprintf(stderr, "ERREUR : ligne du fichier de configuration invalide : \"%s\".\n", mess_src);
+			if(strcmp(mess_src, "") != 0)
+			{
+				fprintf(stderr, "ERREUR : ligne du fichier de configuration invalide : \"%s\".\n", mess_src);
+			}
 			break;
 	}
 }
