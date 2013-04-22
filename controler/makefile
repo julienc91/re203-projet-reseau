@@ -5,7 +5,7 @@ export CC=gcc
 
 SRC= $(wildcard *.c)
 OBJ= $(SRC:.c=.o)
-COMMONOBJ = prompt.o messages.o
+COMMONOBJ = prompt.o messages.o net.o
 all: common controler
 
 
@@ -17,7 +17,7 @@ controler: $(OBJ)  $(COMMONOBJ) trex.o
 	$(CC) $^ -o $@  $(LDFLAGS)
 
 common:
-	cp ../common/prompt.o ../common/messages.o .
+	cp ../common/prompt.o ../common/messages.o ../common/net.o .
 
 .PHONY: common
 

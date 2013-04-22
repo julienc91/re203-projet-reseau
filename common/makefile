@@ -6,6 +6,9 @@ all: $(OBJ) trex.o
 trex.o: ../trex/trex.c
 	$(CC) -o $@ -c $< $(CFLAGS)
 
+net.o: net.c net.h
+	$(CC) -o $@ -c $< $(CFLAGS)
+
 common: $(OBJ) trex.o
 	$(CC) -g -lpthread $^ -o $@  $(LDFLAGS)
 

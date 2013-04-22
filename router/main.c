@@ -1,4 +1,4 @@
-#include "../src/net.h"
+#include "../common/net.h"
 //#include "../common/prompt.h"
 #include "../common/messages.h"
 

@@ -7,7 +7,7 @@ BINARY=router
 all: $(BINARY)
 
 
-net.o:	../src/net.c ../src/net.h
+net.o:	../common/net.c ../common/net.h
 	$(CC) $(CFLAGS) -o net.o -c $< $(LFLAGS)
 
 $(BINARY): net.o main.c
