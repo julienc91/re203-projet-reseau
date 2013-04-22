@@ -1,4 +1,4 @@
-#include "net.h"
+#include "../src/net.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -339,71 +339,10 @@ int      client_compare     (Client *a, Client *b){
   return ((a->sock == b->sock) && (strcmp(a->id, b->id) == 0));
 }
 
-
-/*
-
-// * * * * * * * * * * * TESTS * * * * * * * * * * *
-void input_event      (network *net, char *buffer){ 
-printf("<input event: %s>\n", buffer);
+void client_set_id(Client *c, const char *id){
+  strcpy(c->id, id);
 }
 
-void connection_event (network *net, Client *c, char *buffer){ 
-printf("<connection on socket %d : %s>\n", c->sock, buffer);
+char *client_get_id(Client *c){
+  return c->id;
 }
-
-void disconnection_event (network *net, Client *c){ 
-printf("<disconnection from socket %d>\n", c->sock);
-}
-
-void message_event    (network *net, Client *c, char *buffer){ 
-printf("<message from socket %d : %s>\n", c->sock, buffer);
-}
-
-
-
-int main(int argc, char **argv)
-{
-if (argc != 3){
-fprintf(stderr, "Usage: %s <port serveur> <port connexion>\n", argv[0]);
-return EXIT_FAILURE;
-}
-unsigned int port = atoi(argv[1]);
- 
-init(); // windows compatibility
-
-// * * * * ouverture serveur * * * *
-network *net = network_open(atoi(argv[1]));
-
-// * * * * evenements * * * *
-net->input_event = input_event;
-net->connection_event = connection_event;
-net->disconnection_event = disconnection_event;
-net->message_event = message_event;
-
-// * * * * connexion sortante * * * *
-printf("Connection to localhost on port %d...\n",port);
-Client *c = network_connect(net, "localhost", port);
-
-if (!c){
-fprintf(stderr, "Connection failed.\n");
-}else{
-printf("Connected on socket %d.\n", c->sock);
-network_send(c, "log in");
-}
-
-// * * * * gestion serveur * * * *
-while(1){
-network_update(net);
-}
-
-// * * * * fermeture serveur * * * *
-network_close(net);
-
-
-end(); // windows compatibility
-
-return EXIT_SUCCESS;
-}
-
-//*/
-

@@ -1,13 +1,13 @@
 \documentclass[a4paper,11pt]{article}
 
-
+\usepackage{lscape}
 \usepackage{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage[francais]{babel}
 \usepackage[T1]{fontenc}
+\usepackage{gantt}
 \usepackage{tikz}
 \usepackage{tikz-uml}
-\usepackage{gantt}
 \usepackage{relsize}
 \usepackage{color}
 \definecolor{dkgreen}{rgb}{0,0.6,0}
@@ -101,12 +101,19 @@ Plusieurs modules distincts composent le contrôleur, chacun ayant ses propres b
 
 La communication sur le réseau se fait à l'aide de la bibliothèque C \texttt{sys/socket.h}, complète et largement utilisée. La gestion des graphes, quant à elle, utilise la bibliothèque C \texttt{graphviz/graph.h} fournie avec l'ensemble d'outils \textit{Graphviz}. Le principal avantage est qu'elle permet très facilement le passage d'un fichier au format \textit{it} à une structure de graphe, et inversement.
 
-Plus bas niveau, afin d'améliorer la complexité générale du programme, des tables de hachage sont utilisées. A cet effet, la bibliothèque C standard ne contenant pas de telle structure de données, l'implémentation utilisée se base sur une bibliothque C tierce publiée sous licence GPL\footnote{Le code source est consultable à cette adresse: \texttt{https://github.com/ankurs/Hash-Table/}}. Leur utilisation sera détaillée dans la partie \ref{implementation_controleur}.
-
-\subsection{Implémentation}
-\label{implementation_controleur}
+Plus bas niveau, afin d'améliorer la complexité générale du programme, des tables de hachage sont utilisées. A cet effet, la bibliothèque C standard ne contenant pas de telle structure de données, l'implémentation utilisée se base sur une bibliothque C tierce publiée sous licence GPL\footnote{Le code source est consultable à cette adresse: \texttt{https://github.com/ankurs/Hash-Table/}}.
 
 \subsection{Etat actuel de l'avancement}
+\label{implementation_controleur}
+
+Actuellement, les différentes parties du contrôleur ont été implémentées de manière séparée:
+\begin{itemize}
+ \item L'invite de commande est opérationnelle: reconnaissance des différentes commandes possibles à l'aide d'expression régulières et échappement des caractères
+ \item La gestion des graphes est mise en place: création à partir d'un fichier \textit{dot}, ajout/retrait/modification d'arête ou de n\oe ud, sauvegarde dans un fichier
+ \item Une bibliothèque de socket utilisant les fonctions de \textit{sys/socket.h} est prête à l'utilisation. Elle permet la connexion, la déconnexion, l'envoi de messages, \dots
+\end{itemize}
+Il ne reste donc qu'à \textit{lier} les différentes composantes entre elles pour obtenir un contrôleur respectant les attentes.
+
 
 \section{Les routeurs}
 
@@ -125,18 +132,49 @@ De même que le contrôleur, le programme du routeur se décompose en plusieurs 
 
 Pour des raisons d'optimisation en complexité, la table de routage est implémentée à l'aide de la classe \texttt{map} de la bibliothèque C++ standard.
 
-\subsection{Implémentation}
-
 \subsection{Etat actuel de l'avancement}
 
-\section{Fonctionnement}
+L'avancement du programme du routeur est semblable à celui du contrôleur: les différents modules évoqués dans la partie précédente sont opérationnels mais ne sont pas encore connectés entre eux; à l'exception des algorithmes de maintenance de la table de routage qui n'ont pas encore été écrits. Il ne reste donc plus qu'à effectuer cette liaison pour arriver à un routeur respectant les règles attendues.
 
-% Diagramme de séquence des communications
-% => contrôleur <-> routeur
-% => routeur <-> routeur
+Sauf retard, il est également prévu de consacrer une séance à la réalisation de tests de recette.
+
+\subsection{Routeur $\leftrightarrow$ Routeur}
+
+Après avoir reçu sa liste de voisins par le contrôleur, un routeur qui vient de rejoindre le réseau doit tout d'abord se signaler auprès de l'ensemble de ses voisins et établie avec eux une connexion permanente. De façon régulière, il doit échanger avec ses voisins ses vecteurs distances, et reçoit également les vecteurs distances de ces derniers. Ces nouvelles données lui permettent de mettre à jour sa table de routage si besoin est.
+
+Un routeur doit également communiquer avec un voisin lorsqu'il doit transmettre un paquet en passant par ce voisin. Pour savoir à quel voisin transmettre le paquet, il lui suffit de regarder le destinataire du message et sa table de routage, et de le transmettre au bon routeur.
+
+Quel que soit le type d'échange, le récepteur envoie systématiquement un message d'aquittement au routeur émetteur.
+
+\begin{figure}[H]
+\begin{center}
+\begin{tikzpicture} 
+\begin{umlseqdiag}
+\umlobject[class=Router]{r$_1$} 
+\umlobject[class=Router]{r$_2$}
+\begin{umlcall}[op={connection}]{r$_1$}{r$_2$}
+\begin{umlcall}[type=return]{r$_2$}{r$_1$}\end{umlcall}
+\begin{umlcall}[op={send\_vectors}]{r$_1$}{r$_2$}\end{umlcall}
+\begin{umlcall}[type=return]{r$_2$}{r$_1$}\end{umlcall}
+\begin{umlcall}[op={update\_table}]{r$_2$}{r$_2$}\end{umlcall}
+
+\begin{umlcall}[op={send\_message}]{r$_2$}{r$_1$}\end{umlcall}
+\begin{umlcall}[type=return]{r$_1$}{r$_2$}\end{umlcall}
+\end{umlcall} 
+\end{umlseqdiag} 
+\end{tikzpicture}
+\caption{Diagramme de séquence des communications entre deux routeurs}
+\end{center}
+\end{figure}
 
 \section{Nos objectifs pour la suite du projet}
 
+Le déroulement prévisionnel du projet est indiqué sur le diagramme de Gantt donné en figure \ref{gantt}.
+
+\begin{landscape}
+\begin{center}
+\begin{figure}[H]
+ \centering
 \begin{gantt}{10}{9}
   \begin{ganttitle}
     \numtitle{1}{1}{9}{1}
@@ -150,6 +188,17 @@ Pour des raisons d'optimisation en complexité, la table de routage est impléme
   \ganttbar{Contrôleur}{5}{2}
   \ganttbar{Routeur}{6}{2}
   \ganttbar{Tests}{8}{1}
+  
+  
+%   \ganttcon{1}{1}{1}{2}
+%   \ganttcon{1}{1}{1}{3}
+%   \ganttcon{1}{1}{1}{4}
+%   \ganttcon{1}{1}{2}{5}
+%   \ganttcon{3}{4}{4}{6}
+%   \ganttcon{3}{5}{4}{6}
+%   \ganttcon{4}{2}{4}{6}
+%   \ganttcon{7}{7}{8}{9}
+%   \ganttcon{8}{8}{8}{9}
 
   % \ganttbarcon{another consecutive task}{8}{2}
   % \ganttmilestone[color=cyan]{Milestone with color!}{4}
@@ -160,6 +209,11 @@ Pour des raisons d'optimisation en complexité, la table de routage est impléme
   % \ganttmilestonecon{A connected Milestone}{7}
   % \ganttbarcon{another consecutive task}{8}{2}
 \end{gantt}
+\caption{Diagramme de Gantt pour le projet}
+\label{gantt}
+\end{figure}
+\end{center}
+\end{landscape}
 
 
 \end{document}

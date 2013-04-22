@@ -1,44 +1,50 @@
 #include "display.h"
+#include "graph_.h"
+#include <unistd.h>
 
-void exec__prompt_message(struct Message* m)
+void exec__prompt_message(struct Message *m)
 {
 	if(m == NULL)
 	{
 		return;
 	}
 
+	Agnode_t *n1, *n2;
+
 	switch(m->type)
 	{
 		case LOAD:
 			// actions sur graphe
-
+			graph = graph__open(mess__unescape(m->s_parameter));
 			//actions sur réseau
 
 			//affichage
-			disp__loaded(0); // calculer nombre de noeuds chargés
+			disp__loaded(agnnodes(graph)); // calculer nombre de noeuds chargés
 			break;
 
 		case SAVE:
 			// actions sur graphe
-
+			graph__save(graph, mess__unescape(m->s_parameter));
 			//actions sur réseau
-
+			/*NONE*/
 			//affichage
-			disp__saved(0); // calculer nombre de noeuds sauvés
+			disp__saved(agnnodes(graph)); // calculer nombre de noeuds sauvés
 			break;
 
 		case SHOW:
 			// actions sur graphe
-
+			/*NONE*/
 			//actions sur réseau
-
+			/*NONE*/
 			//affichage
-			disp__topology();
+			agwrite(graph, stdout);
+			//disp__topology();
 			break;
 
 		case ADDLINK:
 			// actions sur graphe
 
+			graph__addEdge(graph, agfindnode(graph, m->node1), agfindnode(graph, m->node2), mess__getWeight(m));
 			//actions sur réseau
 
 			//affichage
@@ -48,7 +54,7 @@ void exec__prompt_message(struct Message* m)
 
 		case UPDATELINK:
 			// actions sur graphe
-
+			graph__setWeight(graph, agfindedge(graph,agfindnode(graph, m->node1), agfindnode(graph, m->node2)) , mess__getWeight(m));
 			//actions sur réseau
 
 			//affichage
@@ -58,6 +64,7 @@ void exec__prompt_message(struct Message* m)
 
 		case DELLINK:
 			// actions sur graphe
+			graph__removeEdge(graph, agfindedge(graph,agfindnode(graph, m->node1), agfindnode(graph, m->node2)));
 
 			//actions sur réseau
 
@@ -77,13 +84,13 @@ void exec__prompt_message(struct Message* m)
 			break;
 
 		default:
-			printf("ERREUR: Action non reconnue");
+			printf("ERREUR: Action non reconnue\n");
 			break;
 	}
 }
 
 
-void exec__sock_message(struct Message* m)
+void exec__sock_message(struct Message *m, Agraph_t *graph)
 {
 	if(m == NULL)
 	{
@@ -114,7 +121,7 @@ void exec__sock_message(struct Message* m)
 			break;
 
 		default:
-			printf("ERREUR: Action non reconnue");
+			printf("ERREUR: Action non reconnue\n");
 			break;
 	}
 }

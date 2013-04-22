@@ -1,8 +1,22 @@
 #ifndef __GRAPH_H_
 #define __GRAPH_H_
 
-//#include <graphviz/gvc.h>
+//~ #include <graphviz/gvc.h>
+
+typedef struct{
+	} Agraphinfo_t;
+typedef struct{
+	} Agnodeinfo_t;
+typedef struct{
+	int weight;
+	} Agedgeinfo_t;
+//~ #include <graphviz/types.h>
+
+/* IMPORTANT : DEFINIR LES STRUCTURES AVANT L INCLUDE SUIVANT */
 #include <graphviz/graph.h>
+
+static Agraph_t *graph;
+
 
 Agraph_t* graph__open(char* filename);
 void graph__close(Agraph_t* graph);
