@@ -104,7 +104,7 @@ struct Message* mess__parse(char* mess_src)
 		"add link \\w* \\w* \\d*",
 		"update link \\w* \\w* \\d*",
 		"del link \\w* \\w*",
-		"disconnect",
+		"disconnect \\w*",
 		"message \\w* \".*\"",
 		"route \\w*",
 		"routetable",
@@ -124,23 +124,24 @@ struct Message* mess__parse(char* mess_src)
 		"packet src \\w* dst \\w* ok",
 		"packet src \\w* dst \\w* toofar",
 		"ping src \\w* dst \\w* ttl \\d*",
-		"pong src \\w* dst \\w* ttl \\d*"
+		"pong src \\w* dst \\w* ttl \\d*",
+		"ping \\w*"
 	};
 
-	TRex* trex_table[30];
+	TRex* trex_current_regex;
 	int i;
 	int match = 0;
 
-	for(i = 0; i < 27; i++) // trouver le moyen de staticifier ça
+	for(i = 0; i < 28; i++) // trouver le moyen de staticifier ça
 	{
-		trex_table[i] = trex_compile(regex_strtable[i], NULL);
-		if(trex_match(trex_table[i], mess_src))
+		trex_current_regex = trex_compile(regex_strtable[i], NULL);
+		if(trex_match(trex_current_regex, mess_src))
 		{
 			match = 1;
-			trex_free(trex_table[i]);
+			trex_free(trex_current_regex);
 			break;
 		}
-		trex_free(trex_table[i]);
+		trex_free(trex_current_regex);
 	}
 	if(match == 0) i = -1;
 
@@ -157,7 +158,6 @@ struct Message* mess__parse(char* mess_src)
 			break;
 		case 2:
 			mess_dest->type = SHOW;
-			printf("eyho");
 			break;
 		case 3:
 			mess_dest->type = ADDLINK;
@@ -184,6 +184,8 @@ struct Message* mess__parse(char* mess_src)
 			break;
 		case 6:
 			mess_dest->type = DISCONNECT;
+			strtok(mess_src, " ");
+			mess_dest->node1  = strcopy(strtok(NULL, " "));
 			break;
 		case 7:
 			mess_dest->type = MESSAGE;
@@ -326,6 +328,11 @@ struct Message* mess__parse(char* mess_src)
 			mess_dest->node2  = strcopy(strtok(NULL, " "));
 			strtok(NULL, " ");
 			mess_dest->n_parameter = atoi(strtok(NULL, " "));
+			break;
+		case 27:
+			mess_dest->type = PING;
+			strtok(mess_src, " ");
+			mess_dest->node1  = strcopy(strtok(NULL, " "));
 			break;
 		default:
 			mess_dest->type = NONE;
