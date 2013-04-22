@@ -148,7 +148,10 @@ void config__readLine(Configuration* conf, char* mess_src)
 		case 11:
 			//lignes vides
 		default:
-			fprintf(stderr, "ERREUR : ligne du fichier de configuration invalide : \"%s\".\n", mess_src);
+			if(strcmp(mess_src, "") != 0)
+			{
+				fprintf(stderr, "ERREUR : ligne du fichier de configuration invalide : \"%s\".\n", mess_src);
+			}
 			break;
 	}
 }
