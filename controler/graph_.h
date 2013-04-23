@@ -26,4 +26,6 @@ int graph__getWeight(Agraph_t* graph, Agedge_t* edge);
 void graph__addEdge(Agraph_t* graph, Agnode_t* n1, Agnode_t* n2, int weight);
 void graph__removeEdge(Agraph_t* graph, Agedge_t* edge);
 
+char* graph__getId(Agnode_t* node);
+
 #endif

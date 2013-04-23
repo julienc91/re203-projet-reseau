@@ -137,6 +137,8 @@ void exec__sock_message(struct Message *m)
 				else
 				{
 					n1->u.is_connected = 1;
+					//~ table__add_socket(graph__getId(n1), network__connect(
+					
 				}
 			}
 			else //cas ou le noeud est donne, on verifie si il n'est pas deja utilise
