@@ -123,7 +123,23 @@ void exec__sock_message(struct Message *m)
 		case LOGIN:
 			if(m->node1 == NULL) //cas ou on ne donne pas le noeud, en assigner un
 			{
+				n1 = agfstnode(graph);
+				while(n1 != NULL && n1->u.is_connected == 1)
+				{
+					n1 = agnxtnode(graph, n1);
+				}
 				
+				if(n1 == NULL)
+				{
+					printf("ERREUR : Aucun noeud libre\n");   
+					return ;
+				}
+				else
+				{
+					n1->u.is_connected = 1;
+					//~ table__add_socket(graph__getId(n1), network__connect(
+					
+				}
 			}
 			else //cas ou le noeud est donne, on verifie si il n'est pas deja utilise
 			{
