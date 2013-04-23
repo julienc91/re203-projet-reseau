@@ -108,9 +108,9 @@ Plus bas niveau, afin d'améliorer la complexité générale du programme, des t
 
 Actuellement, les différentes parties du contrôleur ont été implémentées de manière séparée:
 \begin{itemize}
- \item L'invite de commande est opérationnelle: reconnaissance des différentes commandes possibles à l'aide d'expression régulières et échappement des caractères
- \item La gestion des graphes est mise en place: création à partir d'un fichier \textit{dot}, ajout/retrait/modification d'arête ou de n\oe ud, sauvegarde dans un fichier
- \item Une bibliothèque de socket utilisant les fonctions de \textit{sys/socket.h} est prête à l'utilisation. Elle permet la connexion, la déconnexion, l'envoi de messages, \dots
+ \item L'invite de commande est opérationnelle: reconnaissance des différentes commandes possibles à l'aide d'expressions régulières et échappements des caractères;
+ \item La gestion des graphes est mise en place: création à partir d'un fichier \textit{dot}, ajout/retrait/modification d'arête ou de n\oe ud, sauvegarde dans un fichier;
+ \item Une bibliothèque de gestion de sockets utilisant les fonctions de \textit{sys/socket.h} est prête à l'utilisation. Elle permet la connexion, la déconnexion, l'envoi de messages, \dots Son implémentation est générique et permet une programmation évènementielle via des pointeurs de fonction correspondants aux actions à effectuer lors d'une connexion, de la récéption d'un message, etc.
 \end{itemize}
 Il ne reste donc qu'à \textit{lier} les différentes composantes entre elles pour obtenir un contrôleur respectant les attentes.
 
