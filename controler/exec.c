@@ -126,7 +126,7 @@ void exec__sock_message(struct Message *m)
 
 		case POLL:
 			// si il y a eu un changement de voisinage, renvoyer la topologie
-
+			
 			// sinon, renvoyer neighborhood ok
 			break;
 
