@@ -77,5 +77,7 @@ int mess__getWeight(struct Message* mess);
 char* mess__treatInput(char * src);
 char* mess__treatOutput(char * src);
 
+char* mess__toString(struct Message* mess);
+
 void mess__debug(struct Message* m);
 #endif

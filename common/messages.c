@@ -346,6 +346,86 @@ struct Message* mess__parse(char* mess_src)
 	return mess_dest;
 }
 
+char* mess__toString(struct Message* mess)
+{
+	char * out = malloc(sizeof(char) * (50 + ((mess->s_parameter != NULL)? strlen(mess->s_parameter) : 0)));
+	
+	switch(mess->type)
+	{
+		// Routeur <-> Controleur 
+		case LOGIN: 			//log in as ID port p
+			if(mess->node1 == NULL)
+			{
+				sprintf(out, "log in port %d", mess->node1, mess->n_parameter);
+			}
+			else
+			{		
+				sprintf(out, "log in as %s port %d", mess->node1, mess->n_parameter);
+			}
+			break;
+				//log in port p
+		case LOGOUT: 		//log out
+			sprintf(out, "log out");
+			break;
+			
+		case GREETING: 		//greeting n  (que se passe-t-il si rien libre?)
+			sprintf(out, "greeting %s", mess->node1);
+			break;
+			
+		case BYE:		//bye
+			sprintf(out, "bye");
+			break;
+		
+		case POLL:			//poll
+			sprintf(out, "poll");
+			break;
+			
+		case NEIGHBORHOOD:
+			if(mess->accept == OK)
+				sprintf(out, "neighborhood ok");
+			else
+				sprintf(out, "neighborhood newlist %s", mess->s_parameter);
+			break;
+			
+		case LINK:
+			if(mess->accept == OK)
+				sprintf(out, "link ok");
+			else
+				sprintf(out, "link");
+			break;
+				
+		case VECTOR:
+			if(mess->accept == OK)
+				sprintf(out, "vector ok");
+			else
+				sprintf(out, "vector %s", mess->s_parameter);
+			break;
+			
+		case PACKET:
+			if(mess->accept == OK)
+				sprintf(out, "packet src %s dst %s ok", mess->node1, mess->node2);
+			else if(mess->accept == TOOFAR)
+				sprintf(out, "packet src %s dst %s toofar", mess->node1, mess->node2);
+			else
+				sprintf(out, "packet src %s dst %s ttl %d data %s", mess->node1, mess->node2, mess->n_parameter, mess->s_parameter);
+			break;
+			
+		case PING: // penser aux deux ping, haut niveau et bas niveau
+			sprintf(out, "ping src %s dst %s ttl %d", mess->node1, mess->node2, mess->n_parameter);
+			break;
+			
+		case PONG:
+			sprintf(out, "pong src %s dst %s ttl %d", mess->node1, mess->node2, mess->n_parameter);
+			break;
+			
+		default:
+			fprintf(stderr, "ERREUR: Message invalide.\n");
+			break;
+	
+	}
+	
+	return out;
+}
 
 
 void mess__free(struct Message** mess)
