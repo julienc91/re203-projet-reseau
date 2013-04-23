@@ -1,11 +1,11 @@
 #ifndef NET_H_
 #define NET_H_
 
-#ifdef WIN32
+#if defined(WIN32) || defined(__MINGW32__)
 
 #include <winsock2.h>
-
-#elif defined (__linux__)
+#include <ws2tcpip.h>
+#elif defined(__linux__)
 
 #define h_addr h_addr_list[0] /*backward compatibility*/
 #include <sys/types.h>
@@ -23,6 +23,7 @@ typedef int SOCKET;
 typedef struct sockaddr_in SOCKADDR_IN;
 typedef struct sockaddr SOCKADDR;
 typedef struct in_addr IN_ADDR;
+
 
 #else
 

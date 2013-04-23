@@ -1,8 +1,6 @@
 #ifndef __MESSAGES_H_
 #define __MESSAGES_H_
 
-#include <stddef.h>
-
 enum Acceptance
 {
 	NOT,
@@ -28,6 +26,7 @@ enum MessageType
 	ROUTETABLE, 	//routetable
 
 	//Protocole (tout se finit par *)
+	// Routeur <-> Controleur 
 	LOGIN, 			//log in as ID port p
 					//log in port p
 	LOGOUT, 		//log out
@@ -38,6 +37,7 @@ enum MessageType
 	NEIGHBORHOOD,	//neighborhood newlist [...;id_i,cost_i,ip_i:port_i;...]
 					//neighborhood ok
 
+	// Routeur <-> Routeur
 	LINK,			//link
 					//link ok
 	VECTOR,			//vector [..]

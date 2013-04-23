@@ -148,7 +148,7 @@ void network__update(network *net){
     /* new client */
     SOCKADDR_IN csin = { 0 };
     size_t sinsize = sizeof csin;
-    int csock = accept(net->server, (SOCKADDR *)&csin, (socklen_t *)&sinsize);
+    int csock = accept(net->server, (SOCKADDR *)&csin, (socklen_t *) &sinsize);
     if(csock == SOCKET_ERROR){
       perror("accept()");
       return;
