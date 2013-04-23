@@ -11,11 +11,11 @@ void input_event (network *net, char *buffer){
   printf("<input event: '%s'>\n", buffer);
   
   if (strcmp(buffer, "quit") == 0){
-    network_close(net);
+    network__close(net);
     return;
   }
 
-  network_send(&(net->clients[0]), buffer);
+  network__send(&(net->clients[0]), buffer);
 }
 
 void connection_event (network *net, Client *c, char *buffer){ 
@@ -54,7 +54,7 @@ int main(int argc, char **argv){
   init(); // windows compatibility
 
   // * * * * ouverture serveur * * * *
-  network *net = network_open(atoi(argv[1]));
+  network *net = network__open(atoi(argv[1]));
 
   // * * * * evenements * * * *
   net->input_event = input_event;
@@ -64,7 +64,7 @@ int main(int argc, char **argv){
 
   // * * * * connexion sortante * * * *
   printf("Connection to localhost on port %d...\n",port);
-  Client *c = network_connect(net, "localhost", port);
+  Client *c = network__connect(net, "localhost", port);
 
   if (!c){
     fprintf(stderr, "Connection failed.\n");
@@ -73,17 +73,17 @@ int main(int argc, char **argv){
     printf("Connected on socket %d.\n", c->sock);
     char buf[100];
     sprintf(buf, "log in as %s", argv[3]);
-    network_send(c, buf);
+    network__send(c, buf);
   }
 
   // * * * * gestion serveur * * * *
-  while(network_is_opened(net)){
-    network_update(net);
+  while(network__is_opened(net)){
+    network__update(net);
   }
 
   // * * * * fermeture serveur * * * *
-  network_close(net);
-  network_free(net);
+  network__close(net);
+  network__free(net);
 
 
   end(); // windows compatibility
