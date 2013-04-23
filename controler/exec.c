@@ -2,6 +2,7 @@
 #include "graph_.h"
 #include <unistd.h>
 #include "exec.h"
+#include "sock_table.h"
 
 void exec__init(void)
 {
@@ -18,6 +19,8 @@ void exec__prompt_message(struct Message *m)
 
 	Agnode_t *n1, *n2;
 	Agedge_t *e;
+	struct Message reponse;
+	//~ reponse.n_parameter = NULL;
 
 	switch(m->type)
 	{
@@ -103,6 +106,13 @@ void exec__prompt_message(struct Message *m)
 
 void exec__sock_message(struct Message *m)
 {
+	Agnode_t *n1, *n2;
+	Agedge_t *e;
+	char voisinage[1000]="";
+	char *id;
+	char aux[100]="";
+	Client * client;
+	
 	if(m == NULL)
 	{
 		return;
@@ -126,7 +136,49 @@ void exec__sock_message(struct Message *m)
 
 		case POLL:
 			// si il y a eu un changement de voisinage, renvoyer la topologie
+			//~ n1 = agfindnode(graph, m->node1);
+			//~ fprintf(stderr, "ICI \n");
+			graph = graph__open("topo.dot");
 
+			agwrite(graph, stdout);
+			//~ fprintf(stderr, "LA\n");
+
+			n1 = agfstnode(graph);
+
+			e = agfstedge(graph, n1);
+			while(e!=NULL)
+			{
+				if(e->tail != n1)
+				{
+					n2 = e->tail;
+				}
+				else
+				{
+					n2 = e->head;
+				}
+				
+				id = agget(n2, "label");
+				strcat(voisinage, id);
+				strcat(voisinage, ",");
+				sprintf(aux, "%d,", graph__getWeight(graph, e));
+				strcat(voisinage, aux);
+				//TODO ajouter l ip
+				aux[0]='\0';
+				client = table__get_socket(id);
+				sprintf(aux, "%s", client__get_address(client));
+				strcat(voisinage, aux);
+				strcat(voisinage, ":");
+				//TODO ajouter le port
+				aux[0]='\0';
+				sprintf(aux, "%d", client__get_port(client));
+				strcat(voisinage, aux);
+				strcat(voisinage, ";");
+				
+				e = agnxtedge(graph, e, n1);
+			}
+			printf("le voisinage : %s\n",voisinage);
+			voisinage[0]='\0';
+			aux[0]='\0';			
 			// sinon, renvoyer neighborhood ok
 			break;
 
