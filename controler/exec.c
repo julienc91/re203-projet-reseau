@@ -6,7 +6,7 @@
 
 void exec__init(void)
 {
-	net = network_open(12345);
+	net = network__open(12345);
 	//ajouter le chargement du fichier de config 
 }
 
@@ -137,11 +137,11 @@ void exec__sock_message(struct Message *m)
 		case POLL:
 			// si il y a eu un changement de voisinage, renvoyer la topologie
 			//~ n1 = agfindnode(graph, m->node1);
-			fprintf(stderr, "ICI \n");
+			//~ fprintf(stderr, "ICI \n");
 			graph = graph__open("topo.dot");
 
 			agwrite(graph, stdout);
-			fprintf(stderr, "LA\n");
+			//~ fprintf(stderr, "LA\n");
 
 			n1 = agfstnode(graph);
 
@@ -163,9 +163,15 @@ void exec__sock_message(struct Message *m)
 				sprintf(aux, "%d,", graph__getWeight(graph, e));
 				strcat(voisinage, aux);
 				//TODO ajouter l ip
+				aux[0]='\0';
 				client = table__get_socket(id);
+				sprintf(aux, client__get_address(client));
+				strcat(voisinage, aux);
 				strcat(voisinage, ":");
 				//TODO ajouter le port
+				aux[0]='\0';
+				sprintf(aux, client__get_port(client));
+				strcat(voisinage, aux);
 				strcat(voisinage, ";");
 				
 				e = agnxtedge(graph, e, n1);
