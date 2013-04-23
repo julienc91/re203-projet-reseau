@@ -72,20 +72,22 @@ void init(void);
 void end(void);
 
 /* * * * public functions * * * */
-network *network_open       (unsigned int port);
-void     network_close      (network *net);
-int      network_is_opened  (network *net);
-void     network_free       (network *net);
-void     network_update     (network *net);
-Client  *network_connect    (network *net,
+network *network__open       (unsigned int port);
+void     network__close      (network *net);
+int      network__is_opened  (network *net);
+void     network__free       (network *net);
+void     network__update     (network *net);
+Client  *network__connect    (network *net,
 			     const char *address,
 			     const unsigned int port);
-void     network_disconnect (network *net, Client *c);
-void     network_send       (Client *, const char *message);
-void     network_broadcast  (network *net, const char *message);
+void     network__disconnect (network *net, Client *c);
+void     network__send       (Client *, const char *message);
+void     network__broadcast  (network *net, const char *message);
 
-int      client_compare     (Client *a, Client *b);
-void     client_set_id      (Client *c, const char *id);
-char    *client_get_id      (Client *c);
+int      client__compare     (Client *a, Client *b);
+void     client__set_id      (Client *c, const char *id);
+char    *client__get_id      (Client *c);
+char    *client__get_address (Client *c);
+int      client__get_port    (Client *c);
 
 #endif

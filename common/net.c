@@ -5,8 +5,8 @@
 #include <errno.h>
 #include <string.h>
 
-#define NETWORK_OPENED 1
-#define NETWORK_CLOSED 0
+#define NETWORK__OPENED 1
+#define NETWORK__CLOSED 0
 
 /* private functions */
 
@@ -46,10 +46,10 @@ void end(void)
 
 
 
-network *network_open(unsigned int port){
+network *network__open(unsigned int port){
   network *net = malloc(sizeof(*net));
   
-  net->status = NETWORK_OPENED;
+  net->status = NETWORK__OPENED;
   net->server = init_server_connection(port);
   net->nb_clients = 0;
   net->max = net->server;
@@ -58,27 +58,27 @@ network *network_open(unsigned int port){
   return net;
 }
 
-void network_close(network *net){
+void network__close(network *net){
   closesocket(net->server);
   unsigned int i = 0;
   for(i = 0; i < net->nb_clients; i++){
     closesocket(net->clients[i].sock);
   }
  
-  net->status = NETWORK_CLOSED;
+  net->status = NETWORK__CLOSED;
 }
 
-int network_is_opened (network *net){
-  return (net->status == NETWORK_OPENED);
+int network__is_opened (network *net){
+  return (net->status == NETWORK__OPENED);
 }
 
-void network_free(network *net){
-  if (network_is_opened(net)) network_close(net);
+void network__free(network *net){
+  if (network__is_opened(net)) network__close(net);
   free(net->clients);
   free(net);
 }
 
-Client *network_connect(network *net, const char *address, const unsigned int port){
+Client *network__connect(network *net, const char *address, const unsigned int port){
   Client c;
   c.sock = init_client_connection(address, port);
 
@@ -86,28 +86,49 @@ Client *network_connect(network *net, const char *address, const unsigned int po
   return add_client(net, &c);
 }
 
-void network_disconnect (network *net, Client *c){
+void network__disconnect (network *net, Client *c){
   // close socket
   closesocket(c->sock);
   // update array
   remove_client(net, c);
 }
 
-void network_send(Client *c, const char *message){
+void network__send(Client *c, const char *message){
   write_client (c->sock, message);
 }
 
-void network_broadcast  (network *net, const char *message){
+void network__broadcast  (network *net, const char *message){
   unsigned int i;
   for (i = 0; i < net->nb_clients; i++){
-    network_send(&(net->clients[i]), message);
+    network__send(&(net->clients[i]), message);
   }
 }
 
+char *client__get_address(Client *c) {
+  struct sockaddr_in sin;
+  socklen_t len = sizeof(sin);
+  if (getsockname(c->sock, (struct sockaddr *)&sin, &len) == -1){
+    perror("getsockname");
+  }
+  else{
+    return inet_ntoa(sin.sin_addr);
+  }
+}
 
-void network_update(network *net){
+int client__get_port(Client *c) {
+  struct sockaddr_in sin;
+  socklen_t len = sizeof(sin);
+  if (getsockname(c->sock, (struct sockaddr *)&sin, &len) == -1){
+    perror("getsockname");
+  }
+  else{
+    return ntohs(sin.sin_port);
+  }
+}
+
+void network__update(network *net){
   if (net == NULL) return;
-  if (!network_is_opened(net)) return;
+  if (!network__is_opened(net)) return;
 
   char buffer[BUF_SIZE];
 
@@ -178,7 +199,7 @@ void network_update(network *net){
 	/* client disconnected */
 	if(c == 0){
 	  net->disconnection_event(net, &client);
-	  network_disconnect(net, &client);
+	  network__disconnect(net, &client);
 	}
 	else{
 	  /* message received */
@@ -193,7 +214,7 @@ void network_update(network *net){
 static int get_client_id (network *net, Client *c){
   unsigned int i;
   for (i = 0; i < net->nb_clients; i++){
-    if (client_compare(c, &(net->clients[i]))) return i;
+    if (client__compare(c, &(net->clients[i]))) return i;
   }
   return -1;
 }
