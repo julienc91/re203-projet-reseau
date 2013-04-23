@@ -1,7 +1,7 @@
+extern "C" {
 #include "../common/net.h"
-//#include "../common/prompt.h"
 #include "../common/messages.h"
-
+}
 
 #include <stdio.h>
 #include <stdlib.h>

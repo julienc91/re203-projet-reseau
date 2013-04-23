@@ -1,4 +1,4 @@
-CC=@gcc
+CC=@g++
 RM=@rm -f
 CFLAGS=-Wall -Wextra -g -Wno-unused-parameter
 LFLAGS=-lpthread
@@ -13,8 +13,8 @@ COMMONOBJ = $(addprefix $(COMMON_PATH), $(COMMON_FILES))
 
 all: $(BINARY)
 
-$(BINARY): main.c $(COMMONOBJ) 
-	@echo -n " Compiling " $@ "..."
+$(BINARY): main.cpp $(COMMONOBJ) 
+	@echo -n " Compiling" $@ "..."
 	$(CC) $(CFLAGS) $^ -o $(BINARY) $(LFLAGS)
 	@echo " Done."
 
