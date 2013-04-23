@@ -5,7 +5,7 @@
 
 void exec__init(void)
 {
-	net = network_open(12345);
+	net = network__open(12345);
 	//ajouter le chargement du fichier de config 
 }
 

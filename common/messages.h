@@ -74,6 +74,8 @@ int mess__getAcceptance(struct Message* mess);
 int mess__getTTL(struct Message* mess);
 int mess__getWeight(struct Message* mess);
 
+char* mess__treatInput(char * src);
+char* mess__treatOutput(char * src);
 
 void mess__debug(struct Message* m);
 #endif

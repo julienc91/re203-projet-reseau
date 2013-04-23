@@ -3,7 +3,7 @@
 
 Exec::Exec()
 {
-	net = network_open(12345); // why ?
+	net = network__open(12345); // why ?
 }
 static void Exec::prompt_message(Message* m)
 {

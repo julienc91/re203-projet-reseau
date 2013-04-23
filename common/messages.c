@@ -415,6 +415,33 @@ void mess__debug(struct Message* m)
 	}
 }
 
+char* mess__treatInput(char * src)
+{
+	// On enlève les \\ et \* 
+	src = mess__unescape(src);
+	
+	// On enlève l'étoile de fin
+	if(src[strlen(src) - 1] == '*')
+		src[strlen(src) - 1] = 0;
+		
+	return src;
+}
+char* mess__treatOutput(char * src)
+{
+	// On rajoute les \\ et \*
+	src = mess__escape(src);
+	
+	// On rajoute l'étoile de fin
+	char * final = malloc((strlen(src) + 1) * sizeof(char));
+	strcpy(final, src);
+	final[strlen(src)] == '*';
+	final[strlen(src) + 1] == 0;
+	
+	free(src); //eh oui, à un endroit au moins, la mémoire est gérée
+	return final;
+}
+
+
 //*///*/*/*////*/
 /* Utilitaires */
 //*///*/*/*////*/
