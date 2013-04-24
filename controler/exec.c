@@ -3,11 +3,17 @@
 #include <unistd.h>
 #include "exec.h"
 #include "sock_table.h"
+#include "net_functions.h"
+
 
 void exec__init(void)
 {
 	net = network__open(12345);
 	//ajouter le chargement du fichier de config 
+	net->input_event = input_event;
+	net->connection_event = connection_event;
+	net->disconnection_event = disconnection_event;
+	net->message_event = message_event;
 }
 
 void exec__prompt_message(struct Message *m)
@@ -134,32 +140,40 @@ void exec__sock_message(struct Message *m)
 					printf("ERREUR : Aucun noeud libre\n");   
 					return ;
 				}
-				else
-				{
-					n1->u.is_connected = 1;
-					//~ table__add_socket(graph__getId(n1), network__connect(
-					
-				}
 			}
 			else //cas ou le noeud est donne, on verifie si il n'est pas deja utilise
 			{
-				
+				n1 = agfindnode(graph, m->node1);
+				if (n1 != NULL && n1->u.is_connected == 1)
+				{
+					n1 = agfstnode(graph);
+					while(n1 != NULL && n1->u.is_connected == 1)
+					{
+						n1 = agnxtnode(graph, n1);
+					}
+					
+					if(n1 == NULL)
+					{
+						printf("ERREUR : Aucun noeud libre\n");   
+						return ;
+					}
+				}
 			}
+			//TODO ajouter le client et l'id à la table		
+			//~ table__add_socket(graph__getId(n1), network__connect(
+			
 			//actions sur le graphe
-			/*NONE*/
+			n1->u.is_connected = 1;						
 			//envoyer greeting
 			break;
 
 		case POLL:
 			// si il y a eu un changement de voisinage, renvoyer la topologie
-			//~ n1 = agfindnode(graph, m->node1);
-			//~ fprintf(stderr, "ICI \n");
-			graph = graph__open("topo.dot");
-
 			agwrite(graph, stdout);
-			//~ fprintf(stderr, "LA\n");
-
+			
+			//TODO inverser les commentaires, choix du premier noeud dans le but de test
 			n1 = agfstnode(graph);
+			//~ n1 = agfindnode(graph, m->node1);
 
 			e = agfstedge(graph, n1);
 			while(e!=NULL)
@@ -181,12 +195,12 @@ void exec__sock_message(struct Message *m)
 				//TODO ajouter l ip
 				aux[0]='\0';
 				client = table__get_socket(id);
-				sprintf(aux, "%s", client__get_address(client));
+				//~ sprintf(aux, "%s", client__get_address(client));
 				strcat(voisinage, aux);
 				strcat(voisinage, ":");
 				//TODO ajouter le port
 				aux[0]='\0';
-				sprintf(aux, "%d", client__get_port(client));
+				//~ sprintf(aux, "%d", client__get_port(client));
 				strcat(voisinage, aux);
 				strcat(voisinage, ";");
 				
