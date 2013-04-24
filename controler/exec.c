@@ -192,15 +192,15 @@ void exec__sock_message(struct Message *m)
 				strcat(voisinage, ",");
 				sprintf(aux, "%d,", graph__getWeight(graph, e));
 				strcat(voisinage, aux);
-				//TODO ajouter l ip
+				
 				aux[0]='\0';
 				client = table__get_socket(id);
-				//~ sprintf(aux, "%s", client__get_address(client));
+				sprintf(aux, "%s", client__get_address(client));
 				strcat(voisinage, aux);
 				strcat(voisinage, ":");
-				//TODO ajouter le port
+				
 				aux[0]='\0';
-				//~ sprintf(aux, "%d", client__get_port(client));
+				sprintf(aux, "%d", client__get_port(client));
 				strcat(voisinage, aux);
 				strcat(voisinage, ";");
 				
