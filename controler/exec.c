@@ -26,7 +26,6 @@ void exec__prompt_message(struct Message *m)
 	Agnode_t *n1, *n2;
 	Agedge_t *e;
 	struct Message reponse;
-	//~ reponse.n_parameter = NULL;
 
 	switch(m->type)
 	{
@@ -144,7 +143,7 @@ void exec__sock_message(struct Message *m)
 			else //cas ou le noeud est donne, on verifie si il n'est pas deja utilise
 			{
 				n1 = agfindnode(graph, m->node1);
-				if (n1 != NULL && n1->u.is_connected == 1)
+				if ((n1 == NULL) || (n1 != NULL && n1->u.is_connected == 1))
 				{
 					n1 = agfstnode(graph);
 					while(n1 != NULL && n1->u.is_connected == 1)
@@ -163,7 +162,9 @@ void exec__sock_message(struct Message *m)
 			//~ table__add_socket(graph__getId(n1), network__connect(
 			
 			//actions sur le graphe
-			n1->u.is_connected = 1;						
+
+			n1->u.is_connected = 1;
+			printf("Noeud : %s, is_connected : %d\n", graph__getId(n1), n1->u.is_connected);						
 			//envoyer greeting
 			break;
 
@@ -187,23 +188,25 @@ void exec__sock_message(struct Message *m)
 					n2 = e->head;
 				}
 				
-				id = agget(n2, "label");
-				strcat(voisinage, id);
-				strcat(voisinage, ",");
-				sprintf(aux, "%d,", graph__getWeight(graph, e));
-				strcat(voisinage, aux);
-				
-				aux[0]='\0';
-				client = table__get_socket(id);
-				sprintf(aux, "%s", client__get_address(client));
-				strcat(voisinage, aux);
-				strcat(voisinage, ":");
-				
-				aux[0]='\0';
-				sprintf(aux, "%d", client__get_port(client));
-				strcat(voisinage, aux);
-				strcat(voisinage, ";");
-				
+				if (n2->u.is_connected == 1)
+				{
+					id = agget(n2, "label");
+					strcat(voisinage, id);
+					strcat(voisinage, ",");
+					sprintf(aux, "%d,", graph__getWeight(graph, e));
+					strcat(voisinage, aux);
+					
+					aux[0]='\0';
+					client = table__get_socket(id);
+					//~ sprintf(aux, "%s", client__get_address(client));
+					strcat(voisinage, aux);
+					strcat(voisinage, ":");
+					
+					aux[0]='\0';
+					//~ sprintf(aux, "%d", client__get_port(client));
+					strcat(voisinage, aux);
+					strcat(voisinage, ";");
+				}
 				e = agnxtedge(graph, e, n1);
 			}
 			printf("le voisinage : %s\n",voisinage);
