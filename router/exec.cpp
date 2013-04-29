@@ -78,6 +78,7 @@ void Exec::sock_message(Message* m)
 
 		//**** routeur <-> routeur ****//
 		case LINK:
+			std::cout << "link reçu" << std::endl;
 			break;
 		case VECTOR:
 			break;
