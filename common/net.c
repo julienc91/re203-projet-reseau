@@ -48,7 +48,7 @@ void end(void)
 
 network *network__open(unsigned int port){
   network *net = malloc(sizeof(*net));
-  
+
   net->status = NETWORK__OPENED;
   net->server = init_server_connection(port);
   net->nb_clients = 0;
@@ -64,7 +64,7 @@ void network__close(network *net){
   for(i = 0; i < net->nb_clients; i++){
     closesocket(net->clients[i].sock);
   }
- 
+
   net->status = NETWORK__CLOSED;
 }
 
@@ -114,10 +114,10 @@ void network__update(network *net){
 
   fd_set rdfs;
   FD_ZERO(&rdfs);
-  
+
   /* add STDIN_FILENO */
   FD_SET(STDIN_FILENO, &rdfs);
-  
+
   /* add the connection socket */
   FD_SET(net->server, &rdfs);
 
@@ -133,18 +133,20 @@ void network__update(network *net){
   }
 
   /* something from standard input : i.e keyboard */
-  if(FD_ISSET(STDIN_FILENO, &rdfs)){
-    int c;
-    char *buf = buffer;
-    while ((c = getchar()) != '\n' && c != EOF){*(buf++) = c;}
-    *buf = '\0';
-    net->input_event(net, buffer);
-    fflush(stdin); // force flush
-
+  //if(FD_ISSET(STDIN_FILENO, &rdfs)){
+    //int c;
+    //char *buf = buffer;
+    //while ((c = getchar()) != '\n' && c != EOF){*(buf++) = c;}
+    //*buf = '\0';
+    //net->input_event(net, buffer);
+    //fflush(stdin); // force flush
+//
     /* stop process when type on keyboard */
-    return;
-  }
-  else if(FD_ISSET(net->server, &rdfs)){
+    //return;
+  //}
+  //else
+  //
+  if(FD_ISSET(net->server, &rdfs)){
     /* new client */
     SOCKADDR_IN csin = { 0 };
     size_t sinsize = sizeof csin;
@@ -202,7 +204,7 @@ static int get_client_id (network *net, Client *c){
 static Client *add_client(network *net, Client *c){
   /* what is the new maximum fd ? */
   net->max = c->sock > net->max ? c->sock : net->max;
-  
+
   net->clients[net->nb_clients] = *c;
   (net->nb_clients)++;
 
@@ -219,7 +221,7 @@ static void remove_client(network *net, Client *c){
 
   // free memory
   memmove(net->clients + to_remove, net->clients + to_remove + 1, (net->nb_clients - to_remove - 1) * sizeof(Client));
- 
+
   // change nb of clients
   (net->nb_clients)--;
 }
