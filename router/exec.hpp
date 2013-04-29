@@ -6,9 +6,9 @@
 
 class Exec
 {
-	Exec();
-	static void prompt_message(Message* m);
-	static void sock_message(Message* m);
+	public:
+		void prompt_message(Message* m);
+		static void sock_message(Message* m);
 };
 
 #endif

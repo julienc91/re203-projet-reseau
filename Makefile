@@ -1,13 +1,15 @@
 export CFLAGS= -g -std=c99
+export CPPFLAGS= -g
 export LDFLAGS=-lpthread -lgraph -lcdt
 export CC=@gcc
+export CP=@g++
 export RM=@rm -f
 export CD=-@cd
 export SILENT_MAKE=@$(MAKE) -s
 
 SRCA=$(wildcard common/*.c)
 SRCB=$(wildcard controler/*.c)
-SRCC=$(wildcard router/*.c)
+SRCC=$(wildcard router/*.cpp)
 OBJ=$(SRC:.c=.o)
 
 

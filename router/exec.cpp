@@ -5,6 +5,7 @@
 
 void Exec::prompt_message(Message* m)
 {
+	time_t stamp;
 	if(m == NULL)
 	{
 		return;
@@ -14,7 +15,7 @@ void Exec::prompt_message(Message* m)
 	{
 		case MESSAGE:
 			//calcul temps
-			time_t stamp = time(0);
+			stamp = time(0);
 
 			//actions sur réseau
 
@@ -77,7 +78,6 @@ void Exec::sock_message(Message* m)
 
 		//**** routeur <-> routeur ****//
 		case LINK:
-			if(m)
 			break;
 		case VECTOR:
 			break;
@@ -89,7 +89,7 @@ void Exec::sock_message(Message* m)
 			break;
 
 		default:
-			printf("ERREUR: Action non reconnue");
+			std::cout << "ERREUR: Action non reconnue" << std::endl;
 			break;
 	}
 }
