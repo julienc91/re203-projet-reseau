@@ -356,7 +356,7 @@ char* mess__toString(struct Message* mess)
 		case LOGIN: 			//log in as ID port p
 			if(mess->node1 == NULL)
 			{
-				sprintf(out, "log in port %d", mess->node1, mess->n_parameter);
+				sprintf(out, "log in port %d", mess->n_parameter);
 			}
 			else
 			{		
@@ -514,8 +514,8 @@ char* mess__treatOutput(char * src)
 	// On rajoute l'étoile de fin
 	char * final = malloc((strlen(src) + 1) * sizeof(char));
 	strcpy(final, src);
-	final[strlen(src)] == '*';
-	final[strlen(src) + 1] == 0;
+	final[strlen(src)] = '*';
+	final[strlen(src) + 1] = '\0';
 	
 	free(src); //eh oui, à un endroit au moins, la mémoire est gérée
 	return final;

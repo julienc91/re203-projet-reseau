@@ -5,10 +5,10 @@
 #include "sock_table.h"
 #include "net_functions.h"
 
-
 void exec__init(void)
 {
-	net = network__open(12345);
+	net = network__open(23456);
+	//~ printf("Retour de network open : %p\n", net);
 	//ajouter le chargement du fichier de config 
 	net->input_event = input_event;
 	net->connection_event = connection_event;
