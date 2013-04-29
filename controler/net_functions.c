@@ -1,10 +1,9 @@
 #include "../common/net.h"
 #include "../common/messages.h"
+#include "../common/util.h"
 #include "exec.h"
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
-
 
 void input_event(network *net, char *string)
 {
@@ -13,7 +12,7 @@ void input_event(network *net, char *string)
 
 void connection_event(network *net, Client *client, char *string)
 {
-	printf("Pouet ! \n");
+	//~ printf("Pouet ! \n");
 	//Necessaire pour les tests via telnet
 	int i = strlen(string);
 	
@@ -28,14 +27,21 @@ void connection_event(network *net, Client *client, char *string)
 	message = exec__sock_message(message);
 
 	client__set_id(client, message->node1);
-	message->type = GREETING;
+	//~ message->type = GREETING;
 	network__send(client, mess__treatOutput(mess__toString(message)));
 }
 
 void disconnection_event(network *net, Client *client)
 {
-		printf("Pouet disco! \n");
+		//~ printf("Pouet disco! \n");
+		struct Message *message;
+		mess__init(&message);
+		message->type = DISCONNECT;
+		strcopy(message->node1, client__get_id(client)); 
+		message = exec__sock_message(message);
 
+		//~ client__set_id(client, message->node1);
+		network__send(client, mess__treatOutput(mess__toString(message)));
 }
 
 void message_event(network *net, Client *client, char *string)

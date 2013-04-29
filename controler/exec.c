@@ -4,11 +4,11 @@
 #include "exec.h"
 #include "sock_table.h"
 #include "net_functions.h"
+#include "../common/util.h"
 
 void exec__init(void)
 {
 	net = network__open(23456);
-	//~ printf("Retour de network open : %p\n", net);
 	//ajouter le chargement du fichier de config 
 	net->input_event = input_event;
 	net->connection_event = connection_event;
@@ -161,10 +161,7 @@ struct Message *exec__sock_message(struct Message *m)
 				}
 			}
 			//TODO ajouter le client et l'id à la table
-			free(m->node1);
-			m->node1 = malloc((strlen(graph__getId(n1)) +1) * sizeof(char));
-			m->node1[0]='\0';
-			strcat(m->node1, graph__getId(n1));
+			strcopy(m->node1, graph__getId(n1));
 			//~ client__set_id(client, message->n1);
 			//~ table__add_socket(graph__getId(n1), network__connect(
 			
@@ -173,6 +170,7 @@ struct Message *exec__sock_message(struct Message *m)
 			n1->u.is_connected = 1;
 			printf("Noeud : %s, is_connected : %d\n", graph__getId(n1), n1->u.is_connected);						
 			//envoyer greeting
+			m->type = GREETING;
 			break;
 
 		case POLL:
@@ -180,8 +178,8 @@ struct Message *exec__sock_message(struct Message *m)
 			agwrite(graph, stdout);
 			
 			//TODO inverser les commentaires, choix du premier noeud dans le but de test
-			n1 = agfstnode(graph);
-			//~ n1 = agfindnode(graph, m->node1);
+			//~ n1 = agfstnode(graph);
+			n1 = agfindnode(graph, m->node1);
 
 			e = agfstedge(graph, n1);
 			while(e!=NULL)
@@ -217,12 +215,16 @@ struct Message *exec__sock_message(struct Message *m)
 				e = agnxtedge(graph, e, n1);
 			}
 			printf("le voisinage : %s\n",voisinage);
+			
 			voisinage[0]='\0';
 			aux[0]='\0';			
 			// sinon, renvoyer neighborhood ok
 			break;
 
 		case LOGOUT:
+			n1 = agfindnode(graph, m->node1);
+			n1->u.is_connected = 0;
+			m->type = BYE;
 			// envoyer bye
 			break;
 
