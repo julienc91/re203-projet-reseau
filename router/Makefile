@@ -5,7 +5,7 @@ LFLAGS=-lpthread
 
 BINARY=router
 COMMON_PATH  = ../common/
-COMMON_FILES = prompt.o messages.o net.o trex.o
+COMMON_FILES = prompt.o messages.o net.o config.o trex.o
 
 COMMONOBJ = $(addprefix $(COMMON_PATH), $(COMMON_FILES))
 
@@ -13,7 +13,7 @@ COMMONOBJ = $(addprefix $(COMMON_PATH), $(COMMON_FILES))
 
 all: $(BINARY)
 
-$(BINARY): main.cpp event.cpp exec.cpp $(COMMONOBJ) 
+$(BINARY): main.cpp event.cpp exec.cpp $(COMMONOBJ)
 	@echo -n " Compiling" $@ "..."
 	$(CC) $(CFLAGS) $^ -o $(BINARY) $(LFLAGS)
 	@echo " Done."
