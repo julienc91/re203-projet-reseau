@@ -5,7 +5,7 @@
 
 void Exec::prompt_message(Message* m)
 {
-	time_t stamp;
+	//time_t stamp;
 	if(m == NULL)
 	{
 		return;
@@ -15,9 +15,10 @@ void Exec::prompt_message(Message* m)
 	{
 		case MESSAGE:
 			//calcul temps
-			stamp = time(0);
+		//	stamp = time(0);
 
 			//actions sur réseau
+			// il faut séparer le message en packet de bonne taille et les envoyer
 
 			//affichage
 

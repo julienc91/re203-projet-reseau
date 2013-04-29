@@ -116,7 +116,7 @@ void network__update(network *net){
   FD_ZERO(&rdfs);
 
   /* add STDIN_FILENO */
-  FD_SET(STDIN_FILENO, &rdfs);
+  //FD_SET(STDIN_FILENO, &rdfs);
 
   /* add the connection socket */
   FD_SET(net->server, &rdfs);
@@ -133,20 +133,18 @@ void network__update(network *net){
   }
 
   /* something from standard input : i.e keyboard */
-  //if(FD_ISSET(STDIN_FILENO, &rdfs)){
-    //int c;
-    //char *buf = buffer;
-    //while ((c = getchar()) != '\n' && c != EOF){*(buf++) = c;}
-    //*buf = '\0';
-    //net->input_event(net, buffer);
-    //fflush(stdin); // force flush
-//
+  if(FD_ISSET(STDIN_FILENO, &rdfs)){
+    int c;
+    char *buf = buffer;
+    while ((c = getchar()) != '\n' && c != EOF){*(buf++) = c;}
+    *buf = '\0';
+    net->input_event(net, buffer);
+    fflush(stdin); // force flush
+
     /* stop process when type on keyboard */
-    //return;
-  //}
-  //else
-  //
-  if(FD_ISSET(net->server, &rdfs)){
+    return;
+  }
+  else if(FD_ISSET(net->server, &rdfs)){
     /* new client */
     SOCKADDR_IN csin = { 0 };
     size_t sinsize = sizeof csin;
