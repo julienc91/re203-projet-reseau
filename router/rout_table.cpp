@@ -2,19 +2,7 @@
 #include <string>
 
 
-Routeur::Routeur(string name){
-    _name = name;
-    _tab = new RoutTable(name);
-}
 
-Routeur::Routeur(const Routeur * data){
-    _name   = data->_name;
-    _tab    = new RoutTable(data->_tab);
-}
-
-Routeur::~Routeur(){
-    delete _tab;
-}
 
 RoutTable::RoutTable(const string name){
     _head = new Entry(name, NULL, 0);

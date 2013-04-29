@@ -70,7 +70,7 @@ void config__readLine(Configuration* conf, char* mess_src)
 	static char* regex_strtable[] =
 	{
 		"router-port = \\d*\\c",
-		"controller-adress = \\d*.\\d*.\\d*.\\d*\\c",
+		"controller-address = \\d*\\.\\d*\\.\\d*\\.\\d*\\c",
 		"controller-port = \\d*\\c",
 		"controller-update-interval = \\d*\\c",
 		"router-update-interval = \\d*\\c",
