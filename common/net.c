@@ -45,7 +45,6 @@ void end(void)
 }
 
 
-
 network *network__open(unsigned int port){
   network *net = malloc(sizeof(*net));
 

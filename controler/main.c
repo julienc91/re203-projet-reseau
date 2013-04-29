@@ -12,11 +12,17 @@ int main(void)
 	printf("Graph prompt : Ctrl+D pour quitter\n");
 	pthread_t *prompt_th1 = prompt__start(exec__prompt_message);
 	pthread_join(*prompt_th1, NULL);
+	
+	printf("Prompt quitté\n");
 
-	printf("Routeur prompt : Ctrl+D pour quitter\n");
-	pthread_t *prompt_th2 = prompt__start(exec__sock_message);
-	pthread_join(*prompt_th2, NULL);
+	//~ printf("Routeur prompt : Ctrl+D pour quitter\n");
+	//~ pthread_t *prompt_th2 = prompt__start(exec__sock_message);
+	//~ pthread_join(*prompt_th2, NULL);
 
+	while(1)
+	{
+		network__update(net);
+	}
 	
 	return  0;
 }

@@ -109,7 +109,7 @@ void exec__prompt_message(struct Message *m)
 }
 
 
-void exec__sock_message(struct Message *m)
+struct Message *exec__sock_message(struct Message *m)
 {
 	Agnode_t *n1, *n2;
 	Agedge_t *e;
@@ -120,7 +120,7 @@ void exec__sock_message(struct Message *m)
 	
 	if(m == NULL)
 	{
-		return;
+		return m;
 	}
 
 	switch(m->type)
@@ -136,8 +136,9 @@ void exec__sock_message(struct Message *m)
 				
 				if(n1 == NULL)
 				{
-					printf("ERREUR : Aucun noeud libre\n");   
-					return ;
+					printf("ERREUR : Aucun noeud libre\n"); 
+					m->node1 = "";  
+					return m;
 				}
 			}
 			else //cas ou le noeud est donne, on verifie si il n'est pas deja utilise
@@ -154,11 +155,17 @@ void exec__sock_message(struct Message *m)
 					if(n1 == NULL)
 					{
 						printf("ERREUR : Aucun noeud libre\n");   
-						return ;
+						m->node1 = ""; 
+						return m;	 
 					}
 				}
 			}
-			//TODO ajouter le client et l'id à la table		
+			//TODO ajouter le client et l'id à la table
+			free(m->node1);
+			m->node1 = malloc((strlen(graph__getId(n1)) +1) * sizeof(char));
+			m->node1[0]='\0';
+			strcat(m->node1, graph__getId(n1));
+			//~ client__set_id(client, message->n1);
 			//~ table__add_socket(graph__getId(n1), network__connect(
 			
 			//actions sur le graphe
@@ -223,4 +230,5 @@ void exec__sock_message(struct Message *m)
 			printf("ERREUR: Action non reconnue\n");
 			break;
 	}
+	return m;
 }

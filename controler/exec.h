@@ -7,6 +7,6 @@ static network *net;
 
 void exec__init(void);
 void exec__prompt_message(struct Message* m);
-void exec__sock_message(struct Message* m);
+struct Message *exec__sock_message(struct Message* m);
 
 #endif
