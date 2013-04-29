@@ -3,13 +3,14 @@ extern "C" {
 #include "../common/messages.h"
 }
 
+#include "rout_table.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-void input_event (network *net, char *buffer){ 
+void input_event (network *net, char *buffer){
   printf("<input event: '%s'>\n", buffer);
-  
+
   if (strcmp(buffer, "quit") == 0){
     network__close(net);
     return;
@@ -18,24 +19,24 @@ void input_event (network *net, char *buffer){
   network__send(&(net->clients[0]), buffer);
 }
 
-void connection_event (network *net, Client *c, char *buffer){ 
+void connection_event (network *net, Client *c, char *buffer){
   printf("<connection on socket %d : %s>\n", c->sock, buffer);
   strcpy(c->id, buffer + 10);
 }
 
-void disconnection_event (network *net, Client *c){ 
+void disconnection_event (network *net, Client *c){
   printf("<disconnection from socket %d>\n", c->sock);
 }
 
-void message_event (network *net, Client *c, char *buffer){ 
+void message_event (network *net, Client *c, char *buffer){
   printf("<message from '%s', socket %d : %s>\n", c->id, c->sock, buffer);
 
   struct Message *m = mess__parse(buffer);
-  
+
   if (!m) return;
   switch(m->type){
   case LOGIN:
-   
+
   default:
     fprintf(stderr, "Error: action unknown");
     break;
@@ -50,7 +51,7 @@ int main(int argc, char **argv){
     return EXIT_FAILURE;
   }
   unsigned int port = atoi(argv[2]);
- 
+
   init(); // windows compatibility
 
   // * * * * ouverture serveur * * * *
