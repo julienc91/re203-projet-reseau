@@ -1,8 +1,6 @@
 #ifndef __MESSAGES_H_
 #define __MESSAGES_H_
 
-#include <stddef.h>
-
 enum Acceptance
 {
 	NOT,
@@ -28,6 +26,7 @@ enum MessageType
 	ROUTETABLE, 	//routetable
 
 	//Protocole (tout se finit par *)
+	// Routeur <-> Controleur 
 	LOGIN, 			//log in as ID port p
 					//log in port p
 	LOGOUT, 		//log out
@@ -38,6 +37,7 @@ enum MessageType
 	NEIGHBORHOOD,	//neighborhood newlist [...;id_i,cost_i,ip_i:port_i;...]
 					//neighborhood ok
 
+	// Routeur <-> Routeur
 	LINK,			//link
 					//link ok
 	VECTOR,			//vector [..]
@@ -74,6 +74,10 @@ int mess__getAcceptance(struct Message* mess);
 int mess__getTTL(struct Message* mess);
 int mess__getWeight(struct Message* mess);
 
+char* mess__treatInput(char * src);
+char* mess__treatOutput(char * src);
+
+char* mess__toString(struct Message* mess);
 
 void mess__debug(struct Message* m);
 #endif

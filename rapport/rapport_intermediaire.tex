@@ -19,6 +19,7 @@
 \usepackage{kpfonts}
 
 \usepackage{graphicx}
+%\usepackage{rotating}
 
 \lstset{
   language=C++,
@@ -108,9 +109,9 @@ Plus bas niveau, afin d'améliorer la complexité générale du programme, des t
 
 Actuellement, les différentes parties du contrôleur ont été implémentées de manière séparée:
 \begin{itemize}
- \item L'invite de commande est opérationnelle: reconnaissance des différentes commandes possibles à l'aide d'expression régulières et échappement des caractères
- \item La gestion des graphes est mise en place: création à partir d'un fichier \textit{dot}, ajout/retrait/modification d'arête ou de n\oe ud, sauvegarde dans un fichier
- \item Une bibliothèque de socket utilisant les fonctions de \textit{sys/socket.h} est prête à l'utilisation. Elle permet la connexion, la déconnexion, l'envoi de messages, \dots
+ \item L'invite de commande est opérationnelle: reconnaissance des différentes commandes possibles à l'aide d'expressions régulières et échappements des caractères;
+ \item La gestion des graphes est mise en place: création à partir d'un fichier \textit{dot}, ajout/retrait/modification d'arête ou de n\oe ud, sauvegarde dans un fichier;
+ \item Une bibliothèque de gestion de sockets utilisant les fonctions de \textit{sys/socket.h} est prête à l'utilisation. Elle permet la connexion, la déconnexion, l'envoi de messages, \dots Son implémentation est générique et permet une programmation évènementielle via des pointeurs de fonction correspondants aux actions à effectuer lors d'une connexion, de la récéption d'un message, etc.
 \end{itemize}
 Il ne reste donc qu'à \textit{lier} les différentes composantes entre elles pour obtenir un contrôleur respectant les attentes.
 
@@ -140,7 +141,7 @@ Sauf retard, il est également prévu de consacrer une séance à la réalisatio
 
 \subsection{Routeur $\leftrightarrow$ Routeur}
 
-Après avoir reçu sa liste de voisins par le contrôleur, un routeur qui vient de rejoindre le réseau doit tout d'abord se signaler auprès de l'ensemble de ses voisins et établie avec eux une connexion permanente. De façon régulière, il doit échanger avec ses voisins ses vecteurs distances, et reçoit également les vecteurs distances de ces derniers. Ces nouvelles données lui permettent de mettre à jour sa table de routage si besoin est.
+Après avoir reçu sa liste de voisins par le contrôleur, un routeur qui vient de rejoindre le réseau doit tout d'abord se signaler auprès de l'ensemble de ses voisins et établit avec eux une connexion permanente. De façon régulière, il doit échanger avec ses voisins ses vecteurs distances, et reçoit également les vecteurs distances de ces derniers. Ces nouvelles données lui permettent de mettre à jour sa table de routage si besoin est.
 
 Un routeur doit également communiquer avec un voisin lorsqu'il doit transmettre un paquet en passant par ce voisin. Pour savoir à quel voisin transmettre le paquet, il lui suffit de regarder le destinataire du message et sa table de routage, et de le transmettre au bon routeur.
 
@@ -171,9 +172,9 @@ Quel que soit le type d'échange, le récepteur envoie systématiquement un mess
 
 Le déroulement prévisionnel du projet est indiqué sur le diagramme de Gantt donné en figure \ref{gantt}.
 
-\begin{landscape}
-\begin{center}
-\begin{figure}[H]
+\vspace{20pt}
+
+\begin{figure}[angle=45,height=.75,H]
  \centering
 \begin{gantt}{10}{9}
   \begin{ganttitle}
@@ -212,8 +213,6 @@ Le déroulement prévisionnel du projet est indiqué sur le diagramme de Gantt d
 \caption{Diagramme de Gantt pour le projet}
 \label{gantt}
 \end{figure}
-\end{center}
-\end{landscape}
 
 
 \end{document}

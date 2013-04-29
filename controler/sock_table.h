@@ -1,6 +1,6 @@
 #ifndef _SOCK_TABLE_H
-
-#include "../src/net.h"
+#define _SOCK_TABLE_H
+#include "../common/net.h"
 #include "hashtable.h"
 
 
