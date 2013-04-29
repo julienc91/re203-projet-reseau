@@ -122,7 +122,7 @@ struct Message* mess__parse(char* mess_src)
 		"link ok",
 		"vector \\[.*\\]",
 		"vector ok",
-		"packet seqnum \\d* src \\w* dst \\w* ttl \\d* .*",
+		"packet seqnum \\d* src \\w* dst \\w* ttl \\d* data .*",
 		"packet seqnum \\d* src \\w* dst \\w* ok",
 		"packet seqnum \\d* src \\w* dst \\w* toofar",
 		"ping seqnum \\d* src \\w* dst \\w* ttl \\d*",
@@ -291,6 +291,7 @@ struct Message* mess__parse(char* mess_src)
 			char * tmp2 = strtok(NULL, " ");
 			mess_dest->n_parameter = atoi(tmp2);
 
+			strtok(NULL, " ");
 			mess_dest->s_parameter = strstr(mess_src, tmp2) + strlen(tmp2) + 1;
 			break;
 

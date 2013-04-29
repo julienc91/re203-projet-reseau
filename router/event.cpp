@@ -18,7 +18,6 @@ void Event::input(network *net, char *buffer)
 		return;
 	}
 
-
 	network__send(&(net->clients[0]), buffer);
 }
 

@@ -13,7 +13,7 @@ COMMONOBJ = $(addprefix $(COMMON_PATH), $(COMMON_FILES))
 
 all: $(BINARY)
 
-$(BINARY): main.cpp event.cpp exec.cpp $(COMMONOBJ)
+$(BINARY): main.cpp event.cpp exec.cpp net_actions.cpp display.cpp  $(COMMONOBJ)
 	@echo -n " Compiling" $@ "..."
 	$(CC) $(CFLAGS) $^ -o $(BINARY) $(LFLAGS)
 	@echo " Done."

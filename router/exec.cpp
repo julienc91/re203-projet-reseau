@@ -1,11 +1,14 @@
-#include "display.h"
+#include "display.hpp"
 #include "exec.h"
+#include "exceptions.hpp"
+#include "net_actions.hpp"
 #include <iostream>
-#include <ctime>
 
 void Exec::prompt_message(Message* m)
 {
-	//time_t stamp;
+	NetActions action;
+	Display disp;
+
 	if(m == NULL)
 	{
 		return;
@@ -15,21 +18,32 @@ void Exec::prompt_message(Message* m)
 	{
 		case MESSAGE:
 			//calcul temps
-		//	stamp = time(0);
 
 			//actions sur réseau
 			// il faut séparer le message en packet de bonne taille et les envoyer
+			try
+			{
+				action.message(m);
+			}
+			catch(UnknownDest&)
+			{
+				disp.err_unknown();
+				return;
+			}
 
 			//affichage
-
+			disp.mess_sent();
+			//attendre le retour
+			//while(pas de retour || !timeout dépassé)
+			//disp.mess_not_deliv(router->getConfiguration()->defaultPacketTimeoutValue);
 			break;
 
 		case PING:
-			// actions sur graphe
-
 			//actions sur réseau
+			action.ping(m);
 
 			//affichage
+
 			break;
 
 		case ROUTE:
