@@ -8,8 +8,8 @@
 
 void exec__init(void)
 {
-	net = network__open(23456);
-	//ajouter le chargement du fichier de config 
+	net = network__open(12345);
+	//TODO ajouter le chargement du fichier de config 
 	net->input_event = input_event;
 	net->connection_event = connection_event;
 	net->disconnection_event = disconnection_event;
@@ -34,7 +34,10 @@ void exec__prompt_message(struct Message *m)
 			graph = graph__open(mess__unescape(m->s_parameter));
 			//actions sur réseau
 			//affichage
-			disp__loaded(agnnodes(graph)); // calculer nombre de noeuds chargés
+			if(graph != NULL)
+			{
+				disp__loaded(agnnodes(graph)); // calculer nombre de noeuds chargés
+			}
 			break;
 
 		case SAVE:
@@ -160,8 +163,9 @@ struct Message *exec__sock_message(struct Message *m)
 					}
 				}
 			}
-			//TODO ajouter le client et l'id à la table
-			strcopy(m->node1, graph__getId(n1));
+			//TODO ajouter le client et l'id à la table$
+			printf("AVANT strcopy dans exec.c\n");   
+			strcopy2(m->node1, graph__getId(n1));
 			//~ client__set_id(client, message->n1);
 			//~ table__add_socket(graph__getId(n1), network__connect(
 			
@@ -215,7 +219,7 @@ struct Message *exec__sock_message(struct Message *m)
 				e = agnxtedge(graph, e, n1);
 			}
 			printf("le voisinage : %s\n",voisinage);
-			
+			strcopy2(m->node1, voisinage);
 			voisinage[0]='\0';
 			aux[0]='\0';			
 			// sinon, renvoyer neighborhood ok

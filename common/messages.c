@@ -4,10 +4,10 @@
 #include <string.h>
 #include "../trex/trex.h"
 #include "messages.h"
+#include "util.h"
+
 
 char *str_sub (const char *s, unsigned int start, unsigned int end);
-
-char* strcopy(const char* src);
 
 void mess__init(struct Message** mess)
 {
@@ -111,7 +111,7 @@ struct Message* mess__parse(char* mess_src)
 		"routetable",
 		"log in as \\w* port \\d*",
 		"log in port \\d*",
-		"logout",
+		"log out",
 		"greeting \\w*",
 		"bye",
 		"poll",
@@ -552,11 +552,3 @@ char *str_sub (const char *s, unsigned int start, unsigned int end)
 	return new_s;
 }
 
-char* strcopy(const char* src)
-{
-	int n = strlen(src) +1;
-	char* str = malloc(n  * sizeof(char));
-
-	strcpy(str, src);
-	return str;
-}
