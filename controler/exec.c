@@ -4,12 +4,12 @@
 #include "exec.h"
 #include "sock_table.h"
 #include "net_functions.h"
-
+#include "../common/util.h"
 
 void exec__init(void)
 {
 	net = network__open(12345);
-	//ajouter le chargement du fichier de config 
+	//TODO ajouter le chargement du fichier de config 
 	net->input_event = input_event;
 	net->connection_event = connection_event;
 	net->disconnection_event = disconnection_event;
@@ -34,7 +34,10 @@ void exec__prompt_message(struct Message *m)
 			graph = graph__open(mess__unescape(m->s_parameter));
 			//actions sur réseau
 			//affichage
-			disp__loaded(agnnodes(graph)); // calculer nombre de noeuds chargés
+			if(graph != NULL)
+			{
+				disp__loaded(agnnodes(graph)); // calculer nombre de noeuds chargés
+			}
 			break;
 
 		case SAVE:
@@ -109,7 +112,7 @@ void exec__prompt_message(struct Message *m)
 }
 
 
-void exec__sock_message(struct Message *m)
+struct Message *exec__sock_message(struct Message *m)
 {
 	Agnode_t *n1, *n2;
 	Agedge_t *e;
@@ -120,7 +123,7 @@ void exec__sock_message(struct Message *m)
 	
 	if(m == NULL)
 	{
-		return;
+		return m;
 	}
 
 	switch(m->type)
@@ -136,8 +139,9 @@ void exec__sock_message(struct Message *m)
 				
 				if(n1 == NULL)
 				{
-					printf("ERREUR : Aucun noeud libre\n");   
-					return ;
+					printf("ERREUR : Aucun noeud libre\n"); 
+					m->node1 = "";  
+					return m;
 				}
 			}
 			else //cas ou le noeud est donne, on verifie si il n'est pas deja utilise
@@ -154,11 +158,15 @@ void exec__sock_message(struct Message *m)
 					if(n1 == NULL)
 					{
 						printf("ERREUR : Aucun noeud libre\n");   
-						return ;
+						m->node1 = ""; 
+						return m;	 
 					}
 				}
 			}
-			//TODO ajouter le client et l'id à la table		
+			//TODO ajouter le client et l'id à la table$
+			printf("AVANT strcopy dans exec.c\n");   
+			strcopy2(m->node1, graph__getId(n1));
+			//~ client__set_id(client, message->n1);
 			//~ table__add_socket(graph__getId(n1), network__connect(
 			
 			//actions sur le graphe
@@ -166,6 +174,7 @@ void exec__sock_message(struct Message *m)
 			n1->u.is_connected = 1;
 			printf("Noeud : %s, is_connected : %d\n", graph__getId(n1), n1->u.is_connected);						
 			//envoyer greeting
+			m->type = GREETING;
 			break;
 
 		case POLL:
@@ -173,8 +182,8 @@ void exec__sock_message(struct Message *m)
 			agwrite(graph, stdout);
 			
 			//TODO inverser les commentaires, choix du premier noeud dans le but de test
-			n1 = agfstnode(graph);
-			//~ n1 = agfindnode(graph, m->node1);
+			//~ n1 = agfstnode(graph);
+			n1 = agfindnode(graph, m->node1);
 
 			e = agfstedge(graph, n1);
 			while(e!=NULL)
@@ -210,12 +219,16 @@ void exec__sock_message(struct Message *m)
 				e = agnxtedge(graph, e, n1);
 			}
 			printf("le voisinage : %s\n",voisinage);
+			strcopy2(m->node1, voisinage);
 			voisinage[0]='\0';
 			aux[0]='\0';			
 			// sinon, renvoyer neighborhood ok
 			break;
 
 		case LOGOUT:
+			n1 = agfindnode(graph, m->node1);
+			n1->u.is_connected = 0;
+			m->type = BYE;
 			// envoyer bye
 			break;
 
@@ -223,4 +236,5 @@ void exec__sock_message(struct Message *m)
 			printf("ERREUR: Action non reconnue\n");
 			break;
 	}
+	return m;
 }

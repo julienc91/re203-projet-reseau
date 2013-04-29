@@ -10,7 +10,7 @@ Agraph_t* graph__open(char * filename){
     FILE * fd = fopen(filename, "r");
     if(fd == NULL){
         perror("fopen");
-        exit(0);
+        return NULL;
     }
 
     Agraph_t * g = agread(fd);

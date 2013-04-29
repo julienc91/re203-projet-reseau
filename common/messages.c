@@ -4,10 +4,10 @@
 #include <string.h>
 #include "../trex/trex.h"
 #include "messages.h"
+#include "util.h"
+
 
 char *str_sub (const char *s, unsigned int start, unsigned int end);
-
-char* strcopy(const char* src);
 
 void mess__init(struct Message** mess)
 {
@@ -112,7 +112,7 @@ struct Message* mess__parse(char* mess_src)
 		"routetable",
 		"log in as \\w* port \\d*",
 		"log in port \\d*",
-		"logout",
+		"log out",
 		"greeting \\w*",
 		"bye",
 		"poll",
@@ -389,7 +389,7 @@ char* mess__toString(struct Message* mess)
 		case LOGIN: 			//log in as ID port p
 			if(mess->node1 == NULL)
 			{
-				sprintf(out, "log in port %d", mess->node1, mess->n_parameter);
+				sprintf(out, "log in port %d", mess->n_parameter);
 			}
 			else
 			{
@@ -550,8 +550,9 @@ char* mess__treatOutput(char * src)
 	// On rajoute l'étoile de fin
 	char * final = malloc((strlen(src) + 1) * sizeof(char));
 	strcpy(final, src);
-	final[strlen(src)] == '*';
-	final[strlen(src) + 1] == 0;
+
+	final[strlen(src)] = '*';
+	final[strlen(src) + 1] = '\0';
 
 	free(src); //eh oui, à un endroit au moins, la mémoire est gérée
 	return final;
@@ -586,13 +587,4 @@ char *str_sub (const char *s, unsigned int start, unsigned int end)
 		}
 	}
 	return new_s;
-}
-
-char* strcopy(const char* src)
-{
-	int n = strlen(src) +1;
-	char* str = malloc(n  * sizeof(char));
-
-	strcpy(str, src);
-	return str;
 }
