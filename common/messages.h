@@ -5,7 +5,8 @@ enum Acceptance
 {
 	NOT,
 	OK,
-	TOOFAR
+	TOOFAR,
+	TTLZERO
 };
 
 enum MessageType
@@ -26,7 +27,7 @@ enum MessageType
 	ROUTETABLE, 	//routetable
 
 	//Protocole (tout se finit par *)
-	// Routeur <-> Controleur 
+	// Routeur <-> Controleur
 	LOGIN, 			//log in as ID port p
 					//log in port p
 	LOGOUT, 		//log out
@@ -58,7 +59,7 @@ struct Message
 	enum MessageType type;
 	char *s_parameter;
 	char *node1, *node2;
-	int n_parameter;
+	int n_parameter, seqnum;
 	enum Acceptance accept;
 };
 

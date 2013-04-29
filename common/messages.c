@@ -17,6 +17,7 @@ void mess__init(struct Message** mess)
 	(*mess)->node1 = NULL;
 	(*mess)->node2 = NULL;
 	(*mess)->n_parameter = -1;
+	(*mess)->seqnum = -1;
 	(*mess)->accept = NOT;
 }
 
@@ -117,15 +118,16 @@ struct Message* mess__parse(char* mess_src)
 		"poll",
 		"neighborhood newlist \\[.*\\]", //pourrait être amélioré pour vérifier directement si c'est bon
 		"neighborhood ok",
-		"link",
+		"link id \\w*",
 		"link ok",
 		"vector \\[.*\\]",
 		"vector ok",
-		"packet src \\w* dst \\w* ttl \\d* .*",
-		"packet src \\w* dst \\w* ok",
-		"packet src \\w* dst \\w* toofar",
-		"ping src \\w* dst \\w* ttl \\d*",
-		"pong src \\w* dst \\w* ttl \\d*",
+		"packet seqnum \\d* src \\w* dst \\w* ttl \\d* .*",
+		"packet seqnum \\d* src \\w* dst \\w* ok",
+		"packet seqnum \\d* src \\w* dst \\w* toofar",
+		"ping seqnum \\d* src \\w* dst \\w* ttl \\d*",
+		"pong seqnum \\d* src \\w* dst \\w* ttl \\d*",
+		"pong seqnum \\d* src \\w* dst \\w* ttlzero",
 		"ping \\w*"
 	};
 
@@ -133,7 +135,7 @@ struct Message* mess__parse(char* mess_src)
 	int i;
 	int match = 0;
 
-	for(i = 0; i < 28; i++) // trouver le moyen de staticifier ça
+	for(i = 0; i < 29; i++) // trouver le moyen de staticifier ça
 	{
 		trex_current_regex = trex_compile(regex_strtable[i], NULL);
 		if(trex_match(trex_current_regex, mess_src))
@@ -255,6 +257,9 @@ struct Message* mess__parse(char* mess_src)
 			break;
 		case 18:
 			mess_dest->type = LINK;
+			strtok(mess_src, " ");
+			strtok(NULL, " ");
+			mess_dest->node1  = strcopy(strtok(NULL, " "));
 			break;
 		case 19:
 			mess_dest->type = LINK;
@@ -273,8 +278,10 @@ struct Message* mess__parse(char* mess_src)
 			mess_dest->type = PACKET;
 
 			strcpy(tmp, mess_src);
-			strtok(tmp, " ");
 
+			strtok(tmp, " ");
+			strtok(NULL, " ");
+			mess_dest->seqnum  = atoi(strtok(NULL, " "));
 			strtok(NULL, " ");
 			mess_dest->node1  = strcopy(strtok(NULL, " "));
 			strtok(NULL, " ");
@@ -285,44 +292,54 @@ struct Message* mess__parse(char* mess_src)
 			mess_dest->n_parameter = atoi(tmp2);
 
 			mess_dest->s_parameter = strstr(mess_src, tmp2) + strlen(tmp2) + 1;
-
 			break;
+
 		case 23:
 			mess_dest->type = PACKET;
 			mess_dest->accept = OK;
 
 			strtok(mess_src, " ");
 			strtok(NULL, " ");
+			mess_dest->seqnum  = atoi(strtok(NULL, " "));
+			strtok(NULL, " ");
 			mess_dest->node1  = strcopy(strtok(NULL, " "));
 			strtok(NULL, " ");
 			mess_dest->node2  = strcopy(strtok(NULL, " "));
-
 			break;
+
 		case 24:
 			mess_dest->type = PACKET;
 			mess_dest->accept = TOOFAR;
 
 			strtok(mess_src, " ");
 			strtok(NULL, " ");
+			mess_dest->seqnum  = atoi(strtok(NULL, " "));
+			strtok(NULL, " ");
 			mess_dest->node1  = strcopy(strtok(NULL, " "));
 			strtok(NULL, " ");
 			mess_dest->node2  = strcopy(strtok(NULL, " "));
 			break;
+
 		case 25:
 			mess_dest->type = PING;
 
 			strtok(mess_src, " ");
 			strtok(NULL, " ");
+			mess_dest->seqnum  = atoi(strtok(NULL, " "));
+			strtok(NULL, " ");
 			mess_dest->node1  = strcopy(strtok(NULL, " "));
 			strtok(NULL, " ");
 			mess_dest->node2  = strcopy(strtok(NULL, " "));
 			strtok(NULL, " ");
 			mess_dest->n_parameter = atoi(strtok(NULL, " "));
-
 			break;
+
 		case 26:
 			mess_dest->type = PONG;
+
 			strtok(mess_src, " ");
+			strtok(NULL, " ");
+			mess_dest->seqnum  = atoi(strtok(NULL, " "));
 			strtok(NULL, " ");
 			mess_dest->node1  = strcopy(strtok(NULL, " "));
 			strtok(NULL, " ");
@@ -330,11 +347,26 @@ struct Message* mess__parse(char* mess_src)
 			strtok(NULL, " ");
 			mess_dest->n_parameter = atoi(strtok(NULL, " "));
 			break;
+
 		case 27:
+			mess_dest->type = PONG;
+			mess_dest->accept = TTLZERO;
+
+			strtok(mess_src, " ");
+			strtok(NULL, " ");
+			mess_dest->seqnum  = atoi(strtok(NULL, " "));
+			strtok(NULL, " ");
+			mess_dest->node1  = strcopy(strtok(NULL, " "));
+			strtok(NULL, " ");
+			mess_dest->node2  = strcopy(strtok(NULL, " "));
+			break;
+
+		case 28:
 			mess_dest->type = PING;
 			strtok(mess_src, " ");
 			mess_dest->node1  = strcopy(strtok(NULL, " "));
 			break;
+
 		default:
 			mess_dest->type = NONE;
 			fprintf(stderr, "ERREUR: Message invalide.\n");
@@ -349,17 +381,17 @@ struct Message* mess__parse(char* mess_src)
 char* mess__toString(struct Message* mess)
 {
 	char * out = malloc(sizeof(char) * (50 + ((mess->s_parameter != NULL)? strlen(mess->s_parameter) : 0)));
-	
+
 	switch(mess->type)
 	{
-		// Routeur <-> Controleur 
+		// Routeur <-> Controleur
 		case LOGIN: 			//log in as ID port p
 			if(mess->node1 == NULL)
 			{
 				sprintf(out, "log in port %d", mess->node1, mess->n_parameter);
 			}
 			else
-			{		
+			{
 				sprintf(out, "log in as %s port %d", mess->node1, mess->n_parameter);
 			}
 			break;
@@ -367,63 +399,66 @@ char* mess__toString(struct Message* mess)
 		case LOGOUT: 		//log out
 			sprintf(out, "log out");
 			break;
-			
+
 		case GREETING: 		//greeting n  (que se passe-t-il si rien libre?)
 			sprintf(out, "greeting %s", mess->node1);
 			break;
-			
+
 		case BYE:		//bye
 			sprintf(out, "bye");
 			break;
-		
+
 		case POLL:			//poll
 			sprintf(out, "poll");
 			break;
-			
+
 		case NEIGHBORHOOD:
 			if(mess->accept == OK)
 				sprintf(out, "neighborhood ok");
 			else
 				sprintf(out, "neighborhood newlist %s", mess->s_parameter);
 			break;
-			
+
 		case LINK:
 			if(mess->accept == OK)
 				sprintf(out, "link ok");
 			else
-				sprintf(out, "link");
+				sprintf(out, "link id %s", mess->node1);
 			break;
-				
+
 		case VECTOR:
 			if(mess->accept == OK)
 				sprintf(out, "vector ok");
 			else
 				sprintf(out, "vector %s", mess->s_parameter);
 			break;
-			
+
 		case PACKET:
 			if(mess->accept == OK)
-				sprintf(out, "packet src %s dst %s ok", mess->node1, mess->node2);
+				sprintf(out, "packet seqnum %d src %s dst %s ok", mess->seqnum, mess->node1, mess->node2);
 			else if(mess->accept == TOOFAR)
-				sprintf(out, "packet src %s dst %s toofar", mess->node1, mess->node2);
+				sprintf(out, "packet seqnum %d src %s dst %s toofar", mess->seqnum, mess->node1, mess->node2);
 			else
-				sprintf(out, "packet src %s dst %s ttl %d data %s", mess->node1, mess->node2, mess->n_parameter, mess->s_parameter);
+				sprintf(out, "packet seqnum %d src %s dst %s ttl %d data %s", mess->seqnum, mess->node1, mess->node2, mess->n_parameter, mess->s_parameter);
 			break;
-			
+
 		case PING: // penser aux deux ping, haut niveau et bas niveau
-			sprintf(out, "ping src %s dst %s ttl %d", mess->node1, mess->node2, mess->n_parameter);
+			sprintf(out, "ping seqnum %d src %s dst %s ttl %d", mess->seqnum, mess->node1, mess->node2, mess->n_parameter);
 			break;
-			
+
 		case PONG:
-			sprintf(out, "pong src %s dst %s ttl %d", mess->node1, mess->node2, mess->n_parameter);
+			if(mess->accept != TTLZERO)
+				sprintf(out, "pong seqnum %d src %s dst %s ttl %d", mess->seqnum, mess->node1, mess->node2, mess->n_parameter);
+			else
+				sprintf(out, "pong seqnum %d src %s dst %s ttlzero", mess->seqnum, mess->node1, mess->node2);
 			break;
-			
+
 		default:
 			fprintf(stderr, "ERREUR: Message invalide.\n");
 			break;
-	
+
 	}
-	
+
 	return out;
 }
 
@@ -497,26 +532,26 @@ void mess__debug(struct Message* m)
 
 char* mess__treatInput(char * src)
 {
-	// On enlève les \\ et \* 
+	// On enlève les \\ et \*
 	src = mess__unescape(src);
-	
+
 	// On enlève l'étoile de fin
 	if(src[strlen(src) - 1] == '*')
 		src[strlen(src) - 1] = 0;
-		
+
 	return src;
 }
 char* mess__treatOutput(char * src)
 {
 	// On rajoute les \\ et \*
 	src = mess__escape(src);
-	
+
 	// On rajoute l'étoile de fin
 	char * final = malloc((strlen(src) + 1) * sizeof(char));
 	strcpy(final, src);
 	final[strlen(src)] == '*';
 	final[strlen(src) + 1] == 0;
-	
+
 	free(src); //eh oui, à un endroit au moins, la mémoire est gérée
 	return final;
 }
