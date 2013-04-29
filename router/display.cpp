@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ctime>
 #include "display.hpp"
 
 
@@ -14,8 +15,9 @@ void Display::err_unknown()
 
 void Display::mess_sent()
 {
+	std::time_t t =  std::time(NULL);
 	std::tm tm = *std::localtime(&t);
-	constexpr int bufsize = 100;
+	const int bufsize = 100;
 	char buf[bufsize];
 
 	if (std::strftime(buf, bufsize, "%c", &tm) != 0)
