@@ -26,7 +26,8 @@ void connection_event(network *net, Client *client, char *string)
 		printf("Message de type NONE\n");
 		return ;
 	}
-		
+	strcopy2(&message->s_parameter, client__get_address(client));	
+	message->n_parameter = client__get_port(client);
 	message = exec__sock_message(message);
 	client__set_id(client, message->node1);
 	

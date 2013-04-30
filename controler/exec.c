@@ -119,7 +119,7 @@ struct Message *exec__sock_message(struct Message *m)
 	char voisinage[1000]="";
 	char *id;
 	char aux[100]="";
-	Client * client;
+	Client_info *client_info;
 	
 	if(m == NULL)
 	{
@@ -163,13 +163,14 @@ struct Message *exec__sock_message(struct Message *m)
 					}
 				}
 			}
-			//TODO ajouter le client et l'id à la table$
+			//ajouter les infos du client et l'id à la table
 			strcopy2(&m->node1, graph__getId(n1));
-			//~ client__set_id(client, message->n1);
-			//~ table__add_socket(graph__getId(n1), network__connect(
+			client_info = calloc(1,sizeof(Client_info));
+			strcopy2(&client_info->address, m->s_parameter);
+			client_info->port = m->n_parameter;
+			table__add_info(graph__getId(n1), client_info);
 			
 			//actions sur le graphe
-
 			n1->u.is_connected = 1;
 			//envoyer greeting
 			m->type = GREETING;
@@ -180,7 +181,6 @@ struct Message *exec__sock_message(struct Message *m)
 			agwrite(graph, stdout);
 			
 			n1 = agfindnode(graph, m->node1);
-			printf("ID : %s\n", graph__getId(n1));
 
 			e = agfstedge(graph, n1);
 			while(e!=NULL)
@@ -197,28 +197,25 @@ struct Message *exec__sock_message(struct Message *m)
 				if (n2->u.is_connected == 1)
 				{
 					id = graph__getId(n2);
-					printf("ID : %s\n", id);
 					strcat(voisinage, id);
 					strcat(voisinage, ",");
 					sprintf(aux, "%d,", graph__getWeight(graph, e));
 					strcat(voisinage, aux);
 					
 					aux[0]='\0';
-					client = table__get_socket(id);
-					//~ sprintf(aux, "%s", client__get_address(client));
+					client_info = table__get_info(id);
+					sprintf(aux, "%s", client_info->address);
 					strcat(voisinage, aux);
 					strcat(voisinage, ":");
 					
 					aux[0]='\0';
-					//~ sprintf(aux, "%d", client__get_port(client));
+					sprintf(aux, "%d", client_info->port);
 					strcat(voisinage, aux);
 					strcat(voisinage, ";");
 				}
 				e = agnxtedge(graph, e, n1);
 			}
-			//~ printf("le voisinage : %s\n", voisinage);
 			strcopy2(&m->s_parameter, voisinage);
-			//~ printf("voisinage dans node1 : %s\n", m->node1);
 			m->type = NEIGHBORHOOD;
 			voisinage[0]='\0';
 			aux[0]='\0';			
@@ -229,6 +226,7 @@ struct Message *exec__sock_message(struct Message *m)
 			n1 = agfindnode(graph, m->node1);
 			n1->u.is_connected = 0;
 			m->type = BYE;
+			table__delete_info(m->node1);
 			// envoyer bye
 			break;
 
