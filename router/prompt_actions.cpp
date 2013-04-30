@@ -59,5 +59,34 @@ void PromptActions::ping(Message* mess)
 	ll_ping->node2 = strcopy(mess->node1);
 	ll_ping->n_parameter = router->getConfiguration()->defaultTTLValue;
 
-	// network__send(c, mess__toString(packet)); //segfault tant qu'on a pas un vrai c
+	for (int i = 0; i < router->getConfiguration()->defaultPingPacketCount; i++)
+	{
+		// network__send(c, mess__toString(packet)); //segfault tant qu'on a pas un vrai c
+	}
+}
+
+
+void PromptActions::route(Message* mess)
+{
+	// on regarde le next hop dans la table de routage  (router->getRoutetable ou qqch comme ça)
+
+	Client* c = 0; // = ... celui qui correspond à mess->node1
+
+	// si pas dans table de routage, erreur.
+	// throw unknownDest;
+
+	struct Message* ll_ping; // ping de bas niveau (low level)
+	mess__init(&ll_ping);
+	// ping seqnum N src id dst id ttl val*
+
+	ll_ping->seqnum = router->newSeqnum();
+	ll_ping->node1 = strcopy(router->getName());
+	ll_ping->node2 = strcopy(mess->node1);
+
+	int i = 1;
+	while(i < 100) // max ttl ? temps ? tant qu'on n'a pas reçu de réponse favorable à notre route ?
+	{
+		ll_ping->n_parameter = i;
+		// network__send(c, mess__toString(packet)); //segfault tant qu'on a pas un vrai c
+	}
 }

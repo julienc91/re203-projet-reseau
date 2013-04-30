@@ -7,6 +7,7 @@ extern "C"
 }
 
 class PromptActions;
+class SockActions;
 class Router;
 class Display;
 
@@ -19,7 +20,8 @@ class Exec
 
 	private:
 		Router* router;
-		PromptActions* action;
+		PromptActions* paction;
+		SockActions* saction;
 		Display* disp;
 };
 

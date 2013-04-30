@@ -5,7 +5,7 @@ LFLAGS=-lpthread
 
 BINARY=router
 COMMON_PATH  = ../common/
-COMMON_FILES = prompt.o messages.o net.o config.o trex.o util.o
+COMMON_FILES = messages.o net.o config.o trex.o util.o
 
 COMMONOBJ = $(addprefix $(COMMON_PATH), $(COMMON_FILES))
 

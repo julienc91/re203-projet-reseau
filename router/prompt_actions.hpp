@@ -15,6 +15,7 @@ class PromptActions
 		PromptActions(Router* r);
 		void message(Message* m);
 		void ping(Message* m);
+		void route(Message* m);
 
 	private:
 		Router* router;
