@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-	Routeur routeur(argv[3], atoi(argv[1]),  atoi(argv[2]));
+	Router router(argv[3], atoi(argv[1]),  atoi(argv[2]));
 
 
 	return EXIT_SUCCESS;

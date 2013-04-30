@@ -28,11 +28,15 @@ Configuration* config__readController(void)
 		}
 		if (line)
 			free(line);
+
+		return conf;
 	}
 	else
 	{
 		fprintf(stderr, "ERREUR : Ouverture de controller.cfg impossible\n");
 	}
+
+
 }
 
 Configuration* config__readRouter(void)
@@ -58,11 +62,15 @@ Configuration* config__readRouter(void)
 		}
 		if (line)
 			free(line);
+
+		return conf;
 	}
 	else
 	{
 		fprintf(stderr, "ERREUR : Ouverture de router.cfg impossible\n");
 	}
+
+
 }
 
 void config__readLine(Configuration* conf, char* mess_src)

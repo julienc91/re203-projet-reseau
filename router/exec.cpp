@@ -1,14 +1,18 @@
-#include "display.hpp"
-#include "exec.hpp"
-#include "exceptions.hpp"
-#include "net_actions.hpp"
 #include <iostream>
+#include "exec.hpp"
+#include "display.hpp"
+#include "exceptions.hpp"
+#include "prompt_actions.hpp"
+
+Exec::Exec(Router* r)
+{
+	router = r;
+	action = new PromptActions(r);
+	disp = new Display();
+}
 
 void Exec::prompt_message(Message* m)
 {
-	NetActions action;
-	Display disp;
-
 	if(m == NULL)
 	{
 		return;
@@ -23,16 +27,16 @@ void Exec::prompt_message(Message* m)
 			// il faut séparer le message en packet de bonne taille et les envoyer
 			try
 			{
-				action.message(m);
+				action->message(m);
 			}
 			catch(UnknownDest&)
 			{
-				disp.err_unknown();
+				disp->err_unknown();
 				return;
 			}
 
 			//affichage
-			disp.mess_sent();
+			disp->mess_sent();
 			//attendre le retour
 			//while(pas de retour || !timeout dépassé)
 			//disp.mess_not_deliv(router->getConfiguration()->defaultPacketTimeoutValue);
@@ -40,17 +44,24 @@ void Exec::prompt_message(Message* m)
 
 		case PING:
 			//actions sur réseau
-			action.ping(m);
-
-			//affichage
+			try
+			{
+				action->ping(m);
+			}
+			catch(UnknownDest&)
+			{
+				disp->err_unknown();
+				return;
+			}
+			catch(HostUnreachable&)
+			{
+				disp->err_unreachable();
+			}
+			//affichage se fait à la réception des pong
 
 			break;
 
 		case ROUTE:
-			// actions sur graphe
-
-			//actions sur réseau
-
 			//affichage
 			break;
 

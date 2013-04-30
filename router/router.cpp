@@ -1,9 +1,11 @@
 #include "router.hpp"
 
-Routeur::Routeur(char* name, int srcport, int destport)
+Router::Router(char* name, int srcport, int destport)
 {
     _name = new std::string(name);
    // _tab = new RoutTable(name);     // pour l'instant ça plante
+
+	exec = new Exec(this);
 
 	init(); // windows compatibility
 
@@ -38,7 +40,7 @@ Routeur::Routeur(char* name, int srcport, int destport)
 
 	// * * * * gestion stdin   * * * *
 	void (Exec::*meth)(Message* m) = &Exec::prompt_message;
-	prompt.start(&exec, meth);
+	prompt.start(exec, meth);
 
 
 	// début
@@ -46,13 +48,13 @@ Routeur::Routeur(char* name, int srcport, int destport)
 
 }
 
-Routeur::Routeur(const Routeur * data)
+Router::Router(const Router * data)
 {
     _name   = data->_name;
     _tab    = new RoutTable(data->_tab);
 }
 
-Routeur::~Routeur()
+Router::~Router()
 {
 	// * * * * fermeture serveur * * * *
 
@@ -65,7 +67,7 @@ Routeur::~Routeur()
     delete _name;
 }
 
-void Routeur::mainLoop()
+void Router::mainLoop()
 {
 	// * * * * gestion serveur * * * *
 	while(network__is_opened(net))
@@ -74,16 +76,16 @@ void Routeur::mainLoop()
 	}
 }
 
-int Routeur::newSeqnum()
+int Router::newSeqnum()
 {
 	return ++seqnum;
 }
-char* Routeur::getName()
+char* Router::getName()
 {
 	return (char*) _name->c_str();
 }
 
-Configuration* Routeur::getConfiguration()
+Configuration* Router::getConfiguration()
 {
 	return config;
 }

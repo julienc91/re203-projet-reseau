@@ -11,17 +11,18 @@ extern "C" {
 #include "../common/prompt.h"
 #include "../common/config.h"
 }
-#include "event.hpp"
-#include "exec.hpp"
+
 #include "rout_table.hpp"
 #include "prompt.hpp"
 
+class Exec;
+#include "event.hpp"
 
-class Routeur {
+class Router {
 	public:
-		Routeur(char* name, int srcport, int destport);
-		Routeur(const Routeur * data);
-		~Routeur();
+		Router(char* name, int srcport, int destport);
+		Router(const Router * data);
+		~Router();
 
 		void mainLoop();
 
@@ -40,6 +41,6 @@ class Routeur {
 		Configuration* config;
 		int seqnum;
 		Prompt prompt;
-		Exec exec;
+		Exec *exec;
 };
 #endif
