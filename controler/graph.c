@@ -53,5 +53,6 @@ void graph__removeEdge(Agraph_t* graph, Agedge_t* edge){
 
 char* graph__getId(Agnode_t* node)
 {
-	agget(node, "label");
+	return node->name;
+	//~ return agget(node, "label");
 }

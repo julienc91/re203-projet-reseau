@@ -7,7 +7,7 @@
 
 void input_event(network *net, char *string)
 {
-	printf("Pouet Input! \n");
+	printf("Evènement clavier \n");//Obsolete
 }
 
 void connection_event(network *net, Client *client, char *string)
@@ -19,25 +19,27 @@ void connection_event(network *net, Client *client, char *string)
 		i--;
 	}
 	string[i+1] = '\0';
-
 	struct Message *message = mess__parse(mess__treatInput(string));
-	message = exec__sock_message(message);
 
+	if (message->type == NONE)
+	{
+		printf("Message de type NONE\n");
+		return ;
+	}
+		
+	message = exec__sock_message(message);
 	client__set_id(client, message->node1);
+	
 	network__send(client, mess__treatOutput(mess__toString(message)));
 }
 
 void disconnection_event(network *net, Client *client)
 {
-		printf("Pouet disco! \n");
-		//~ struct Message *message;
-		//~ mess__init(&message);
-		//~ message->type = LOGOUT;
-		//~ strcopy(message->node1, client__get_id(client)); 
-		//~ message = exec__sock_message(message);
+	printf("Deconnexion \n");
+	struct Message *message = mess__parse(mess__treatInput("log out*"));
+	strcopy2(&message->node1, client__get_id(client)); 
 
-		//~ client__set_id(client, message->node1);
-		//~ network__send(client, mess__treatOutput(mess__toString(message)));
+	exec__sock_message(message);
 }
 
 void message_event(network *net, Client *client, char *string)
@@ -51,23 +53,20 @@ void message_event(network *net, Client *client, char *string)
 		string[i+1] = '\0';
 
 		struct Message *message = mess__parse(mess__treatInput(string));
-		printf("Pouet disco! \n");
 
 		if (message->type == NONE)
 		{
-			printf("Pouet disco2! \n");
+			printf("Message de type NONE\n");
 			return ;
 		}
-		printf("NODE1 : %s\n", message->node1);
-		printf("client : %s\n", client__get_id(client));
-		strcopy2(message->node1, client__get_id(client)); 
-		printf("Pouet disco3! \n");
+		strcopy2(&message->node1, client__get_id(client)); 
 
 		message = exec__sock_message(message);
-		//~ client__set_id(client, message->node1);
-		//~ message->type = GREETING;
-		printf("Pouet disco4! \n");
 
 		network__send(client, mess__treatOutput(mess__toString(message)));
-
+		
+		if(message->type == LOGOUT)
+		{
+			network__disconnect(net, client);
+		}
 }

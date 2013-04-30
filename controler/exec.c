@@ -164,15 +164,13 @@ struct Message *exec__sock_message(struct Message *m)
 				}
 			}
 			//TODO ajouter le client et l'id à la table$
-			printf("AVANT strcopy dans exec.c\n");   
-			strcopy2(m->node1, graph__getId(n1));
+			strcopy2(&m->node1, graph__getId(n1));
 			//~ client__set_id(client, message->n1);
 			//~ table__add_socket(graph__getId(n1), network__connect(
 			
 			//actions sur le graphe
 
 			n1->u.is_connected = 1;
-			printf("Noeud : %s, is_connected : %d\n", graph__getId(n1), n1->u.is_connected);						
 			//envoyer greeting
 			m->type = GREETING;
 			break;
@@ -181,9 +179,8 @@ struct Message *exec__sock_message(struct Message *m)
 			// si il y a eu un changement de voisinage, renvoyer la topologie
 			agwrite(graph, stdout);
 			
-			//TODO inverser les commentaires, choix du premier noeud dans le but de test
-			//~ n1 = agfstnode(graph);
 			n1 = agfindnode(graph, m->node1);
+			printf("ID : %s\n", graph__getId(n1));
 
 			e = agfstedge(graph, n1);
 			while(e!=NULL)
@@ -199,7 +196,8 @@ struct Message *exec__sock_message(struct Message *m)
 				
 				if (n2->u.is_connected == 1)
 				{
-					id = agget(n2, "label");
+					id = graph__getId(n2);
+					printf("ID : %s\n", id);
 					strcat(voisinage, id);
 					strcat(voisinage, ",");
 					sprintf(aux, "%d,", graph__getWeight(graph, e));
@@ -218,8 +216,10 @@ struct Message *exec__sock_message(struct Message *m)
 				}
 				e = agnxtedge(graph, e, n1);
 			}
-			printf("le voisinage : %s\n",voisinage);
-			strcopy2(m->node1, voisinage);
+			//~ printf("le voisinage : %s\n", voisinage);
+			strcopy2(&m->s_parameter, voisinage);
+			//~ printf("voisinage dans node1 : %s\n", m->node1);
+			m->type = NEIGHBORHOOD;
 			voisinage[0]='\0';
 			aux[0]='\0';			
 			// sinon, renvoyer neighborhood ok
