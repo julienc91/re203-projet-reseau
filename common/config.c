@@ -11,7 +11,7 @@ Configuration* config__readController(void)
 	pFile = fopen ("controller.cfg","r");
 	if (pFile != NULL)
 	{
-		Configuration* conf = malloc(sizeof(Configuration));
+		Configuration* conf = (Configuration*) malloc(sizeof(Configuration));
 		conf->type = CONTROLLER;
 
 		char * line = NULL;
@@ -41,7 +41,7 @@ Configuration* config__readRouter(void)
 	pFile = fopen ("router.cfg","r");
 	if (pFile != NULL)
 	{
-		Configuration* conf = malloc(sizeof(Configuration));
+		Configuration* conf = (Configuration*) malloc(sizeof(Configuration));
 		conf->type = ROUTER;
 
 		char * line = NULL;
@@ -103,7 +103,7 @@ void config__readLine(Configuration* conf, char* mess_src)
 
 	if(match == 0) i = -1;
 
-	char * tmp = malloc((strlen(mess_src) + 1)* sizeof(char));
+	char * tmp = (char*) malloc((strlen(mess_src) + 1)* sizeof(char));
 
 	switch(i)
 	{

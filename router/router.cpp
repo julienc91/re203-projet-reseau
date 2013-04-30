@@ -37,7 +37,8 @@ Routeur::Routeur(char* name, int srcport, int destport)
 	}
 
 	// * * * * gestion stdin   * * * *
-	prompt_thread = prompt__start(Exec::prompt_message);
+	void (Exec::*meth)(Message* m) = &Exec::prompt_message;
+	prompt.start(&exec, meth);
 
 
 	// début
@@ -54,7 +55,7 @@ Routeur::Routeur(const Routeur * data)
 Routeur::~Routeur()
 {
 	// * * * * fermeture serveur * * * *
-	pthread_join(*prompt_thread, NULL);
+
 	network__close(net);
 	network__free(net);
 

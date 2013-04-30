@@ -7,6 +7,7 @@
 #include "util.h"
 
 
+
 char *str_sub (const char *s, unsigned int start, unsigned int end);
 
 void mess__init(struct Message** mess)
@@ -134,6 +135,7 @@ struct Message* mess__parse(char* mess_src)
 	TRex* trex_current_regex;
 	int i;
 	int match = 0;
+	char * ptr, *tmp2;
 
 	for(i = 0; i < 29; i++) // trouver le moyen de staticifier ça
 	{
@@ -197,7 +199,7 @@ struct Message* mess__parse(char* mess_src)
 
 			mess_dest->node1  = strcopy(strtok(NULL, " "));
 
-			char * ptr = strstr(mess_src, mess_dest->node1) + strlen(mess_dest->node1) + 2;
+			ptr = strstr(mess_src, mess_dest->node1) + strlen(mess_dest->node1) + 2;
 			mess_dest->s_parameter = malloc((1 + strlen(ptr)) * sizeof(char));
 			strcpy(mess_dest->s_parameter, ptr);
 			mess_dest->s_parameter[strlen(ptr) - 1] = 0;
@@ -288,7 +290,7 @@ struct Message* mess__parse(char* mess_src)
 			mess_dest->node2  = strcopy(strtok(NULL, " "));
 			strtok(NULL, " ");
 
-			char * tmp2 = strtok(NULL, " ");
+			tmp2 = strtok(NULL, " ");
 			mess_dest->n_parameter = atoi(tmp2);
 
 			strtok(NULL, " ");

@@ -1,6 +1,11 @@
 #ifndef __MESSAGES_H_
 #define __MESSAGES_H_
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 enum Acceptance
 {
 	NOT,
@@ -81,4 +86,9 @@ char* mess__treatOutput(char * src);
 char* mess__toString(struct Message* mess);
 
 void mess__debug(struct Message* m);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

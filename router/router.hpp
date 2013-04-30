@@ -14,6 +14,7 @@ extern "C" {
 #include "event.hpp"
 #include "exec.hpp"
 #include "rout_table.hpp"
+#include "prompt.hpp"
 
 
 class Routeur {
@@ -38,6 +39,7 @@ class Routeur {
 
 		Configuration* config;
 		int seqnum;
-		pthread_t* prompt_thread;
+		Prompt prompt;
+		Exec exec;
 };
 #endif

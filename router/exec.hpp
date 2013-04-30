@@ -8,7 +8,7 @@ extern "C"
 class Exec
 {
 	public:
-		static void prompt_message(Message* m);
+		void prompt_message(Message* m);
 		static void sock_message(Message* m);
 };
 
