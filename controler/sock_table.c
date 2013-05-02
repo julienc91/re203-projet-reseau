@@ -20,7 +20,7 @@ void table__add_info(char **key, Client_info *c){
         fprintf(stderr, "Key %s already exists\n", *key);
 }
 
-void table__delete_info(char *key){
+void table__delete_info(char **key){
 
     HT_REMOVE(T, *key);
 }

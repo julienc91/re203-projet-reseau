@@ -18,7 +18,7 @@ void table__add_socket(char ** key, Client * c);
 
 /*remove the key indexed Client from the hashtable
  */
-void table__add_info(char **key, Client_info **c);
+void table__add_info(char **key, Client_info *c);
 
 /*remove the key indexed Client from the hashtable
  */

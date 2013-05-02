@@ -9,7 +9,7 @@
 void exec__init(void)
 {
 	net = network__open(12345);
-	//TODO ajouter le chargement du fichier de config 
+	//TODO ajouter le chargement du fichier de config
 	net->input_event = input_event;
 	net->connection_event = connection_event;
 	net->disconnection_event = disconnection_event;
@@ -34,7 +34,7 @@ void exec__prompt_message(struct Message *m)
 			graph = graph__open(mess__unescape(m->s_parameter));
 			n1 = agfstnode(graph);
 			while(n1 != NULL)
-			{	
+			{
 				n1->u.is_connected = 0;
 				n1->u.is_up_to_date = 0;
 				n1 = agnxtnode(graph, n1);
@@ -148,7 +148,7 @@ struct Message *exec__sock_message(struct Message *m)
 	char aux[100]="";
 	char *key = NULL;
 	Client_info *client_info;
-	
+
 	if(m == NULL)
 	{
 		return m;
@@ -164,11 +164,11 @@ struct Message *exec__sock_message(struct Message *m)
 				{
 					n1 = agnxtnode(graph, n1);
 				}
-				
+
 				if(n1 == NULL)
 				{
-					printf("ERREUR : Aucun noeud libre\n"); 
-					m->node1 = "";  
+					printf("ERREUR : Aucun noeud libre\n");
+					m->node1 = "";
 					return m;
 				}
 			}
@@ -182,12 +182,12 @@ struct Message *exec__sock_message(struct Message *m)
 					{
 						n1 = agnxtnode(graph, n1);
 					}
-					
+
 					if(n1 == NULL)
 					{
-						printf("ERREUR : Aucun noeud libre\n");   
-						m->node1 = ""; 
-						return m;	 
+						printf("ERREUR : Aucun noeud libre\n");
+						m->node1 = "";
+						return m;
 					}
 				}
 			}
@@ -199,8 +199,8 @@ struct Message *exec__sock_message(struct Message *m)
 			DEBUG
 			strcopy2(&key, graph__getId(n1));
 			DEBUG
-			table__add_info(key, client_info);
-			
+			table__add_info(&key, client_info);
+
 			e = agfstedge(graph, n1);
 			while(e != NULL)
 			{
@@ -215,8 +215,8 @@ struct Message *exec__sock_message(struct Message *m)
 			n2->u.is_up_to_date = 0;
 			e = agnxtedge(graph, e, n1);
 			}
-				
-			
+
+
 			//actions sur le graphe
 			n1->u.is_connected = 1;
 			n1->u.is_up_to_date = 0;
@@ -226,7 +226,7 @@ struct Message *exec__sock_message(struct Message *m)
 
 		case POLL:
 			// si il y a eu un changement de voisinage, renvoyer la topologie
-			
+
 			n1 = agfindnode(graph, m->node1);
 			if (n1->u.is_up_to_date != 1)
 			{
@@ -243,7 +243,7 @@ struct Message *exec__sock_message(struct Message *m)
 					{
 						n2 = e->head;
 					}
-					
+
 					if (n2->u.is_connected == 1)
 					{
 						id = graph__getId(n2);
@@ -251,13 +251,13 @@ struct Message *exec__sock_message(struct Message *m)
 						strcat(voisinage, ",");
 						sprintf(aux, "%d,", graph__getWeight(graph, e));
 						strcat(voisinage, aux);
-						
+
 						aux[0]='\0';
-						client_info = table__get_info(id);
+						client_info = table__get_info(&id);
 						sprintf(aux, "%s", client_info->address);
 						strcat(voisinage, aux);
 						strcat(voisinage, ":");
-						
+
 						aux[0]='\0';
 						sprintf(aux, "%d", client_info->port);
 						strcat(voisinage, aux);
@@ -282,8 +282,8 @@ struct Message *exec__sock_message(struct Message *m)
 				n1->u.is_up_to_date = 1;
 			}
 			else
-			{			
-				// sinon, renvoyer neighborhood ok	
+			{
+				// sinon, renvoyer neighborhood ok
 				m->type = NEIGHBORHOOD;
 				m->accept = OK;
 			}
@@ -308,7 +308,7 @@ struct Message *exec__sock_message(struct Message *m)
 			}
 			m->type = BYE;
 			DEBUG
-			table__delete_info(m->node1);
+			table__delete_info(&(m->node1));
 			DEBUG
 			// envoyer bye
 			break;
