@@ -13,7 +13,7 @@ typedef struct{
 /* IMPORTANT : DEFINIR LES STRUCTURES AVANT L INCLUDE SUIVANT */
 #include <graphviz/graph.h>
 
-Agraph_t *graph;
+static Agraph_t *graph;
 
 void graph__init(void);
 Agraph_t* graph__open(char* filename);

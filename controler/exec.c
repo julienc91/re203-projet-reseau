@@ -8,7 +8,7 @@
 
 void exec__init(void)
 {
-	net = network__open(23456);
+	net = network__open(12345);
 	//TODO ajouter le chargement du fichier de config 
 	net->input_event = input_event;
 	net->connection_event = connection_event;
@@ -146,6 +146,7 @@ struct Message *exec__sock_message(struct Message *m)
 	char voisinage[1000]="";
 	char *id;
 	char aux[100]="";
+	char *key = NULL;
 	Client_info *client_info;
 	
 	if(m == NULL)
@@ -195,7 +196,9 @@ struct Message *exec__sock_message(struct Message *m)
 			client_info = calloc(1,sizeof(Client_info));
 			strcopy2(&client_info->address, m->s_parameter);
 			client_info->port = m->n_parameter;
-			table__add_info(graph__getId(n1), client_info);
+			
+			key = strcopy(graph__getId(n1));
+			table__add_info(key, client_info);
 			
 			e = agfstedge(graph, n1);
 			while(e != NULL)

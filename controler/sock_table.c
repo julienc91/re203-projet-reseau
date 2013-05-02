@@ -9,7 +9,7 @@ void table__init(){
     T = hash_table_new(MODE_ALLREF);
 }
 
-void table__add_info(char * key, Client_info *c){
+void table__add_info(char *key, Client_info *c){
 
     if(!HT_HAS_KEY(T, key))
         HT_ADD(T, key, c);
@@ -17,12 +17,12 @@ void table__add_info(char * key, Client_info *c){
         fprintf(stderr, "Key %s already exists\n", key);
 }
 
-void table__delete_info(char * key){
+void table__delete_info(char *key){
 
     HT_REMOVE(T, key);
 }
 
-void table__modify_key(char * old_key, char * new_key){
+void table__modify_key(char *old_key, char *new_key){
     Client_info *c = (Client_info *)HT_LOOKUP(T, old_key);
     if (c != NULL){
         if(!HT_HAS_KEY(T, new_key)){
@@ -37,11 +37,11 @@ void table__modify_key(char * old_key, char * new_key){
 }
 
 
-Client_info * table__get_info(char * key){
+Client_info *table__get_info(char *key){
     return (Client_info *)HT_LOOKUP(T, key);
 }
 
-int table__has_info(char * key){
+int table__has_info(char *key){
     return HT_HAS_KEY(T, key);
 }
 

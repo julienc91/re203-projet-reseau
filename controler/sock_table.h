@@ -14,7 +14,7 @@ void table__init();
 
 /*add the Client * c in the hashtable, with key index
  */
-void table__add_info(char * key, Client_info *c);
+void table__add_info(char *key, Client_info *c);
 
 /*remove the key indexed Client from the hashtable
  */
