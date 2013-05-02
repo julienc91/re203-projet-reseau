@@ -5,6 +5,7 @@ typedef struct{
 	} Agraphinfo_t;
 typedef struct{
 	 int is_connected;
+	 int is_up_to_date;
 	} Agnodeinfo_t;
 typedef struct{
 	} Agedgeinfo_t;
@@ -12,7 +13,7 @@ typedef struct{
 /* IMPORTANT : DEFINIR LES STRUCTURES AVANT L INCLUDE SUIVANT */
 #include <graphviz/graph.h>
 
-static Agraph_t *graph;
+Agraph_t *graph;
 
 void graph__init(void);
 Agraph_t* graph__open(char* filename);

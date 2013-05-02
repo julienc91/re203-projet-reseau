@@ -8,7 +8,7 @@
 
 void exec__init(void)
 {
-	net = network__open(12345);
+	net = network__open(23456);
 	//TODO ajouter le chargement du fichier de config 
 	net->input_event = input_event;
 	net->connection_event = connection_event;
@@ -32,6 +32,13 @@ void exec__prompt_message(struct Message *m)
 		case LOAD:
 			// actions sur graphe
 			graph = graph__open(mess__unescape(m->s_parameter));
+			n1 = agfstnode(graph);
+			while(n1 != NULL)
+			{	
+				n1->u.is_connected = 0;
+				n1->u.is_up_to_date = 0;
+				n1 = agnxtnode(graph, n1);
+			}
 			//actions sur réseau
 			//affichage
 			if(graph != NULL)
@@ -61,9 +68,13 @@ void exec__prompt_message(struct Message *m)
 
 		case ADDLINK:
 			// actions sur graphe
-			graph__addEdge(graph, agfindnode(graph, m->node1), agfindnode(graph, m->node2), mess__getWeight(m));
-			//actions sur réseau
+			n1 = agfindnode(graph, m->node1);
+			n1 = agfindnode(graph, m->node2);
 
+			graph__addEdge(graph, n1 , n2, mess__getWeight(m));
+			//actions sur réseau
+			n1->u.is_up_to_date = 0;
+			n2->u.is_up_to_date = 0;
 			//affichage
 			// vérifier que l'on peut ajouter ce lien
 			disp__addlink(m->node1, m->node2, mess__getWeight(m));
@@ -71,9 +82,11 @@ void exec__prompt_message(struct Message *m)
 
 		case UPDATELINK:
 			// actions sur graphe
-			graph__setWeight(graph, agfindedge(graph,agfindnode(graph, m->node1), agfindnode(graph, m->node2)) , mess__getWeight(m));
+			e = agfindedge(graph,agfindnode(graph, m->node1), agfindnode(graph, m->node2));
+			graph__setWeight(graph, e , mess__getWeight(m));
 			//actions sur réseau
-
+			e->head->u.is_up_to_date = 0;
+			e->tail->u.is_up_to_date = 0;
 			//affichage
 			// vérifier que l'on peut modifier ce lien
 			disp__updlink(m->node1, m->node2, mess__getWeight(m));
@@ -81,7 +94,10 @@ void exec__prompt_message(struct Message *m)
 
 		case DELLINK:
 			// actions sur graphe
-			graph__removeEdge(graph, agfindedge(graph,agfindnode(graph, m->node1), agfindnode(graph, m->node2)));
+			agfindedge(graph,agfindnode(graph, m->node1), agfindnode(graph, m->node2));
+			e->head->u.is_up_to_date = 0;
+			e->tail->u.is_up_to_date = 0;
+			graph__removeEdge(graph, e);
 			//actions sur réseau
 
 			//affichage
@@ -92,9 +108,19 @@ void exec__prompt_message(struct Message *m)
 		case DISCONNECT:
 			// actions sur graphe
 			n1 = agfindnode(graph, m->node1);
+			n1->u.is_up_to_date = 0;
 			e = agfstedge(graph, n1);
 			while(e!=NULL)
 			{
+				if( e->head != n1)
+				{
+					e->head->u.is_up_to_date = 0;
+				}
+				else
+				{
+					e->tail->u.is_up_to_date = 0;
+				}
+
 				agdelete(graph,e);
 				e = agfstedge(graph, n1);
 			}
@@ -116,6 +142,7 @@ struct Message *exec__sock_message(struct Message *m)
 {
 	Agnode_t *n1, *n2;
 	Agedge_t *e;
+	int l = 0;
 	char voisinage[1000]="";
 	char *id;
 	char aux[100]="";
@@ -170,20 +197,8 @@ struct Message *exec__sock_message(struct Message *m)
 			client_info->port = m->n_parameter;
 			table__add_info(graph__getId(n1), client_info);
 			
-			//actions sur le graphe
-			n1->u.is_connected = 1;
-			//envoyer greeting
-			m->type = GREETING;
-			break;
-
-		case POLL:
-			// si il y a eu un changement de voisinage, renvoyer la topologie
-			agwrite(graph, stdout);
-			
-			n1 = agfindnode(graph, m->node1);
-
 			e = agfstedge(graph, n1);
-			while(e!=NULL)
+			while(e != NULL)
 			{
 				if(e->tail != n1)
 				{
@@ -193,40 +208,104 @@ struct Message *exec__sock_message(struct Message *m)
 				{
 					n2 = e->head;
 				}
-				
-				if (n2->u.is_connected == 1)
-				{
-					id = graph__getId(n2);
-					strcat(voisinage, id);
-					strcat(voisinage, ",");
-					sprintf(aux, "%d,", graph__getWeight(graph, e));
-					strcat(voisinage, aux);
-					
-					aux[0]='\0';
-					client_info = table__get_info(id);
-					sprintf(aux, "%s", client_info->address);
-					strcat(voisinage, aux);
-					strcat(voisinage, ":");
-					
-					aux[0]='\0';
-					sprintf(aux, "%d", client_info->port);
-					strcat(voisinage, aux);
-					strcat(voisinage, ";");
-				}
-				e = agnxtedge(graph, e, n1);
+			n2->u.is_up_to_date = 0;
+			e = agnxtedge(graph, e, n1);
 			}
-			strcopy2(&m->s_parameter, voisinage);
-			m->type = NEIGHBORHOOD;
-			voisinage[0]='\0';
-			aux[0]='\0';			
-			// sinon, renvoyer neighborhood ok
+				
+			
+			//actions sur le graphe
+			n1->u.is_connected = 1;
+			n1->u.is_up_to_date = 0;
+			//envoyer greeting
+			m->type = GREETING;
+			break;
+
+		case POLL:
+			// si il y a eu un changement de voisinage, renvoyer la topologie
+			
+			n1 = agfindnode(graph, m->node1);
+			if (n1->u.is_up_to_date != 1)
+			{
+				strcat(voisinage, "[");
+
+				e = agfstedge(graph, n1);
+				while(e!=NULL)
+				{
+					if(e->tail != n1)
+					{
+						n2 = e->tail;
+					}
+					else
+					{
+						n2 = e->head;
+					}
+					
+					if (n2->u.is_connected == 1)
+					{
+						id = graph__getId(n2);
+						strcat(voisinage, id);
+						strcat(voisinage, ",");
+						sprintf(aux, "%d,", graph__getWeight(graph, e));
+						strcat(voisinage, aux);
+						
+						aux[0]='\0';
+						client_info = table__get_info(id);
+						sprintf(aux, "%s", client_info->address);
+						strcat(voisinage, aux);
+						strcat(voisinage, ":");
+						
+						aux[0]='\0';
+						sprintf(aux, "%d", client_info->port);
+						strcat(voisinage, aux);
+						strcat(voisinage, ";");
+					}
+					e = agnxtedge(graph, e, n1);
+				}
+				l = strlen(voisinage)-1;
+				if(voisinage[l] == ';')
+				{
+					voisinage[l] = ']';
+				}
+				else if (voisinage[l] == '[')
+				{
+					strcat(voisinage, "]");
+				}
+
+				strcopy2(&m->s_parameter, voisinage);
+				m->type = NEIGHBORHOOD;
+				voisinage[0]='\0';
+				aux[0]='\0';
+				n1->u.is_up_to_date = 1;
+			}
+			else
+			{			
+				// sinon, renvoyer neighborhood ok	
+				m->type = NEIGHBORHOOD;
+				m->accept = OK;
+			}
 			break;
 
 		case LOGOUT:
 			n1 = agfindnode(graph, m->node1);
 			n1->u.is_connected = 0;
+			e = agfstedge(graph, n1);
+			while(e != NULL)
+			{
+				if(e->tail != n1)
+				{
+					n2 = e->tail;
+				}
+				else
+				{
+					n2 = e->head;
+				}
+				n2->u.is_up_to_date = 0;
+				e = agnxtedge(graph, e, n1);
+			}
 			m->type = BYE;
+			DEBUG
 			table__delete_info(m->node1);
+			DEBUG
 			// envoyer bye
 			break;
 
