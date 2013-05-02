@@ -196,8 +196,9 @@ struct Message *exec__sock_message(struct Message *m)
 			client_info = calloc(1,sizeof(Client_info));
 			strcopy2(&client_info->address, m->s_parameter);
 			client_info->port = m->n_parameter;
-			
-			key = strcopy(graph__getId(n1));
+			DEBUG
+			strcopy2(&key, graph__getId(n1));
+			DEBUG
 			table__add_info(key, client_info);
 			
 			e = agfstedge(graph, n1);

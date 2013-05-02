@@ -7,6 +7,8 @@ static hash_table_t *T;
 void table__init(){
 
     T = hash_table_new(MODE_ALLREF);
+    //~ T = hash_table_new(MODE_VALUEREF);
+
 }
 
 void table__add_info(char *key, Client_info *c){
