@@ -26,7 +26,8 @@ void connection_event(network *net, Client *client, char *string)
 		printf("Message de type NONE\n");
 		return ;
 	}
-		
+	strcopy2(&message->s_parameter, client__get_address(client));	
+	//~ message->n_parameter = client__get_port(client);
 	message = exec__sock_message(message);
 	client__set_id(client, message->node1);
 	
@@ -38,8 +39,9 @@ void disconnection_event(network *net, Client *client)
 	printf("Deconnexion \n");
 	struct Message *message = mess__parse(mess__treatInput("log out*"));
 	strcopy2(&message->node1, client__get_id(client)); 
-
+	DEBUG
 	exec__sock_message(message);
+	DEBUG
 }
 
 void message_event(network *net, Client *client, char *string)
@@ -60,13 +62,15 @@ void message_event(network *net, Client *client, char *string)
 			return ;
 		}
 		strcopy2(&message->node1, client__get_id(client)); 
-
+		DEBUG
 		message = exec__sock_message(message);
+		DEBUG
 
 		network__send(client, mess__treatOutput(mess__toString(message)));
-		
+		DEBUG
 		if(message->type == LOGOUT)
 		{
 			network__disconnect(net, client);
+			DEBUG
 		}
 }

@@ -7,42 +7,45 @@ static hash_table_t *T;
 void table__init(){
 
     T = hash_table_new(MODE_ALLREF);
+    //~ T = hash_table_new(MODE_VALUEREF);
+
 }
 
-void table__add_socket(char * key, Client * c){
+void table__add_info(char **key, Client_info *c){
 
-    if(!HT_HAS_KEY(T, key))
-        HT_ADD(T, key, c);
+
+    if(!HT_HAS_KEY(T, *key))
+        HT_ADD(T, *key, c);
     else
-        fprintf(stderr, "Key %s already exists\n", key);
+        fprintf(stderr, "Key %s already exists\n", *key);
 }
 
-void table__delete_socket(char * key){
+void table__delete_info(char **key){
 
-    HT_REMOVE(T, key);
+    HT_REMOVE(T, *key);
 }
 
-void table__modify_key(char * old_key, char * new_key){
-    Client * c = (Client *)HT_LOOKUP(T, old_key);
+void table__modify_key(char **old_key, char **new_key){
+    Client_info *c = (Client_info *)HT_LOOKUP(T, *old_key);
     if (c != NULL){
-        if(!HT_HAS_KEY(T, new_key)){
-            HT_REMOVE(T, old_key);
-            HT_ADD(T, new_key, c);
+        if(!HT_HAS_KEY(T, *new_key)){
+            HT_REMOVE(T, *old_key);
+            HT_ADD(T, *new_key, c);
         }
         else
-            fprintf(stderr, "Key %s already exists\n", new_key);
+            fprintf(stderr, "Key %s already exists\n", *new_key);
     }
     else
-        fprintf(stderr, "Key %s does not exist\n", old_key);
+        fprintf(stderr, "Key %s does not exist\n", *old_key);
 }
 
 
-Client * table__get_socket(char * key){
-    return (Client *)HT_LOOKUP(T, key);
+Client_info *table__get_info(char **key){
+    return (Client_info *)HT_LOOKUP(T, *key);
 }
 
-int table__has_socket(char * key){
-    return HT_HAS_KEY(T, key);
+int table__has_info(char **key){
+    return HT_HAS_KEY(T, *key);
 }
 
 void table__delete(){

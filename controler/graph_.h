@@ -5,6 +5,7 @@ typedef struct{
 	} Agraphinfo_t;
 typedef struct{
 	 int is_connected;
+	 int is_up_to_date;
 	} Agnodeinfo_t;
 typedef struct{
 	} Agedgeinfo_t;
