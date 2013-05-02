@@ -77,7 +77,7 @@ char* mess__escape(char* mess_src);
 char* mess__unescape(char* mess_src);
 
 int mess__getAcceptance(struct Message* mess);
-int mess__getTTL(struct Message* mess);
+int mess__getAndDecTTL(struct Message* mess);
 int mess__getWeight(struct Message* mess);
 
 char* mess__treatInput(char * src);

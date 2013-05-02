@@ -6,21 +6,22 @@
 class Display
 {
 	public:
-		static void err_unreachable();
-		static void err_unknown();
+		void err_unreachable();
+		void err_unknown();
 
-		static void mess_sent();
-		static void mess_deliv(double rtt);
-		static void mess_not_deliv(int deltamax);
+		void mess_sent();
+		void mess_deliv(double rtt);
+		void mess_not_deliv(int deltamax);
+		void mess_received(char* mess);
 
-		static void ping_echo(char * n1, char * n2);
-		static void ping_result(double success, double failure, double min, double avg, double max);
+		void ping_echo(char * n1, char * n2, time_t time);
+		void ping_result(double success, double failure, double min, double avg, double max);
 
-		static void route_init(char * n1, char * n2);
-		static void route_hop(int num, char * node);
-		static void route_result(int qt, double rtt, bool sym);
+		void route_init(char * n1, char * n2);
+		void route_hop(int num, char * node);
+		void route_result(int qt, double rtt);
 
-		static void routetable(std::map<void,void>);
+		void routetable(std::map<void,void>);
 };
 
 #endif

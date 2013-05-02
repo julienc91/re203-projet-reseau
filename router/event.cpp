@@ -39,5 +39,5 @@ void Event::message(network *net, Client *c, char *buffer)
 	struct Message *m = mess__parse(buffer);
 
 	if (!m) return;
-	Exec::sock_message(m);
+	//faire en sorte de pouvoir faire du non statique : Exec::sock_message(m);
 }

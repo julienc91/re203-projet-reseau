@@ -31,5 +31,48 @@ void Display::mess_deliv(double rtt)
 
 void Display::mess_not_deliv(int deltamax)
 {
-	std::cout << "\t-> error : message not delivered ! (Delta > "<< deltamax <<" seconds)";
+	std::cout << "\t-> error : message not delivered ! (Delta > " << deltamax << " seconds)";
+}
+
+
+void Display::mess_received(char* mess)
+{
+	std::cout << "\t-> message received !" << std::endl;
+	std::cout << mess << std::endl;
+}
+
+void Display::ping_echo(char* n1, char* n2, time_t time)
+{
+	// -> from N1 to N3 time=hh:mm:ss.ms
+	std::cout << "\t-> from " << n1 << " to " << n2 << " time=" << std::endl;
+}
+
+void Display::ping_result(double success, double failure, double min, double avg, double max)
+{
+	//    -> Result: x% success, y% failure
+    //    -> RTT   : min=123.45ms avg=123.45 max=123.45
+    std::cout << std::endl;
+	std::cout << "\t-> Result: " << success << "% success, " << failure << "% failure" << std::endl;
+	std::cout << "\t-> RTT   : min=" << min << "ms avg=" << avg << " max=" << max << std::endl;
+}
+
+
+void Display::route_init(char * n1, char * n2)
+{
+	std::cout << "\t-> from " << n1 << " to " << n2 << std::endl;
+}
+
+void Display::route_hop(int num, char * node)
+{
+	std::cout << "\t\tHop " << num << " = " << node << std::endl;
+}
+
+
+void Display::route_result(int qt, double rtt)
+{
+	//Path = 3 hops
+	//RTT = 123.ms
+	std::cout << std::endl;
+	std::cout << "\t\tPath = " << qt << " hops" << std::endl;
+	std::cout << "\t\tRTT = " << rtt << "ms" << std::endl;
 }
