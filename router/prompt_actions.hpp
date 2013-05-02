@@ -7,12 +7,15 @@ extern "C"
 	#include "../common/net.h"
 }
 
-class Router;
-class NetActions
+#include "router.hpp"
+
+class PromptActions
 {
 	public:
+		PromptActions(Router* r);
 		void message(Message* m);
 		void ping(Message* m);
+		void route(Message* m);
 
 	private:
 		Router* router;

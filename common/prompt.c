@@ -5,7 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef __cplusplus
+pthread_t* prompt__start(void (*mess_handler) (void*, struct Message*))
+#else
 pthread_t* prompt__start(void (*mess_handler) (struct Message*))
+#endif
 {
 	pthread_t* prompt_thread = malloc(sizeof(pthread_t));
 	pthread_create(prompt_thread, NULL, prompt__main_thread, (void*)mess_handler);
@@ -25,7 +29,11 @@ void* prompt__main_thread(void* v)
 		//mess__debug(m);
 		if(v != NULL && m != NULL)
 		{
-			((void (*)(struct Message*)) v)(m); //plus belle ligne de code que j'aie jamais écrite
+			#ifdef __cplusplus
+			((void (*)(void*, struct Message*)) v)(m);
+			#else
+			((void (*)(struct Message*)) v)(m);
+			#endif
 		}
 	}
 
