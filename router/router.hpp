@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <map>
 
 extern "C" {
 #include "../common/net.h"
@@ -12,12 +13,12 @@ extern "C" {
 #include "../common/config.h"
 }
 
-#include "rout_table.hpp"
+#include "entry.hpp"
 #include "prompt.hpp"
 
 class Exec;
 #include "event.hpp"
-
+typedef std::map<std::string, Entry> RouteTable;
 class Router
 {
 	friend class Event;
@@ -33,13 +34,16 @@ class Router
 		void setName(char*);
 		Configuration* getConfiguration();
 
+		RouteTable* getRouteTable();
+
+
 
 	private:
 		std::string *_name;
-		RoutTable * _tab;
+		RouteTable routeTable;
 
 		network* net;
-		Client* c; //euh ? est-ce nécessaire ? c'est pas juste pour des tests ce client ? (jm)
+		Client* c;
 
 		Configuration* config;
 		int seqnum;

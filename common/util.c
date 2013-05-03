@@ -20,8 +20,8 @@ void strcopy2(char **dest, char* origin)
 	}
 }
 
-char *strcopy(char* origin)
-{	
+char *strcopy( const char* origin)
+{
 	char * dest;
 	if (origin != NULL)
 	{
