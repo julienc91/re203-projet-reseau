@@ -1,5 +1,6 @@
 #include "../common/net.h"
-
+#include "../common/messages.h"
+#include "../common/util.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -94,8 +95,8 @@ void network__disconnect (network *net, Client *c){
 
 void network__send(Client *c, const char *message)
 {
-  message = mess__treatOutput(message);
-  write_client (c->sock, message);
+  char* mess2 = strcopy(message);
+  write_client (c->sock, mess__treatOutput(message));
 }
 
 void network__broadcast  (network *net, const char *message){
@@ -334,4 +335,3 @@ static void write_client(SOCKET sock, const char *buffer)
       exit(errno);
     }
 }
-
