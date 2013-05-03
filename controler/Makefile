@@ -4,7 +4,7 @@ CC=@gcc
 RM=@rm -f
 
 COMMON_PATH  = ../common/
-COMMON_FILES = prompt.o messages.o net.o trex.o util.o
+COMMON_FILES = prompt.o messages.o net.o trex.o util.o config.o
 
 SRC= $(wildcard *.c)
 OBJ= $(SRC:.c=.o)

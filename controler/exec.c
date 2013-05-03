@@ -5,11 +5,16 @@
 #include "sock_table.h"
 #include "net_functions.h"
 #include "../common/util.h"
+#include "../common/config.h"
+
 
 void exec__init(void)
 {
+	//~ config = config__readController();
+
+	//~ net = network__open(config->controllerPort);
 	net = network__open(12345);
-	//TODO ajouter le chargement du fichier de config
+
 	net->input_event = input_event;
 	net->connection_event = connection_event;
 	net->disconnection_event = disconnection_event;
@@ -69,66 +74,85 @@ void exec__prompt_message(struct Message *m)
 		case ADDLINK:
 			// actions sur graphe
 			n1 = agfindnode(graph, m->node1);
-			n1 = agfindnode(graph, m->node2);
+			n2 = agfindnode(graph, m->node2);
 
-			graph__addEdge(graph, n1 , n2, mess__getWeight(m));
-			//actions sur réseau
-			n1->u.is_up_to_date = 0;
-			n2->u.is_up_to_date = 0;
-			//affichage
-			// vérifier que l'on peut ajouter ce lien
-			disp__addlink(m->node1, m->node2, mess__getWeight(m));
+			e = agfindedge(graph,agfindnode(graph, m->node1), agfindnode(graph, m->node2));
+			if (e == NULL)
+			{
+				graph__addEdge(graph, n1 , n2, mess__getWeight(m));
+				//actions sur réseau
+				n1->u.is_up_to_date = 0;
+				n2->u.is_up_to_date = 0;
+				//affichage
+				// vérifier que l'on peut ajouter ce lien
+				
+				disp__addlink(m->node1, m->node2, mess__getWeight(m));
+			}
 			break;
 
 		case UPDATELINK:
 			// actions sur graphe
 			e = agfindedge(graph,agfindnode(graph, m->node1), agfindnode(graph, m->node2));
-			graph__setWeight(graph, e , mess__getWeight(m));
-			//actions sur réseau
-			e->head->u.is_up_to_date = 0;
-			e->tail->u.is_up_to_date = 0;
-			//affichage
-			// vérifier que l'on peut modifier ce lien
-			disp__updlink(m->node1, m->node2, mess__getWeight(m));
+			if(e != NULL)
+			{
+				graph__setWeight(graph, e , mess__getWeight(m));
+				//actions sur réseau
+				e->head->u.is_up_to_date = 0;
+				e->tail->u.is_up_to_date = 0;
+				//affichage
+				// vérifier que l'on peut modifier ce lien
+				disp__updlink(m->node1, m->node2, mess__getWeight(m));
+			}
 			break;
 
 		case DELLINK:
 			// actions sur graphe
-			agfindedge(graph,agfindnode(graph, m->node1), agfindnode(graph, m->node2));
-			e->head->u.is_up_to_date = 0;
-			e->tail->u.is_up_to_date = 0;
-			graph__removeEdge(graph, e);
-			//actions sur réseau
+			e = agfindedge(graph,agfindnode(graph, m->node1), agfindnode(graph, m->node2));
+			if(e != NULL)
+			{
+				e->head->u.is_up_to_date = 0;
+				e->tail->u.is_up_to_date = 0;
+				graph__removeEdge(graph, e);
+				//actions sur réseau
 
-			//affichage
-			// vérifier que l'on peut supprimer ce lien
-			disp__dellink(m->node1, m->node2);
+				//affichage
+				// vérifier que l'on peut supprimer ce lien
+				disp__dellink(m->node1, m->node2);
+			}
 			break;
 
 		case DISCONNECT:
 			// actions sur graphe
 			n1 = agfindnode(graph, m->node1);
-			n1->u.is_up_to_date = 0;
-			e = agfstedge(graph, n1);
-			while(e!=NULL)
+			if (n1 != NULL)
 			{
-				if( e->head != n1)
-				{
-					e->head->u.is_up_to_date = 0;
-				}
-				else
-				{
-					e->tail->u.is_up_to_date = 0;
-				}
-
-				agdelete(graph,e);
+				n1->u.is_up_to_date = 0;
 				e = agfstedge(graph, n1);
-			}
+				while(e != NULL)
+				{
+					if( e->head != n1)
+					{
+						e->head->u.is_up_to_date = 0;
+					}
+					else
+					{
+						e->tail->u.is_up_to_date = 0;
+					}
+
+					agdelete(graph,e);
+					e = agfstedge(graph, n1);
+				}
 			//actions sur réseau
 
 			//affichage
 			// vérifier que l'on peut déconnecter ce noeud
-			disp__disconnect(m->node1);
+				disp__disconnect(m->node1);
+			}
+			break;
+		
+		case QUIT:
+			//
+			network__close(net);
 			break;
 
 		default:
@@ -168,6 +192,7 @@ struct Message *exec__sock_message(struct Message *m)
 				if(n1 == NULL)
 				{
 					printf("ERREUR : Aucun noeud libre\n");
+					m->type = NONE;
 					m->node1 = "";
 					return m;
 				}
@@ -186,6 +211,7 @@ struct Message *exec__sock_message(struct Message *m)
 					if(n1 == NULL)
 					{
 						printf("ERREUR : Aucun noeud libre\n");
+						m->type = NONE;
 						m->node1 = "";
 						return m;
 					}
@@ -193,13 +219,11 @@ struct Message *exec__sock_message(struct Message *m)
 			}
 			//ajouter les infos du client et l'id à la table
 			strcopy2(&m->node1, graph__getId(n1));
-			client_info = calloc(1,sizeof(Client_info));
+			client_info = calloc(1 ,sizeof(Client_info));
 			strcopy2(&client_info->address, m->s_parameter);
 			client_info->port = m->n_parameter;
-			DEBUG
 			strcopy2(&key, graph__getId(n1));
-			DEBUG
-			table__add_info(&key, client_info);
+			table__add_info(&key, &client_info);
 
 			e = agfstedge(graph, n1);
 			while(e != NULL)
@@ -226,14 +250,13 @@ struct Message *exec__sock_message(struct Message *m)
 
 		case POLL:
 			// si il y a eu un changement de voisinage, renvoyer la topologie
-
 			n1 = agfindnode(graph, m->node1);
-			if (n1->u.is_up_to_date != 1)
+			if (n1 != NULL && !n1->u.is_up_to_date)
 			{
 				strcat(voisinage, "[");
 
 				e = agfstedge(graph, n1);
-				while(e!=NULL)
+				while(e != NULL)
 				{
 					if(e->tail != n1)
 					{
@@ -254,6 +277,7 @@ struct Message *exec__sock_message(struct Message *m)
 
 						aux[0]='\0';
 						client_info = table__get_info(&id);
+						
 						sprintf(aux, "%s", client_info->address);
 						strcat(voisinage, aux);
 						strcat(voisinage, ":");
@@ -307,9 +331,7 @@ struct Message *exec__sock_message(struct Message *m)
 				e = agnxtedge(graph, e, n1);
 			}
 			m->type = BYE;
-			DEBUG
 			table__delete_info(&(m->node1));
-			DEBUG
 			// envoyer bye
 			break;
 
