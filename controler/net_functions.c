@@ -1,4 +1,5 @@
 #include "../common/net.h"
+#include "../common/client.h"
 #include "../common/messages.h"
 #include "../common/util.h"
 #include "exec.h"
