@@ -92,7 +92,9 @@ void network__disconnect (network *net, Client *c){
   remove_client(net, c);
 }
 
-void network__send(Client *c, const char *message){
+void network__send(Client *c, const char *message)
+{
+  message = mess__treatOutput(message);
   write_client (c->sock, message);
 }
 

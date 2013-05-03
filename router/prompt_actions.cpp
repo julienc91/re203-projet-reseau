@@ -16,15 +16,17 @@ PromptActions::PromptActions(Router* r)
 void PromptActions::message(Message* mess)
 {
 	// on regarde le next hop dans la table de routage  (router->getRoutetable ou qqch comme ça)
-	Client* c = 0; // = ... celui qui correspond à mess->node1
+	RouteTable* tbl = router->getRouteTable();
+	RouteTable::iterator t;
+	if((t = tbl->find(std::string(mess->node1))) != RouteTable::end)
+	{
+		Client* c = (*t)->second.client(); // = ... celui qui correspond à mess->node1
+	}
+	else
+	{
+		throw UnknownDest;
+	}
 
-	// si pas dans table de routage, erreur.
-	// throw unknownDest;
-
-
-
-	// c = quelquechose...
-	// on transforme le message en packet
 	struct Message* packet;
 	mess__init(&packet);
 
@@ -34,9 +36,7 @@ void PromptActions::message(Message* mess)
 	packet->n_parameter = router->getConfiguration()->defaultTTLValue;
 	packet->s_parameter = strcopy(mess->s_parameter);
 
-	// network__send(c, mess__toString(packet)); //segfault tant qu'on a pas un vrai c
-
-	// note : le treatOutput doit être fait dans net.h
+	network__send(c, mess__toString(packet));
 }
 
 
@@ -69,7 +69,7 @@ void PromptActions::route(Message* mess)
 {
 	// on regarde le next hop dans la table de routage  (router->getRoutetable ou qqch comme ça)
 
-	Client* c = 0; // = ... celui qui correspond à mess->node1
+	entry* e = map["N3"]; // = ... celui qui correspond à mess->node1
 
 	// si pas dans table de routage, erreur.
 	// throw unknownDest;
@@ -84,8 +84,9 @@ void PromptActions::route(Message* mess)
 
 	int i = 1;
 	while(i < 100) // max ttl ? temps ? tant qu'on n'a pas reçu de réponse favorable à notre route ?
+	//peut être exécuter dans un thread avec incrémentation et comparaison d'une variable dans la classe
 	{
 		ll_ping->n_parameter = i;
-		// network__send(c, mess__toString(packet)); //segfault tant qu'on a pas un vrai c
+		network__send(e.c, mess__toString(ll_ping)); //segfault tant qu'on a pas un vrai c
 	}
 }

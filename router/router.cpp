@@ -101,3 +101,8 @@ Configuration* Router::getConfiguration()
 {
 	return config;
 }
+
+RouteTable* Router::getRouteTable()
+{
+	return &routeTable;
+}
