@@ -5,10 +5,10 @@ LFLAGS=-lpthread
 
 BINARY=router
 COMMON_PATH  = ../common/
-COMMON_FILES = messages.o net.o config.o trex.o util.o
+COMMON_FILES = messages.o net.o config.o trex.o util.o client.o
 
-SRC= $(wildcard *.c)
-OBJ= $(SRC:.c=.o)
+SRC= $(wildcard *.cpp)
+OBJ= $(SRC:.cpp=.o)
 COMMONOBJ = $(addprefix $(COMMON_PATH), $(COMMON_FILES))
 
 .PHONY:	clean
@@ -17,7 +17,7 @@ all: $(BINARY)
 
 $(BINARY): $(OBJ) $(COMMONOBJ)
 	@echo -n " Compiling" $@ "..."
-	$(CC) $^ -o $@  $(LDFLAGS)
+	$(CC) $^ -o $(BINARY)  $(LDFLAGS)
 	@echo " Done."
 
 %.o: %.c
