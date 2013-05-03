@@ -1,49 +1,14 @@
 #ifndef NET_H_
 #define NET_H_
 
-#if defined(WIN32) || defined(__MINGW32__)
+#include "sock.h"
+#include "client.h"
 
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#elif defined(__linux__)
-
-#define h_addr h_addr_list[0] /*backward compatibility*/
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/select.h>
-//~ #include <netdb.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <unistd.h> /* close */
-#include <netdb.h> /* gethostbyname */
-#define INVALID_SOCKET -1
-#define SOCKET_ERROR -1
-#define closesocket(s) close(s)
-typedef int SOCKET;
-typedef struct sockaddr_in SOCKADDR_IN;
-typedef struct sockaddr SOCKADDR;
-typedef struct in_addr IN_ADDR;
-
-
-#else
-
-#error not defined for this platform
-
-#endif
-
-#define CRLF		"\r\n"
 #define NB_CLIENTS 	100
 
-#define BUF_SIZE	1024
+
 #define CONNECTION_ERROR -1
 
-
-/* * * * client * * * */
-typedef struct
-{
-  SOCKET sock;
-  char id[BUF_SIZE];
-}Client;
 
 /* * * * events * * * */
 typedef struct network_s network;
@@ -85,10 +50,6 @@ void     network__disconnect (network *net, Client *c);
 void     network__send       (Client *, const char *message);
 void     network__broadcast  (network *net, const char *message);
 
-int      client__compare     (Client *a, Client *b);
-void     client__set_id      (Client *c, const char *id);
-char    *client__get_id      (Client *c);
-char    *client__get_address (Client *c);
-int      client__get_port    (Client *c);
+
 
 #endif
