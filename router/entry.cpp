@@ -1,6 +1,11 @@
-#include "rout_table.hpp"
+#include "entry.hpp"
 #include <string>
 
+
+extern "C"
+{
+	#include "../common/client.h"
+}
 using namespace std;
 
 

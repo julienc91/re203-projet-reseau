@@ -57,7 +57,6 @@ Router::Router(char* name, int srcport, int destport)
 Router::Router(const Router * data)
 {
     _name   = data->_name;
-    _tab    = new RoutTable(data->_tab);
 }
 
 Router::~Router()
@@ -69,7 +68,6 @@ Router::~Router()
 
 	end(); // windows compatibility
 
-    delete _tab;
     delete _name;
 }
 
