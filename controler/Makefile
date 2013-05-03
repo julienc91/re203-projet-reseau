@@ -15,7 +15,9 @@ all:	controler
 
 
 controler: $(OBJ) $(COMMONOBJ)
+	@echo -n " Compiling" $@ "..."
 	$(CC) $^ -o $@  $(LDFLAGS)
+	@echo " Done."
 
 .PHONY: clean
 
