@@ -5,6 +5,8 @@
 #include "prompt_actions.hpp"
 #include "sock_actions.hpp"
 
+#include <cstring>
+#include <cstdlib>
 
 Exec::Exec(Router* r)
 {
@@ -15,8 +17,6 @@ Exec::Exec(Router* r)
 	pingCount = 0;
 	pingTimeTables = new time_t[router->getConfiguration()->defaultPingPacketCount];
 
-	paction = new PromptActions(r);
-	saction = new SockActions(r);
 	disp = new Display();
 }
 
@@ -32,7 +32,7 @@ void Exec::prompt_message(Message* m)
 		case MESSAGE:
 			try
 			{
-				paction->message(m);
+				router->promptActions()->message(m);
 			}
 			catch(UnknownDest&)
 			{
@@ -50,7 +50,7 @@ void Exec::prompt_message(Message* m)
 		case PING:
 			try
 			{
-				paction->ping(m);
+				router->promptActions()->ping(m);
 				pingCount = router->getConfiguration()->defaultPingPacketCount;
 			}
 			catch(UnknownDest&)
@@ -71,7 +71,7 @@ void Exec::prompt_message(Message* m)
 			//actions sur réseau
 			try
 			{
-				paction->route(m);
+				router->promptActions()->route(m);
 				isWaitingForRoute = true;
 				routeDest = strcopy(m->node2);
 				routeCount = 0;
@@ -168,7 +168,7 @@ void Exec::sock_message(Message* m)
 				{
 					// on envoie l'acquittement
 					m->accept = OK;
-					saction->reverse(m); //seqnum ne change pas!!!!!!
+					router->sockActions()->reverse(m); //seqnum ne change pas!!!!!!
 					disp->mess_received(m->s_parameter);
 				}
 			}
@@ -180,13 +180,13 @@ void Exec::sock_message(Message* m)
 					// chercher à qui envoyer dans la routetable
 
 					// envoyer si possible
-					saction->forward(m);
+					router->sockActions()->forward(m);
 				}
 				else
 				{
 					m->accept = TOOFAR;
 					//renvoyer dans l'autre sens
-					saction->reverse(m);
+					router->sockActions()->reverse(m);
 				}
 			}
 			break;
@@ -196,19 +196,19 @@ void Exec::sock_message(Message* m)
 			{
 				//envoyer pong
 				m->type = PONG;
-				saction->reverse(m);
+				router->sockActions()->reverse(m);
 			}
 			else // on fait transiter
 			{
 				if(mess__getAndDecTTL(m) != 0)
 				{
-					saction->forward(m);
+					router->sockActions()->forward(m);
 				}
 				else
 				{
 					m->accept = TTLZERO;
 					//renvoyer dans l'autre sens
-					saction->reverse(m);
+					router->sockActions()->reverse(m);
 				}
 			}
 
@@ -256,7 +256,7 @@ void Exec::sock_message(Message* m)
 				if(mess__getAndDecTTL(m) != 0)
 				{
 					// envoyer si possible
-					saction->forward(m);
+					router->sockActions()->forward(m);
 				}
 				// ne rien faire si le ttl arrive à 0 sur le chemin du retour...
 			}

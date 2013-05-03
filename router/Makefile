@@ -19,7 +19,7 @@ all: $(BINARY)
 $(BINARY): $(OBJ) $(COMMONOBJ)
 
 	@echo -n " Compiling" $@ "..."
-	$(CC) $^ -o $(BINARY)  $(LDFLAGS)
+	$(CC) $^ -o $(BINARY)  $(LFLAGS)
 	@echo " Done."
 
 %.o: %.cpp

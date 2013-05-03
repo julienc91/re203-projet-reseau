@@ -1,11 +1,6 @@
 #ifndef _ROUTER_HPP
 #define _ROUTER_HPP
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <map>
-
 extern "C" {
 #include "../common/net.h"
 #include "../common/messages.h"
@@ -15,10 +10,13 @@ extern "C" {
 
 #include "entry.hpp"
 #include "prompt.hpp"
-
-class Exec;
 #include "event.hpp"
 #include "routetable.hpp"
+
+class Exec;
+class PromptActions;
+class SockActions;
+
 class Router
 {
 	friend class Event;
@@ -35,15 +33,20 @@ class Router
 		Configuration* getConfiguration();
 
 		RouteTable& getRouteTable();
+		Client* getController();
 
-
+		PromptActions* promptActions();
+		SockActions* sockActions();
 
 	private:
 		std::string *_name;
 		RouteTable routeTable;
 
+		PromptActions* paction;
+		SockActions* saction;
+
 		network* net;
-		Client* c;
+		Client* controller;
 
 		Configuration* config;
 		int seqnum;

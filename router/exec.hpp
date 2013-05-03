@@ -7,8 +7,7 @@ extern "C"
 	#include "../common/util.h"
 }
 
-class PromptActions;
-class SockActions;
+
 class Router;
 class Display;
 
@@ -21,8 +20,6 @@ class Exec
 
 	private:
 		Router* router;
-		PromptActions* paction;
-		SockActions* saction;
 		Display* disp;
 
 		bool isWaitingForRoute;
