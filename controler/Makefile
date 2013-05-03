@@ -3,6 +3,8 @@ LDFLAGS=-lpthread -lgraph -lcdt
 CC=@gcc
 RM=@rm -f
 
+BINARY = controller
+
 COMMON_PATH  = ../common/
 COMMON_FILES = prompt.o messages.o net.o trex.o util.o config.o client.o
 
@@ -10,16 +12,15 @@ SRC= $(wildcard *.c)
 OBJ= $(SRC:.c=.o)
 COMMONOBJ = $(addprefix $(COMMON_PATH), $(COMMON_FILES))
 
+.PHONY: clean
 
-all:	controler
+all: $(BINARY)
 
-
-controler: $(OBJ) $(COMMONOBJ)
+$(BINARY): $(OBJ) $(COMMONOBJ)
 	@echo -n " Compiling" $@ "..."
 	$(CC) $^ -o $@  $(LDFLAGS)
 	@echo " Done."
 
-.PHONY: clean
 
 %.o: %.c
 	@echo -n " Compiling" $@  "..."
