@@ -88,6 +88,7 @@ void Exec::prompt_message(Message* m)
 		case ROUTETABLE:
 			//affichage
 			//disp->routetable(router->getRoutetable());
+			std::cout << "TODO" << std::endl; // TODO
 			break;
 
 		default:
@@ -108,13 +109,13 @@ void Exec::sock_message(Message* m)
 	{
 		case GREETING:
 			router->setName(m->node1);
-			// il faudra penser à mettre à jour le nom du routeur partout ou il est stocké
 			break;
 
 		case NEIGHBORHOOD:
 			if(m->accept == NOT)
 			{
 				//charger la liste
+				//traiter (format de donnée : TODO )
 				//mettre à jour la topologie si nécessaire
 			}
 			// sinon ne rien faire, ça ne change pas
@@ -157,7 +158,7 @@ void Exec::sock_message(Message* m)
 				{
 					// cool, tout s'est bien passé
 					// prendre la timestamp et ...
-					disp->mess_deliv(0);
+					disp->mess_deliv(0); // TODO
 				}
 				else if(m->accept == TOOFAR)
 				{
@@ -177,9 +178,7 @@ void Exec::sock_message(Message* m)
 				//dec. TTL
 				if(mess__getAndDecTTL(m) != 0)
 				{
-					// chercher à qui envoyer dans la routetable
-
-					// envoyer si possible
+					// envoyer (p-ê rajouter gestion d'exceptions ici)
 					router->sockActions()->forward(m);
 				}
 				else
@@ -229,7 +228,7 @@ void Exec::sock_message(Message* m)
 
 					if(pingCount == 0)
 					{
-						// taux de succès:
+						// taux de succès: TODO
 						double success=0;
 						double failure=0;
 						double min=0;
@@ -255,7 +254,6 @@ void Exec::sock_message(Message* m)
 			{
 				if(mess__getAndDecTTL(m) != 0)
 				{
-					// envoyer si possible
 					router->sockActions()->forward(m);
 				}
 				// ne rien faire si le ttl arrive à 0 sur le chemin du retour...
