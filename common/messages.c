@@ -27,9 +27,9 @@ int mess__getWeight(struct Message* mess)
 	return mess->n_parameter;
 }
 
-int mess__getTTL(struct Message* mess)
+int mess__getAndDecTTL(struct Message* mess)
 {
-	return mess->n_parameter;
+	return (mess->n_parameter)--;
 }
 
 

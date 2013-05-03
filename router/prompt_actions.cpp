@@ -15,7 +15,6 @@ PromptActions::PromptActions(Router* r)
 
 void PromptActions::message(Message* mess)
 {
-
 	// on regarde le next hop dans la table de routage  (router->getRoutetable ou qqch comme ça)
 	Client* c = 0; // = ... celui qui correspond à mess->node1
 

@@ -14,7 +14,7 @@ COMMONOBJ = $(addprefix $(COMMON_PATH), $(COMMON_FILES))
 all: $(BINARY)
 
 
-$(BINARY): main.cpp router.cpp event.cpp prompt.cpp exec.cpp prompt_actions.cpp display.cpp rout_table.cpp $(COMMONOBJ)
+$(BINARY): main.cpp router.cpp event.cpp prompt.cpp exec.cpp prompt_actions.cpp display.cpp rout_table.cpp sock_actions.cpp $(COMMONOBJ)
 	@echo -n " Compiling" $@ "..."
 	$(CC) $(CFLAGS) $^ -o $(BINARY) $(LFLAGS)
 	@echo " Done."
