@@ -60,7 +60,7 @@ void PromptActions::ping(Message* mess)
 
 	for (int i = 0; i < router->getConfiguration()->defaultPingPacketCount; i++)
 	{
-		// network__send(c, mess__toString(packet)); //segfault tant qu'on a pas un vrai c
+		network__send(c, mess__toString(ll_ping)); //segfault tant qu'on a pas un vrai c
 	}
 }
 
