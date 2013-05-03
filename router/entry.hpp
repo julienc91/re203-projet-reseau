@@ -1,3 +1,5 @@
+#ifndef _ENTRY_HPP
+#define _ENTRY_HPP
 #include <string>
 
 extern "C"
@@ -7,6 +9,7 @@ extern "C"
 
 class Entry{
 public:
+  Entry();
   Entry(std::string name, std::string nextHop, int dist = -1);
   Entry(const Entry *data);
 
@@ -25,3 +28,5 @@ private:
   Client *_client;
 
 };
+
+#endif

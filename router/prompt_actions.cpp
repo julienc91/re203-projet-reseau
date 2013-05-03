@@ -2,6 +2,7 @@
 #include "exceptions.hpp"
 #include <cstring>
 
+#include <iostream>
 extern "C"
 {
 	#include "../common/util.h"
@@ -15,19 +16,6 @@ PromptActions::PromptActions(Router* r)
 
 void PromptActions::message(Message* mess)
 {
-	Client* c = 0;
-	// on regarde le next hop dans la table de routage  (router->getRoutetable ou qqch comme ça)
-	RouteTable* tbl = router->getRouteTable();
-	RouteTable::iterator t;
-	if((t = tbl->find(std::string(mess->node1))) != tbl->end())
-	{
-		c = (*t).second.client(); // = ... celui qui correspond à mess->node1
-	}
-	else
-	{
-		throw unknownDest;
-	}
-
 	struct Message* packet;
 	mess__init(&packet);
 
@@ -37,25 +25,26 @@ void PromptActions::message(Message* mess)
 	packet->n_parameter = router->getConfiguration()->defaultTTLValue;
 	packet->s_parameter = strcopy(mess->s_parameter);
 
+
+	// on regarde le next hop dans la table de routage
+	Client* c = 0;
+
+	try
+	{
+		c = router->getRouteTable().nextClient(std::string(packet->node2));
+	}
+	catch(UnknownDest)
+	{
+		throw;
+	}
+
+
 	network__send(c, mess__toString(packet));
 }
 
 
 void PromptActions::ping(Message* mess)
 {
-	Client* c = 0;
-	// on regarde le next hop dans la table de routage  (router->getRoutetable ou qqch comme ça)
-	RouteTable* tbl = router->getRouteTable();
-	RouteTable::iterator t;
-	if((t = tbl->find(std::string(mess->node1))) != tbl->end())
-	{
-		c = (*t).second.client(); // = ... celui qui correspond à mess->node1
-	}
-	else
-	{
-		throw unknownDest;
-	}
-
 	struct Message* ll_ping; // ping de bas niveau (low level)
 	mess__init(&ll_ping);
 
@@ -63,6 +52,18 @@ void PromptActions::ping(Message* mess)
 	ll_ping->node1 = strcopy(router->getName());
 	ll_ping->node2 = strcopy(mess->node1);
 	ll_ping->n_parameter = router->getConfiguration()->defaultTTLValue;
+
+	// on regarde le next hop dans la table de routage
+	Client* c = 0;
+
+	try
+	{
+		c = router->getRouteTable().nextClient(std::string(ll_ping->node2));
+	}
+	catch(UnknownDest)
+	{
+		throw;
+	}
 
 	for (int i = 0; i < router->getConfiguration()->defaultPingPacketCount; i++)
 	{
@@ -73,37 +74,30 @@ void PromptActions::ping(Message* mess)
 
 void PromptActions::route(Message* mess)
 {
-	// on regarde le next hop dans la table de routage  (router->getRoutetable ou qqch comme ça)
-
-	Client* c = 0;
-	// on regarde le next hop dans la table de routage  (router->getRoutetable ou qqch comme ça)
-	RouteTable* tbl = router->getRouteTable();
-	RouteTable::iterator t;
-	if((t = tbl->find(std::string(mess->node1))) != tbl->end())
-	{
-		c = (*t).second.client(); // = ... celui qui correspond à mess->node1
-	}
-	else
-	{
-		throw unknownDest;
-	}
-
-	// si pas dans table de routage, erreur.
-	// throw unknownDest;
-
 	struct Message* ll_ping; // ping de bas niveau (low level)
 	mess__init(&ll_ping);
-	// ping seqnum N src id dst id ttl val*
 
 	ll_ping->seqnum = router->newSeqnum();
 	ll_ping->node1 = strcopy(router->getName());
 	ll_ping->node2 = strcopy(mess->node1);
 
+	// on regarde le next hop dans la table de routage
+	Client* c = 0;
+
+	try
+	{
+		c = router->getRouteTable().nextClient(std::string(ll_ping->node2));
+	}
+	catch(UnknownDest)
+	{
+		throw;
+	}
+
 	int i = 1;
 	while(i < 100) // max ttl ? temps ? tant qu'on n'a pas reçu de réponse favorable à notre route ?
-	//peut être exécuter dans un thread avec incrémentation et comparaison d'une variable dans la classe
+	//peut être exécuter dans un thread avec incrémentation et comparaison d'une variable dans la classe (mutex)
 	{
 		ll_ping->n_parameter = i;
-		network__send(c, mess__toString(ll_ping)); //segfault tant qu'on a pas un vrai c
+		network__send(c, mess__toString(ll_ping));
 	}
 }

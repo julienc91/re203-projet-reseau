@@ -14,6 +14,10 @@ Entry::Entry(string name, string nextHop, int dist)
 {
 }
 
+Entry::Entry()
+{
+}
+
 
 Entry::Entry(const Entry *data){
     _name       = data->_name;

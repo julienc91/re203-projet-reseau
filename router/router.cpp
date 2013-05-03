@@ -100,7 +100,7 @@ Configuration* Router::getConfiguration()
 	return config;
 }
 
-RouteTable* Router::getRouteTable()
+RouteTable& Router::getRouteTable()
 {
-	return &routeTable;
+	return routeTable;
 }

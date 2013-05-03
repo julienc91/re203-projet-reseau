@@ -18,7 +18,7 @@ extern "C" {
 
 class Exec;
 #include "event.hpp"
-typedef std::map<std::string, Entry> RouteTable;
+#include "routetable.hpp"
 class Router
 {
 	friend class Event;
@@ -34,7 +34,7 @@ class Router
 		void setName(char*);
 		Configuration* getConfiguration();
 
-		RouteTable* getRouteTable();
+		RouteTable& getRouteTable();
 
 
 

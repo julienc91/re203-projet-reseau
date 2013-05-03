@@ -1,5 +1,5 @@
 #include "sock_actions.hpp"
-
+#include "exceptions.hpp"
 SockActions::SockActions(Router* r)
 {
 	router = r;
@@ -11,12 +11,35 @@ void SockActions::reverse(Message* m)
 	m->node1 = m->node2; //on inverse les pointeurs
 	m->node2 = tmp;
 
-	// Client* c = 0; // = ... celui qui correspond à mess->node1
-	// network__send(c, mess__toString(packet)); //segfault tant qu'on a pas un vrai c
+
+	// on regarde le next hop dans la table de routage
+	Client* c = 0;
+
+	try
+	{
+		c = router->getRouteTable().nextClient(std::string(m->node2));
+	}
+	catch(UnknownDest)
+	{
+		throw;
+	}
+
+	network__send(c, mess__toString(m)); //segfault tant qu'on a pas un vrai c
 }
 
 void SockActions::forward(Message* m)
 {
-	// Client* c = 0; // = ... celui qui correspond à mess->node1
-	// network__send(c, mess__toString(packet)); //segfault tant qu'on a pas un vrai c
+	// on regarde le next hop dans la table de routage
+	Client* c = 0;
+
+	try
+	{
+		c = router->getRouteTable().nextClient(std::string(m->node2));
+	}
+	catch(UnknownDest)
+	{
+		throw;
+	}
+
+	network__send(c, mess__toString(m)); //segfault tant qu'on a pas un vrai c
 }
