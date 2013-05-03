@@ -95,8 +95,8 @@ void network__disconnect (network *net, Client *c){
 
 void network__send(Client *c, const char *message)
 {
-  char* mess2 = strcopy(message);
-  write_client (c->sock, mess__treatOutput(message));
+  char* mess2 = mess__treatOutput(strcopy(message));
+  write_client (c->sock, mess2);
 }
 
 void network__broadcast  (network *net, const char *message){

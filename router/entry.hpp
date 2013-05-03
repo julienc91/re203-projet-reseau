@@ -1,5 +1,9 @@
 #include <string>
 
+extern "C"
+{
+	#include "../common/client.h"
+}
 
 class Entry{
 public:
@@ -21,4 +25,3 @@ private:
   Client *_client;
 
 };
-

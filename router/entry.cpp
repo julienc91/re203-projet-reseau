@@ -2,10 +2,7 @@
 #include <string>
 
 
-extern "C"
-{
-	#include "../common/client.h"
-}
+
 using namespace std;
 
 
@@ -47,6 +44,6 @@ int Entry::dist() const{
   return _dist;
 }
 
-Client *client(){
+Client *Entry::client(){
   return _client;
 }
