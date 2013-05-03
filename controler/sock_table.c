@@ -1,5 +1,6 @@
 #include "sock_table.h"
 #include <stdio.h>
+#include <string.h>
 
 static hash_table_t *T;
 
@@ -8,13 +9,12 @@ void table__init(){
 
     T = hash_table_new(MODE_ALLREF);
     //~ T = hash_table_new(MODE_VALUEREF);
-
 }
 
 void table__add_info(char **key, Client_info *c){
 
 
-    if(!HT_HAS_KEY(T, *key))
+    if(!hash_table_has_key(T, *key, strlen(*key)))
         HT_ADD(T, *key, c);
     else
         fprintf(stderr, "Key %s already exists\n", *key);
