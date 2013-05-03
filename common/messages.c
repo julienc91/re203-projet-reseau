@@ -129,7 +129,8 @@ struct Message* mess__parse(char* mess_src)
 		"ping seqnum \\d* src \\w* dst \\w* ttl \\d*",
 		"pong seqnum \\d* src \\w* dst \\w* ttl \\d*",
 		"pong seqnum \\d* src \\w* dst \\w* ttlzero",
-		"ping \\w*"
+		"ping \\w*",
+		"quit"
 	};
 
 	TRex* trex_current_regex;
@@ -137,7 +138,7 @@ struct Message* mess__parse(char* mess_src)
 	int match = 0;
 	char * ptr, *tmp2;
 
-	for(i = 0; i < 29; i++) // trouver le moyen de staticifier ça
+	for(i = 0; i < 30; i++) // trouver le moyen de staticifier ça
 	{
 		trex_current_regex = trex_compile(regex_strtable[i], NULL);
 		if(trex_match(trex_current_regex, mess_src))
@@ -369,6 +370,9 @@ struct Message* mess__parse(char* mess_src)
 			strtok(mess_src, " ");
 			mess_dest->node1  = strcopy(strtok(NULL, " "));
 			break;
+
+		case 29:
+			mess_dest->type = QUIT;
 
 		default:
 			mess_dest->type = NONE;

@@ -1,5 +1,7 @@
 #include "router.hpp"
 
+Router* glob__router = 0;
+
 Router::Router(char* name, int srcport, int destport)
 {
     _name = new std::string(name);
@@ -12,8 +14,12 @@ Router::Router(char* name, int srcport, int destport)
 	// * * * * lecture fichier config * * * *
 	config = config__readRouter();
 
+	glob__router = this;
+
 	// * * * * ouverture serveur * * * *
 	net = network__open(srcport);
+
+
 
 	// * * * * evenements * * * *
 	net->input_event =  Event::input;
@@ -83,6 +89,12 @@ int Router::newSeqnum()
 char* Router::getName()
 {
 	return (char*) _name->c_str();
+}
+
+void Router::setName(char* name)
+{
+	delete _name;
+	_name = new std::string(name);
 }
 
 Configuration* Router::getConfiguration()

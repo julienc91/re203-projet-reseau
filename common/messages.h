@@ -55,7 +55,8 @@ enum MessageType
 	PONG,			//pong src id dst id ttl val*
 
 	//Wildcard
-	NONE
+	NONE,
+	QUIT
 };
 
 

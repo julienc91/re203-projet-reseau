@@ -18,7 +18,9 @@ extern "C" {
 class Exec;
 #include "event.hpp"
 
-class Router {
+class Router
+{
+	friend class Event;
 	public:
 		Router(char* name, int srcport, int destport);
 		Router(const Router * data);
@@ -28,6 +30,7 @@ class Router {
 
 		int newSeqnum();
 		char* getName();
+		void setName(char*);
 		Configuration* getConfiguration();
 
 

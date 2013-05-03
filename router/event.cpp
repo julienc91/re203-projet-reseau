@@ -9,11 +9,14 @@ extern "C"
 #include "event.hpp"
 #include "exec.hpp"
 
+extern Router* glob__router;
+
 void Event::input(network *net, char *buffer)
 {
 	std::cout << "<input event: '" << buffer << "'>" << std::endl;
 
-	if (strcmp(buffer, "quit") == 0){
+	if (strcmp(buffer, "quit") == 0)
+	{
 		network__close(net);
 		return;
 	}
@@ -24,7 +27,14 @@ void Event::input(network *net, char *buffer)
 void Event::connect(network *net, Client *c, char *buffer)
 {
 	std::cout << "<connection on socket: '" << c->sock << " : " << buffer << "'>" << std::endl;
+
 	strcpy(c->id, buffer + 10);
+
+	struct Message *m = mess__parse(mess__treatInput(buffer));
+
+	if (!m) return;
+	glob__router->exec->sock_message(m);
+
 }
 
 void Event::disconnect(network *net, Client *c)
@@ -36,8 +46,8 @@ void Event::message(network *net, Client *c, char *buffer)
 {
 	std::cout << "<message from : '" << c->id << ", socket " << c->sock <<" : " << buffer << "'>" << std::endl;
 
-	struct Message *m = mess__parse(buffer);
+	struct Message *m = mess__parse(mess__treatInput(buffer));
 
 	if (!m) return;
-	//faire en sorte de pouvoir faire du non statique : Exec::sock_message(m);
+	glob__router->exec->sock_message(m);
 }

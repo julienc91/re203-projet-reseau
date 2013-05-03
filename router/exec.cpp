@@ -65,7 +65,6 @@ void Exec::prompt_message(Message* m)
 			}
 
 			//affichage se fait à la réception des pong
-
 			break;
 
 		case ROUTE:
@@ -108,7 +107,7 @@ void Exec::sock_message(Message* m)
 	switch(m->type)
 	{
 		case GREETING:
-			// router->setName(m->node1);
+			router->setName(m->node1);
 			// il faudra penser à mettre à jour le nom du routeur partout ou il est stocké
 			break;
 
@@ -123,6 +122,7 @@ void Exec::sock_message(Message* m)
 
 		case BYE:
 			// quitter le logiciel
+			exit(0);
 			break;
 
 		//**** routeur <-> routeur ****//
@@ -230,11 +230,11 @@ void Exec::sock_message(Message* m)
 					if(pingCount == 0)
 					{
 						// taux de succès:
-						double success;
-						double failure;
-						double min;
-						double avg;
-						double max;
+						double success=0;
+						double failure=0;
+						double min=0;
+						double avg=0;
+						double max=0;
 						disp->ping_result(success, failure, min, avg, max);
 					}
 				}

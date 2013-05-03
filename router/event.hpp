@@ -1,6 +1,8 @@
 #ifndef _EVENT_HPP
 #define _EVENT_HPP
 
+#include "router.hpp"
+
 class Event
 {
 	public:
