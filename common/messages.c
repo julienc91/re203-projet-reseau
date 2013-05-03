@@ -373,6 +373,7 @@ struct Message* mess__parse(char* mess_src)
 
 		case 29:
 			mess_dest->type = QUIT;
+			break;
 
 		default:
 			mess_dest->type = NONE;

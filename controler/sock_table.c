@@ -11,26 +11,26 @@ void table__init(){
     //~ T = hash_table_new(MODE_VALUEREF);
 }
 
-void table__add_info(char **key, Client_info *c){
+void table__add_info(char **key, Client_info **c){
 
 
     if(!hash_table_has_key(T, *key, strlen(*key)))
-        HT_ADD(T, *key, c);
+        hash_table_add(T,*key, strlen(*key), *c, sizeof(*c));
     else
         fprintf(stderr, "Key %s already exists\n", *key);
 }
 
 void table__delete_info(char **key){
 
-    HT_REMOVE(T, *key);
+    hash_table_remove(T, *key, strlen(*key));
 }
 
 void table__modify_key(char **old_key, char **new_key){
-    Client_info *c = (Client_info *)HT_LOOKUP(T, *old_key);
+    Client_info *c = (Client_info *)hash_table_lookup(T, *old_key, strlen(*old_key));
     if (c != NULL){
-        if(!HT_HAS_KEY(T, *new_key)){
-            HT_REMOVE(T, *old_key);
-            HT_ADD(T, *new_key, c);
+        if(!hash_table_has_key(T, *new_key, strlen(*new_key))){
+            hash_table_remove(T, *old_key, strlen(*old_key));
+            hash_table_add(T, *new_key, strlen(*new_key), (void *) c, sizeof(c));
         }
         else
             fprintf(stderr, "Key %s already exists\n", *new_key);
@@ -41,11 +41,11 @@ void table__modify_key(char **old_key, char **new_key){
 
 
 Client_info *table__get_info(char **key){
-    return (Client_info *)HT_LOOKUP(T, *key);
+    return (Client_info *)hash_table_lookup(T, *key, strlen(*key));
 }
 
 int table__has_info(char **key){
-    return HT_HAS_KEY(T, *key);
+    return hash_table_has_key(T, *key, strlen(*key));
 }
 
 void table__delete(){
