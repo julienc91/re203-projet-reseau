@@ -51,3 +51,8 @@ int Entry::dist() const{
 Client *Entry::client(){
   return _client;
 }
+
+void Entry::setClient(Client* c)
+{
+	_client = c;
+}

@@ -3,6 +3,8 @@
 #include "sock_actions.hpp"
 #include <iostream>
 #include <cstring>
+#include <vector>
+#include <cstdlib>
 
 Router* glob__router = 0;
 
@@ -11,6 +13,9 @@ Router::Router(char* name, int srcport, int destport)
     _name = new std::string(name);
    // _tab = new RoutTable(name);     // pour l'instant ça plante
 
+   	// * * * * lecture fichier config * * * *
+	config = config__readRouter();
+
 	exec = new Exec(this);
 	paction = new PromptActions(this);
 	saction = new SockActions(this);
@@ -18,8 +23,7 @@ Router::Router(char* name, int srcport, int destport)
 
 	init(); // windows compatibility
 
-	// * * * * lecture fichier config * * * *
-	config = config__readRouter();
+
 
 	// * * * * ouverture serveur * * * *
 	net = network__open(srcport);
@@ -45,6 +49,8 @@ Router::Router(char* name, int srcport, int destport)
 
 		sockActions()->login(config->routerPort, name);
 	}
+
+	parseNeighborhood((char*) "[a,b,c,d;e,f,g,h;ap,lol,kikoo]");
 
 	// * * * * gestion stdin   * * * *
 	void (Exec::*meth)(Message* m) = &Exec::prompt_message;
@@ -122,4 +128,35 @@ PromptActions* Router::promptActions()
 SockActions* Router::sockActions()
 {
 	return saction;
+}
+
+void Router::parseNeighborhood(char* str_orig)
+{
+	char *str = strcopy(str_orig + 1); // pour le [
+	str[strlen(str) - 1] = 0; // pour le ]
+	std::vector<char*> v;
+	// 1 : on extrait chaque groupe d'infos (séparés par ;)
+	char * r = strtok(str, ";");
+	if(r != NULL)
+		v.push_back(r);
+
+	while((r = strtok(NULL, ";")) != NULL)
+	{
+		v.push_back(r);
+	}
+
+	// à ce moment, on a dans v : | a,b,c,d  | e,f,g,h |  par ex.
+	// (si vect = [a,b,c,d;e,f,g,h;...])
+
+	std::vector<char*>::iterator i;
+	for(i = v.begin(); i != v.end(); ++i)
+	{
+		r = strtok((*i), ",");
+		routeTable[std::string(r)] = Entry(std::string(r), std::string(r), atoi(strtok(NULL, ",")));
+		// TODO : set l'ip. Elle est avec le port (fmt : ip:port) dans le prochain strtok
+		char * ip_src = strtok(NULL, ",");
+		char * ip = strtok(ip_src, ":");
+		routeTable[std::string(r)].setClient(network__connect(net, ip, atoi(strtok(NULL, ":"))));
+	}
+
 }

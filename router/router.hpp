@@ -38,6 +38,8 @@ class Router
 		PromptActions* promptActions();
 		SockActions* sockActions();
 
+		void parseNeighborhood(char* str);
+
 	private:
 		std::string *_name;
 		RouteTable routeTable;

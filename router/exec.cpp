@@ -114,9 +114,7 @@ void Exec::sock_message(Message* m)
 		case NEIGHBORHOOD:
 			if(m->accept == NOT)
 			{
-				//charger la liste
-				//traiter (format de donnée : TODO )
-				//mettre à jour la topologie si nécessaire
+				router.parseNeighborhood(m->s_parameter);
 			}
 			// sinon ne rien faire, ça ne change pas
 			break;

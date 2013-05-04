@@ -20,6 +20,7 @@ public:
   int &dist();
   int dist() const;
   Client *client();
+  void setClient(Client*);
 
 private:
   std::string _name;

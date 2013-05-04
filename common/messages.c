@@ -488,27 +488,6 @@ void mess__free(struct Message** mess)
 
 	free((*mess));
 }
-/*
-int main(int argc, char * argv[])
-{
-
-	//mess__parse(m, argv[1], 4);
-	char * truc = malloc(sizeof(char)*100);
-	strcpy(truc, "message n12 \"salut les copains!\"");
-	struct Message * m = mess__parse( truc);
-
-	char* origin = "j'aime au//ssi l*a chatte \\ 7 * 3*";
-	char* bidule = mess__escape(origin);
-	char* chose = mess__unescape(bidule);
-	printf("\n\noriginal: %s\néchappé: %s\noriginal: %s\n", origin, bidule, chose);
-
-	free(truc);
-	free(bidule);
-	free(chose);
-	mess__free(&m);
-	return 0;
-}
-*/
 
 
 void mess__debug(struct Message* m)
@@ -549,6 +528,7 @@ char* mess__treatInput(char * src)
 
 	return src;
 }
+
 char* mess__treatOutput(char * src)
 {
 	// On rajoute les \\ et \*
