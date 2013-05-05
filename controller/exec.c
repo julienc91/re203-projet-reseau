@@ -13,7 +13,7 @@ void exec__init(void)
 	config = config__readController();
 
 	net = network__open(config->controllerPort);
-	net = network__open(12345);
+	//~ net = network__open(12345);
 
 	net->input_event = input_event;
 	net->connection_event = connection_event;
