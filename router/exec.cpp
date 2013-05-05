@@ -114,7 +114,7 @@ void Exec::sock_message(Message* m)
 		case NEIGHBORHOOD:
 			if(m->accept == NOT)
 			{
-				router.parseNeighborhood(m->s_parameter);
+				router->parseNeighborhood(m->s_parameter);
 			}
 			// sinon ne rien faire, ça ne change pas
 			break;

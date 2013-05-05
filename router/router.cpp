@@ -149,14 +149,36 @@ void Router::parseNeighborhood(char* str_orig)
 	// (si vect = [a,b,c,d;e,f,g,h;...])
 
 	std::vector<char*>::iterator i;
+	std::vector<std::string> routerNames;
+
 	for(i = v.begin(); i != v.end(); ++i)
 	{
-		r = strtok((*i), ",");
-		routeTable[std::string(r)] = Entry(std::string(r), std::string(r), atoi(strtok(NULL, ",")));
-		// TODO : set l'ip. Elle est avec le port (fmt : ip:port) dans le prochain strtok
-		char * ip_src = strtok(NULL, ",");
-		char * ip = strtok(ip_src, ":");
-		routeTable[std::string(r)].setClient(network__connect(net, ip, atoi(strtok(NULL, ":"))));
+		std::string s(strtok((*i), ","));
+		routerNames.push_back(s);
+		if(routeTable.find(s) != routeTable.end())
+		{
+			routeTable[s] = Entry(s, s, atoi(strtok(NULL, ",")));
+
+			char * ip = strtok(strtok(NULL, ","), ":");
+			routeTable[s].setClient(network__connect(net, ip, atoi(strtok(NULL, ":"))));
+		}
+		else
+		{
+			routeTable[s].dist() = atoi(strtok(NULL, ","));
+		}
 	}
+
+
+	RouteTable::iterator k;
+	for(k = routeTable.begin(); k != routeTable.end(); k++)
+	{
+		if(routeTable.find((*k).first) == routeTable.end())
+		{
+			network__disconnect(net, (*k).second.client());
+			routeTable.erase(k);
+		}
+	}
+
+	// rechercher dans la table de routage tous ceux qui ne sont pas dans v et les supprimer
 
 }
