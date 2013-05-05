@@ -4,11 +4,12 @@
 #include "../common/messages.h"
 #include "../common/config.h"
 
+network *net;
+static Configuration *config;
 
 void exec__init(void);
 void exec__prompt_message(struct Message* m);
 struct Message *exec__sock_message(struct Message* m);
-network *net;
-static Configuration *config;
+
 #endif
 

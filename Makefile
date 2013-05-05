@@ -8,14 +8,14 @@ export CD=-@cd
 export SILENT_MAKE=@$(MAKE) -s
 
 SRCA=$(wildcard common/*.c)
-SRCB=$(wildcard controler/*.c)
+SRCB=$(wildcard controller/*.c)
 SRCC=$(wildcard router/*.cpp)
 OBJ=$(SRC:.c=.o)
 
 
 all:
 	$(SILENT_MAKE) common
-	$(SILENT_MAKE) controler
+	$(SILENT_MAKE) controller
 	$(SILENT_MAKE) router
 
 
@@ -25,9 +25,9 @@ common: $(SRCA)
 	#@echo "Done."
 	@echo ""
 
-controler: $(SRCB)
+controller: $(SRCB)
 	@echo "controller/"
-	$(CD) controler && $(MAKE)
+	$(CD) controller && $(MAKE)
 	#@echo "Done."
 	@echo ""
 
@@ -37,10 +37,10 @@ router: $(SRCC)
 	#@echo "Done."
 	@echo ""
 
-.PHONY: clean common controler router
+.PHONY: clean common controller router
 
 clean:
 	$(RM) common/*.o
-	$(RM) controler/*.o
+	$(RM) controller/*.o
 	$(RM) router/*.o
 	@echo "Cleaned."

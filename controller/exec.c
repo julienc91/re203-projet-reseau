@@ -1,8 +1,8 @@
 #include "display.h"
-#include "graph_.h"
+#include "graphlib.h"
 #include <unistd.h>
 #include "exec.h"
-#include "sock_table.h"
+#include "info_table.h"
 #include "net_functions.h"
 #include "../common/util.h"
 #include "../common/config.h"
@@ -10,10 +10,10 @@
 
 void exec__init(void)
 {
-	//~ config = config__readController();
+	config = config__readController();
 
-	//~ net = network__open(config->controllerPort);
-	net = network__open(12345);
+	net = network__open(config->controllerPort);
+	//~ net = network__open(12345);
 
 	net->input_event = input_event;
 	net->connection_event = connection_event;
@@ -152,6 +152,7 @@ void exec__prompt_message(struct Message *m)
 		
 		case QUIT:
 			//
+			printf("Fin du controleur \n");
 			network__close(net);
 			break;
 

@@ -1,7 +1,7 @@
-#include "graph_.h"
+#include "graphlib.h"
 #include "../common/prompt.h"
 #include "exec.h"
-#include "sock_table.h"
+#include "info_table.h"
 
 extern network *net;
 
@@ -20,13 +20,17 @@ int main(void)
 		network__update(net);
 	}
 
-	pthread_join(*prompt_th1, NULL);
-	printf("Prompt quitté\n");
+	//~ pthread_join(*prompt_th1, NULL);
+	//~ printf("Prompt quitté\n");
 
 	// * * * * fermeture serveur * * * *
 	
 	network__close(net);
 	network__free(net);
 
+	// nettoyage de la table de hachage
+	table__delete();
+	graph__delete();
+	
 	return  0;
 }

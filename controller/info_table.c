@@ -1,4 +1,4 @@
-#include "sock_table.h"
+#include "info_table.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -8,7 +8,6 @@ static hash_table_t *T;
 void table__init(){
 
     T = hash_table_new(MODE_ALLREF);
-    //~ T = hash_table_new(MODE_VALUEREF);
 }
 
 void table__add_info(char **key, Client_info **c){
@@ -49,6 +48,5 @@ int table__has_info(char **key){
 }
 
 void table__delete(){
-
     hash_table_delete(T);
 }
