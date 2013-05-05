@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include "graph_.h"
+#include "graphlib.h"
 #include "../common/util.h"
+
 void graph__init(void)
 {
 	aginit();
@@ -17,6 +18,10 @@ Agraph_t* graph__open(char * filename){
     fclose(fd);
 
     return g;
+}
+
+void graph__delete(){
+    graph__close(graph);
 }
 
 void graph__close(Agraph_t* graph){
