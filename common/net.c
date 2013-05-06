@@ -15,7 +15,7 @@
 static int     init_server_connection (unsigned int port);
 static int     init_client_connection (const char *address, const unsigned int port);
 static int     read_client            (SOCKET sock, char *buffer);
-static void    write_client           (SOCKET sock, const char *buffer);
+static int     write_client           (SOCKET sock, const char *buffer);
 static Client *add_client             (network *net, Client *c);
 static int     get_client_id          (network *net, Client *c);
 static void    remove_client          (network *net, Client *c);
@@ -82,7 +82,7 @@ Client *network__connect(network *net, const char *address, const unsigned int p
   Client c;
   c.sock = init_client_connection(address, port);
 
-  if (c.sock == CONNECTION_ERROR) return NULL;
+  if (c.sock == NETWORK__CONNECTION_ERROR) return NULL;
   return add_client(net, &c);
 }
 
@@ -93,17 +93,22 @@ void network__disconnect (network *net, Client *c){
   remove_client(net, c);
 }
 
-void network__send(Client *c, const char *message)
+int network__send(Client *c, const char *message)
 {
   char* mess2 = mess__treatOutput(strcopy(message));
-  write_client (c->sock, mess2);
+  return write_client (c->sock, mess2);
 }
 
-void network__broadcast  (network *net, const char *message){
+int network__broadcast  (network *net, const char *message){
+  int broadcast_return_value = 0;
+  int return_value = 0, failed = 0;
   unsigned int i;
   for (i = 0; i < net->nb_clients; i++){
-    network__send(&(net->clients[i]), message);
+    return_value = network__send(&(net->clients[i]), message);
+    if (return_value < 0) failed = 1;
+    broadcast_return_value += return_value;
   }
+  return failed ? NETWORK__SEND_ERROR : broadcast_return_value;
 }
 
 
@@ -286,7 +291,7 @@ static int init_client_connection(const char *address, const unsigned int port)
     {
       perror("socket()");
       //exit (errno);
-      return CONNECTION_ERROR;
+      return NETWORK__CONNECTION_ERROR;
     }
 
   hostinfo = gethostbyname(address);
@@ -294,7 +299,7 @@ static int init_client_connection(const char *address, const unsigned int port)
     {
       fprintf (stderr, "Unknown host %s.\n", address);
       //exit(EXIT_FAILURE);
-      return CONNECTION_ERROR;
+      return NETWORK__CONNECTION_ERROR;
     }
 
   sin.sin_addr = *(IN_ADDR *) hostinfo->h_addr;
@@ -305,7 +310,7 @@ static int init_client_connection(const char *address, const unsigned int port)
     {
       perror("connect()");
       //exit(errno);
-      return CONNECTION_ERROR;
+      return NETWORK__CONNECTION_ERROR;
     }
 
   return sock;
@@ -327,11 +332,27 @@ static int read_client(SOCKET sock, char *buffer)
   return n;
 }
 
-static void write_client(SOCKET sock, const char *buffer)
+static int write_client(SOCKET sock, const char *buffer)
 {
   if(send(sock, buffer, strlen(buffer), 0) < 0)
     {
       perror("send()");
-      exit(errno);
+      return NETWORK__SEND_ERROR;
     }
 }
+
+void network__debug(network *net){
+    fprintf(stderr, "[DEBUG] Network status : ");
+    if (net->status==NETWORK__CLOSED){
+        fprintf(stderr, "'closed'\n");
+    } else {
+        fprintf(stderr, "'opened'\n"); 
+    }
+    fprintf(stderr, "[DEBUG] Server socket : '%d'\n", (int)net->server);
+    fprintf(stderr, "[DEBUG] %d client(s) connected :\n", net->nb_clients);
+    int i;
+    for (i = 0; i < net->nb_clients; i++){
+        fprintf(stderr, "[DEBUG] (%d) id='%s', socket=''\n", i, net->clients[i].id, (int)net->clients[i].sock);
+    }
+}
+

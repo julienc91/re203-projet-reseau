@@ -44,7 +44,7 @@ void Event::disconnect(network *net, Client *c)
 
 void Event::message(network *net, Client *c, char *buffer)
 {
-	std::cout << "<message from : '" << c->id << "', socket " << c->sock <<" : '" << buffer << "'>" << std::endl;
+	std::cout << "<message from '" << c->id << "', socket " << c->sock <<" : '" << buffer << "'>" << std::endl;
 
 	struct Message *m = mess__parse(mess__treatInput(buffer));
 

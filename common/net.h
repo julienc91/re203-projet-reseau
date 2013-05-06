@@ -7,8 +7,8 @@
 #define NB_CLIENTS 	100
 
 
-#define CONNECTION_ERROR -1
-
+#define NETWORK__CONNECTION_ERROR -1
+#define NETWORK__SEND_ERROR       -2
 
 /* * * * events * * * */
 typedef struct network_s network;
@@ -47,9 +47,9 @@ Client  *network__connect    (network *net,
 			     const char *address,
 			     const unsigned int port);
 void     network__disconnect (network *net, Client *c);
-void     network__send       (Client *, const char *message);
-void     network__broadcast  (network *net, const char *message);
-
+int      network__send       (Client *, const char *message);
+int      network__broadcast  (network *net, const char *message);
+void     network__debug      (network *net);
 
 
 #endif

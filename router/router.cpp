@@ -225,3 +225,8 @@ void Router::parseNeighborhood(char* str_orig)
 		}
 	}
 }
+
+network* Router::getNetwork()
+{
+	return this->net;
+}

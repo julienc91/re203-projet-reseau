@@ -41,6 +41,8 @@ class Router
 		void parseNeighborhood(char* str);
 		void parseVector(char* str, char* sourceNode);
 
+		network* getNetwork();
+
 	private:
 		std::string *_name;
 		RouteTable routeTable;
