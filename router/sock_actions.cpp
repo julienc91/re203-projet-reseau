@@ -1,6 +1,9 @@
 #include "sock_actions.hpp"
 #include "exceptions.hpp"
 
+#include <string.h>
+
+
 SockActions::SockActions(Router* r)
 {
 	router = r;
@@ -56,7 +59,8 @@ void SockActions::login(int port, char* id)
 
 	if(id != 0)
 	{
-		m->s_parameter = strcopy(id);
+		m->node1 = new char[strlen(id) + 1];
+		strcpy(m->node1, id);
 	}
 
 	network__send(router->getController(), mess__toString(m));
