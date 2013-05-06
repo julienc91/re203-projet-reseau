@@ -21,7 +21,7 @@ class Router
 {
 	friend class Event;
 	public:
-		Router(char* name, int srcport, int destport);
+		Router(char* name, char* conf);
 		Router(const Router * data);
 		~Router();
 

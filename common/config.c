@@ -39,10 +39,17 @@ Configuration* config__readController(void)
 
 }
 
-Configuration* config__readRouter(void)
+Configuration* config__readRouter(char* file)
 {
 	FILE * pFile;
-	pFile = fopen ("router.cfg","r");
+	if(file != NULL)
+	{
+		pFile = fopen (file,"r");
+	}
+	else
+	{
+		pFile = fopen ("router.cfg","r");
+	}
 	if (pFile != NULL)
 	{
 		Configuration* conf = (Configuration*) malloc(sizeof(Configuration));

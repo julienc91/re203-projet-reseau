@@ -49,5 +49,9 @@ void Event::message(network *net, Client *c, char *buffer)
 	struct Message *m = mess__parse(mess__treatInput(buffer));
 
 	if (!m) return;
+	if(m->type == VECTOR)
+	{
+		m->node1 = strcopy(c->id);
+	}
 	glob__router->exec->sock_message(m);
 }

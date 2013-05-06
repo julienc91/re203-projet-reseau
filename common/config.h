@@ -19,7 +19,7 @@ typedef struct Configuration
 
 
 Configuration* config__readController(void);
-Configuration* config__readRouter(void);
+Configuration* config__readRouter(char* file);
 
 void config__readLine(Configuration*, char* line);
 

@@ -9,13 +9,12 @@
 
 Router* glob__router = 0;
 
-Router::Router(char* name, int srcport, int destport)
+Router::Router(char* name, char* conf)
 {
     _name = new std::string(name);
-   // _tab = new RoutTable(name);     // pour l'instant ça plante
 
    	// * * * * lecture fichier config * * * *
-	config = config__readRouter();
+	config = config__readRouter(conf);
 
 	exec = new Exec(this);
 	paction = new PromptActions(this);
@@ -25,9 +24,8 @@ Router::Router(char* name, int srcport, int destport)
 	init(); // windows compatibility
 
 
-
 	// * * * * ouverture serveur * * * *
-	net = network__open(srcport);
+	net = network__open(config->routerPort);
 
 	// * * * * evenements * * * *
 	net->input_event =  Event::input;
@@ -36,8 +34,8 @@ Router::Router(char* name, int srcport, int destport)
 	net->message_event = Event::message;
 
 	// * * * * connexion sortante * * * *
-	std::cout << "Connection to localhost on port " << destport << std::endl;
-	controller = network__connect(net, "localhost", destport); //localhost à changer
+	std::cout << "Connection to controller : "<< config->controllerAddress << ":" << config->controllerPort << std::endl;
+	controller = network__connect(net, config->controllerAddress, config->controllerPort); //localhost à changer
 
 	if (!controller)
 	{
@@ -50,8 +48,6 @@ Router::Router(char* name, int srcport, int destport)
 
 		sockActions()->login(config->routerPort, name);
 	}
-
-	parseNeighborhood((char*) "[a,b,c,d;e,f,g,h;ap,lol,kikoo]");
 
 	// * * * * gestion stdin   * * * *
 	void (Exec::*meth)(Message* m) = &Exec::prompt_message;
