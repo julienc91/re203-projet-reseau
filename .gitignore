@@ -2,3 +2,5 @@
 common/common
 controller/controller
 router/router
+rapport/*.aux
+rapport/*.log
