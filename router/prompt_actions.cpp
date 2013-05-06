@@ -54,7 +54,7 @@ void PromptActions::ping(Message* mess)
 	mess__init(&ll_ping);
 
 	ll_ping->type = PING;
-	ll_ping->seqnum = router->newSeqnum();
+
 	ll_ping->node1 = strcopy(router->getName());
 	ll_ping->node2 = strcopy(mess->node1);
 	ll_ping->n_parameter = router->getConfiguration()->defaultTTLValue;
@@ -73,6 +73,7 @@ void PromptActions::ping(Message* mess)
 
 	for (int i = 0; i < router->getConfiguration()->defaultPingPacketCount; i++)
 	{
+		ll_ping->seqnum = router->newSeqnum();
 		network__send(c, mess__toString(ll_ping)); //segfault tant qu'on a pas un vrai c
 	}
 }
