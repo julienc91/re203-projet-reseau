@@ -14,7 +14,7 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		std::cerr << "Usage: " << argv[0] << "<id> <fichier de conf>" << std::endl;
+		std::cerr << "Usage: " << argv[0] << " <id> <fichier de conf>" << std::endl;
 		return 1;
 	}
 

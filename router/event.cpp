@@ -26,7 +26,7 @@ void Event::input(network *net, char *buffer)
 
 void Event::connect(network *net, Client *c, char *buffer)
 {
-	std::cout << "<connection on socket: '" << c->sock << " : " << buffer << "'>" << std::endl;
+	std::cout << "<connection on socket: '" << c->sock << "' : '" << buffer << "'>" << std::endl;
 
 	strcpy(c->id, buffer + 10);
 
@@ -44,7 +44,7 @@ void Event::disconnect(network *net, Client *c)
 
 void Event::message(network *net, Client *c, char *buffer)
 {
-	std::cout << "<message from : '" << c->id << ", socket " << c->sock <<" : " << buffer << "'>" << std::endl;
+	std::cout << "<message from : '" << c->id << "', socket " << c->sock <<" : '" << buffer << "'>" << std::endl;
 
 	struct Message *m = mess__parse(mess__treatInput(buffer));
 
