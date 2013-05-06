@@ -266,6 +266,9 @@ int init_server_connection(unsigned int port)
   sin.sin_port = htons(port);
   sin.sin_family = AF_INET;
 
+  /* trick to prevent 'bind():  address already in use' errors */
+  int one = 1; setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+
   if(bind(sock,(SOCKADDR *) &sin, sizeof sin) == SOCKET_ERROR)
     {
       perror("bind()");
