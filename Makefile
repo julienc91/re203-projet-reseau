@@ -12,6 +12,7 @@ SRCB=$(wildcard controller/*.c)
 SRCC=$(wildcard router/*.cpp)
 OBJ=$(SRC:.c=.o)
 
+.PHONY: clean common controller router doc
 
 all:
 	$(SILENT_MAKE) common
@@ -22,22 +23,20 @@ all:
 common: $(SRCA)
 	@echo "common/"
 	$(CD) common && $(MAKE)
-	#@echo "Done."
 	@echo ""
 
 controller: $(SRCB)
 	@echo "controller/"
 	$(CD) controller && $(MAKE)
-	#@echo "Done."
 	@echo ""
 
 router: $(SRCC)
 	@echo "router/"
 	$(CD) router && $(MAKE)
-	#@echo "Done."
 	@echo ""
 
-.PHONY: clean common controller router
+doc:	doc/doxygen.conf
+	doxygen doc/doxygen.conf
 
 clean:
 	$(RM) common/*.o
