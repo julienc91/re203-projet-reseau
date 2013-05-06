@@ -5,7 +5,7 @@
  * Opens a server socket and manages connections
  * as an array of "Client"s.
  * 
- * /
+ */
 
 
 #include "../common/net.h"
