@@ -131,6 +131,52 @@ SockActions* Router::sockActions()
 	return saction;
 }
 
+void Router::parseVector(char* str_orig, char* node_orig)
+{
+	std::string sourceNode(node_orig);
+	char *str = strcopy(str_orig + 1); // pour le [
+	str[strlen(str) - 1] = 0; // pour le ]
+
+	std::vector<char*> v;
+	// 1 : on extrait chaque groupe d'infos (séparés par ;)
+	char * r = strtok(str, ";");
+	if(r != NULL)
+		v.push_back(r);
+
+	while((r = strtok(NULL, ";")) != NULL)
+	{
+		v.push_back(r);
+	}
+
+	// dans le tableau on a id,dist  dans chaque case.
+	// dans la routetable, il faut :
+	// si le noeud est présent, mettre à jour la distance si elle est plus courte
+	// sinon l'ajouter et mettre en next hop sourceNode
+
+	std::vector<char*>::iterator i;
+
+	// On ajoute ceux qui ne sont pas dans la table
+	for(i = v.begin(); i != v.end(); ++i)
+	{
+		std::string s(strtok((*i), ","));
+		int dist = atoi(strtok(NULL, ","));
+
+		if(routeTable.find(s) != routeTable.end())
+		{
+			if(dist < routeTable[s].dist())
+			{
+				routeTable[s].dist() = dist;
+				routeTable[s].nextHop() = sourceNode;
+			}
+		}
+		else
+		{
+			routeTable[s] = Entry(s, sourceNode, dist + routeTable[sourceNode].dist());
+			// exception si sourceNode pas dans hashtable ? peu probable
+		}
+	}
+}
+
 void Router::parseNeighborhood(char* str_orig)
 {
 	char *str = strcopy(str_orig + 1); // pour le [
@@ -152,6 +198,7 @@ void Router::parseNeighborhood(char* str_orig)
 	std::vector<char*>::iterator i;
 	std::vector<std::string> routerNames;
 
+	// On ajoute ceux qui ne sont pas dans la table
 	for(i = v.begin(); i != v.end(); ++i)
 	{
 		std::string s(strtok((*i), ","));
@@ -172,6 +219,7 @@ void Router::parseNeighborhood(char* str_orig)
 
 
 	RouteTable::iterator k;
+	// On enlève ceux qui n'y sont plus
 	for(k = routeTable.begin(); k != routeTable.end(); k++)
 	{
 		if(std::find(routerNames.begin(), routerNames.end(), (*k).first) == routerNames.end() && routeTable[(*k).first].isNeighbor())

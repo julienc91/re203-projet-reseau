@@ -143,7 +143,7 @@ void Exec::sock_message(Message* m)
 			}
 			else
 			{
-				// on met à jour la hashtable
+				router->parseVector(m->s_parameter, 0); // TODO il faut récupérer le noeud d'ou provient le vecteur !!!
 			}
 			break;
 

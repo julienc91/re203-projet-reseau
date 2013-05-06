@@ -39,6 +39,7 @@ class Router
 		SockActions* sockActions();
 
 		void parseNeighborhood(char* str);
+		void parseVector(char* str, char* sourceNode);
 
 	private:
 		std::string *_name;
