@@ -18,6 +18,10 @@ typedef void (*disconnection_event_function) (network *, Client *);
 typedef void (*message_event_function)    (network *, Client *, char *);
 
 /* * * * network * * * */
+/**
+ * \struct network
+ * \brief Network object
+ */
 struct network_s{
   short status; // opened / closed
   SOCKET server;
@@ -27,9 +31,13 @@ struct network_s{
   //unsigned int allocated_clients;
 
   // events
+  /*! \brief Event (function pointer) raised when the input has been used */
   input_event_function        input_event;
+  /*! \brief Event (function pointer) raised when a new client is connected */
   connection_event_function   connection_event;
+  /*! \brief Event (function pointer) raised when a client disconnects */
   disconnection_event_function disconnection_event;
+  /*! \brief Event (function pointer) raised when a client sends a message */
   message_event_function      message_event;
 };
 

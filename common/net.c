@@ -1,3 +1,13 @@
+/**
+ * \file net.c
+ * \brief Network manager
+ * 
+ * Opens a server socket and manages connections
+ * as an array of "Client"s.
+ * 
+ * /
+
+
 #include "../common/net.h"
 #include "../common/messages.h"
 #include "../common/util.h"
@@ -24,6 +34,11 @@ void           broadcast              (Client *clients, Client client,int actual
 
 /* * * * * * * * * * */
 
+/**
+ *  \fn void init(void)
+ *  \brief Enables windows compatibility
+ *  Should be used before any functions.
+ */
 void init(void)
 {
 #ifdef WIN32
@@ -37,7 +52,11 @@ void init(void)
 #endif
 }
 
-
+/**
+ *  \fn void init(void)
+ *  \brief Enables windows compatibility
+ *  Should be used after any functions.
+ */
 void end(void)
 {
 #ifdef WIN32
@@ -45,7 +64,15 @@ void end(void)
 #endif
 }
 
-
+/**
+ * \fn network *network__open(unsigned int port)
+ * \brief Initializes the network and open the listening socket
+ * 
+ * \param port Port used by the server socket.
+ * \return A network object.
+ * 
+ * Set the network status to opened.
+ */
 network *network__open(unsigned int port){
   network *net = malloc(sizeof(*net));
 
@@ -58,6 +85,13 @@ network *network__open(unsigned int port){
   return net;
 }
 
+/**
+ * \fn void network__close(network *net)
+ * \brief Close every connections and the server socket.
+ * \param net A network object.
+ * 
+ * Set the network status to closed.
+ */
 void network__close(network *net){
   closesocket(net->server);
   unsigned int i = 0;
@@ -68,16 +102,38 @@ void network__close(network *net){
   net->status = NETWORK__CLOSED;
 }
 
+/**
+ * \fn int network__is_opened (network *net)
+ * \brief Checks if the network is opened.
+ * \param net A network object.
+ * \return Boolean, true if opened.
+ */
 int network__is_opened (network *net){
   return (net->status == NETWORK__OPENED);
 }
 
+/**
+ * \fn void network__free(network *net)
+ * \brief Destroy a network object
+ * \param net A network object.
+ * Will close every connections remaining if the network is still opened.
+ */
 void network__free(network *net){
   if (network__is_opened(net)) network__close(net);
   free(net->clients);
   free(net);
 }
 
+/**
+ * \fn Client *network__connect(network *net, const char *address, const unsigned int port)
+ * \brief Outgoing connection to a new client.
+ * \param net A network object.
+ * \param address IP address of the client.
+ * \param port Port that the client is listening to.
+ * \return A Client object, which can be used to specify its "id", if the connexion was successful, NULL otherwise.
+ * 
+ * The new Client is added to the network array.
+ */
 Client *network__connect(network *net, const char *address, const unsigned int port){
   Client c;
   c.sock = init_client_connection(address, port);
@@ -86,6 +142,13 @@ Client *network__connect(network *net, const char *address, const unsigned int p
   return add_client(net, &c);
 }
 
+/**
+ * \fn void network__disconnect (network *net, Client *c)
+ * \brief Disconnect a Client.
+ * \param net A network object.
+ * \param c A client object.
+ * The local socket is closed before the client's one.
+ */
 void network__disconnect (network *net, Client *c){
   // close socket
   closesocket(c->sock);
@@ -93,12 +156,26 @@ void network__disconnect (network *net, Client *c){
   remove_client(net, c);
 }
 
+/**
+ * \fn int network__send(Client *c, const char *message)
+ * \brief Sends a message to a Client.
+ * \param c A client object
+ * \param message The string to send.
+ * \return Bytes successfuly sent, NETWORK__SEND_ERROR (< 0) otherwise.
+ */
 int network__send(Client *c, const char *message)
 {
   char* mess2 = mess__treatOutput(strcopy(message));
   return write_client (c->sock, mess2);
 }
 
+/**
+ * \fn int network__broadcast  (network *net, const char *message)
+ * \brief Sends a message to every clients connected.
+ * \param net A network object
+ * \param message The string to send.
+ * \return Bytes successfuly sent, NETWORK__SEND_ERROR (< 0) otherwise.
+ */
 int network__broadcast  (network *net, const char *message){
   int broadcast_return_value = 0;
   int return_value = 0, failed = 0;
@@ -112,7 +189,15 @@ int network__broadcast  (network *net, const char *message){
 }
 
 
-
+/**
+ * \fn void network__update(network *net)
+ * \brief Updates the network and raises events.
+ * \param net A network object
+ * Should be used in the main loop of the program 
+ * (continue while the server is opened).
+ * This function will raise events (function pointers) 
+ * which must be set in the network object.
+ */
 void network__update(network *net){
   if (net == NULL) return;
   if (!network__is_opened(net)) return;
@@ -198,6 +283,13 @@ void network__update(network *net){
   }
 }
 
+/**
+ * \fn static int get_client_id (network *net, Client *c)
+ * \brief Index of a Client in the network array.
+ * \param net A network object.
+ * \param c A client object.
+ * \return The index if the client if found, -1 otherwise.
+ */
 static int get_client_id (network *net, Client *c){
   unsigned int i;
   for (i = 0; i < net->nb_clients; i++){
@@ -206,6 +298,13 @@ static int get_client_id (network *net, Client *c){
   return -1;
 }
 
+/**
+ * \fn static Client *add_client(network *net, Client *c)
+ * \brief Add (by copy) a client the network array.
+ * \param net A network object.
+ * \param c A client object.
+ * \return A reference to the client from the array.
+ */
 static Client *add_client(network *net, Client *c){
   /* what is the new maximum fd ? */
   net->max = c->sock > net->max ? c->sock : net->max;
@@ -216,6 +315,10 @@ static Client *add_client(network *net, Client *c){
   return &(net->clients[net->nb_clients - 1]);
 }
 
+/**
+ * \fn static void remove_client(network *net, Client *c)
+ * \brief Remove (and destroy) a client from the network array.
+ */
 static void remove_client(network *net, Client *c){
   // get client id
   int to_remove = get_client_id(net, c);
@@ -231,6 +334,10 @@ static void remove_client(network *net, Client *c){
   (net->nb_clients)--;
 }
 
+/**
+ * \fn void broadcast(Client *clients, Client sender, int actual, const char *buffer, char from_server)
+ * \brief Sends a message to every clients.
+ */
 void broadcast(Client *clients, Client sender, int actual, const char *buffer, char from_server){
   int i = 0;
   char message[BUF_SIZE];
@@ -251,6 +358,10 @@ void broadcast(Client *clients, Client sender, int actual, const char *buffer, c
     }
 }
 
+/**
+ * \fn int init_server_connection(unsigned int port)
+ * \brief Open a server socket (in listening mode).
+ */
 int init_server_connection(unsigned int port)
 {
   SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -284,6 +395,10 @@ int init_server_connection(unsigned int port)
   return sock;
 }
 
+/**
+ * \fn static int init_client_connection(const char *address, const unsigned int port)
+ * \brief Open an outgoing client socket (in connect mode).
+ */
 static int init_client_connection(const char *address, const unsigned int port)
 {
   SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -319,6 +434,10 @@ static int init_client_connection(const char *address, const unsigned int port)
   return sock;
 }
 
+/**
+ * \fn static int read_client(SOCKET sock, char *buffer)
+ * \brief Reads a socket.
+ */
 static int read_client(SOCKET sock, char *buffer)
 {
   int n = 0;
@@ -335,15 +454,26 @@ static int read_client(SOCKET sock, char *buffer)
   return n;
 }
 
+/**
+ * \fn static int write_client(SOCKET sock, char *buffer)
+ * \brief Writes a socket.
+ * \return 0 if successful, NETWORK__SEND_ERROR otherwise. 
+ */
 static int write_client(SOCKET sock, const char *buffer)
 {
-  if(send(sock, buffer, strlen(buffer), 0) < 0)
+    if(send(sock, buffer, strlen(buffer), 0) < 0)
     {
-      perror("send()");
-      return NETWORK__SEND_ERROR;
+        perror("send()");
+        return NETWORK__SEND_ERROR;
     }
+    return 0;
 }
 
+/** 
+ * \fn void network__debug(network *net)
+ * \brief Display a debug message describing the network state.
+ * \param net A network object.
+ */
 void network__debug(network *net){
     fprintf(stderr, "[DEBUG] Network status : ");
     if (net->status==NETWORK__CLOSED){

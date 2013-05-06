@@ -1,12 +1,16 @@
 #include "display.h"
 #include "graphlib.h"
 #include <unistd.h>
+#include <stdio.h>
 #include "exec.h"
 #include "info_table.h"
 #include "net_functions.h"
 #include "../common/util.h"
 #include "../common/config.h"
 
+
+#define CHECK_GRAPH2(graph,ret) if (!(graph)) {fprintf(stderr, "[CONTROLLER] Error: No topology loaded.\n"); return ret;}
+#define CHECK_GRAPH(graph) CHECK_GRAPH2(graph,)
 
 void exec__init(void)
 {
@@ -37,6 +41,11 @@ void exec__prompt_message(struct Message *m)
 		case LOAD:
 			// actions sur graphe
 			graph = graph__open(mess__unescape(m->s_parameter));
+			if (!graph){
+				fprintf(stderr, "[CONTROLLER] Error while loading '%s'.\n", mess__unescape(m->s_parameter));
+				return;
+			}
+			
 			n1 = agfstnode(graph);
 			while(n1 != NULL)
 			{
@@ -53,6 +62,7 @@ void exec__prompt_message(struct Message *m)
 			break;
 
 		case SAVE:
+			CHECK_GRAPH(graph)
 			// actions sur graphe
 			graph__save(graph, mess__unescape(m->s_parameter));
 			//actions sur réseau
@@ -62,6 +72,7 @@ void exec__prompt_message(struct Message *m)
 			break;
 
 		case SHOW:
+			CHECK_GRAPH(graph);
 			// actions sur graphe
 			/*NONE*/
 			//actions sur réseau
@@ -72,6 +83,7 @@ void exec__prompt_message(struct Message *m)
 			break;
 
 		case ADDLINK:
+			CHECK_GRAPH(graph);
 			// actions sur graphe
 			n1 = agfindnode(graph, m->node1);
 			n2 = agfindnode(graph, m->node2);
@@ -91,6 +103,7 @@ void exec__prompt_message(struct Message *m)
 			break;
 
 		case UPDATELINK:
+			CHECK_GRAPH(graph);
 			// actions sur graphe
 			e = agfindedge(graph,agfindnode(graph, m->node1), agfindnode(graph, m->node2));
 			if(e != NULL)
@@ -106,6 +119,7 @@ void exec__prompt_message(struct Message *m)
 			break;
 
 		case DELLINK:
+			CHECK_GRAPH(graph);
 			// actions sur graphe
 			e = agfindedge(graph,agfindnode(graph, m->node1), agfindnode(graph, m->node2));
 			if(e != NULL)
@@ -122,6 +136,7 @@ void exec__prompt_message(struct Message *m)
 			break;
 
 		case DISCONNECT:
+			CHECK_GRAPH(graph);
 			// actions sur graphe
 			n1 = agfindnode(graph, m->node1);
 			if (n1 != NULL)
@@ -173,6 +188,8 @@ struct Message *exec__sock_message(struct Message *m)
 	char aux[100]="";
 	char *key = NULL;
 	Client_info *client_info;
+
+	CHECK_GRAPH2(graph, NULL);
 
 	if(m == NULL)
 	{

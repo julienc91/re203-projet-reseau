@@ -4,7 +4,7 @@
 #include "../common/net.h"
 
 void input_event(network *, char *);
-void connection_event(network *, Client *, char *);
 void disconnection_event(network *, Client *);
+void connection_event(network *, Client *, char *);
 void message_event(network *, Client *, char *);
 #endif
