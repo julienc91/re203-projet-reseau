@@ -48,6 +48,14 @@ int Entry::dist() const{
   return _dist;
 }
 
+bool &Entry::isNeighbor(){
+  return _neighbor;
+}
+
+bool Entry::isNeighbor() const{
+  return _neighbor;
+}
+
 Client *Entry::client(){
   return _client;
 }

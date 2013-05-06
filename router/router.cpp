@@ -5,6 +5,7 @@
 #include <cstring>
 #include <vector>
 #include <cstdlib>
+#include <algorithm>
 
 Router* glob__router = 0;
 
@@ -161,6 +162,7 @@ void Router::parseNeighborhood(char* str_orig)
 
 			char * ip = strtok(strtok(NULL, ","), ":");
 			routeTable[s].setClient(network__connect(net, ip, atoi(strtok(NULL, ":"))));
+			routeTable[s].isNeighbor() = true;
 		}
 		else
 		{
@@ -172,13 +174,10 @@ void Router::parseNeighborhood(char* str_orig)
 	RouteTable::iterator k;
 	for(k = routeTable.begin(); k != routeTable.end(); k++)
 	{
-		if(routeTable.find((*k).first) == routeTable.end())
+		if(std::find(routerNames.begin(), routerNames.end(), (*k).first) == routerNames.end() && routeTable[(*k).first].isNeighbor())
 		{
 			network__disconnect(net, (*k).second.client());
 			routeTable.erase(k);
 		}
 	}
-
-	// rechercher dans la table de routage tous ceux qui ne sont pas dans v et les supprimer
-
 }

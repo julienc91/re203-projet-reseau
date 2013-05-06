@@ -22,10 +22,14 @@ public:
   Client *client();
   void setClient(Client*);
 
+  bool &isNeighbor();
+  bool isNeighbor() const;
+
 private:
   std::string _name;
   std::string _nextHop;
   int _dist;
+  bool _neighbor;
   Client *_client;
 
 };
