@@ -199,13 +199,16 @@ void Router::parseNeighborhood(char* str_orig)
 	{
 		std::string s(strtok((*i), ","));
 		routerNames.push_back(s);
-		if(routeTable.find(s) != routeTable.end())
+		if(routeTable.find(s) == routeTable.end())
 		{
 			routeTable[s] = Entry(s, s, atoi(strtok(NULL, ",")));
 
 			char * ip = strtok(strtok(NULL, ","), ":");
-			routeTable[s].setClient(network__connect(net, ip, atoi(strtok(NULL, ":"))));
+			Client *c = network__connect(net, ip, atoi(strtok(NULL, ":")));
+			routeTable[s].setClient(c);
 			routeTable[s].isNeighbor() = true;
+			
+			this->saction->link(c);
 		}
 		else
 		{

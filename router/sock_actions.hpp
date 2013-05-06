@@ -7,6 +7,8 @@ extern "C"
 }
 #include "router.hpp"
 
+#include "../common/client.h"
+
 class SockActions
 {
 	public:
@@ -23,7 +25,7 @@ class SockActions
 
 		// messages à envoyer à d'autres routeurs
 		// (envoie à tous)
-		void link();
+		void link(Client *t);
 		void vector(char* id, char * vect);
 
 

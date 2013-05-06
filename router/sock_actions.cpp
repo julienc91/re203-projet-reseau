@@ -2,6 +2,7 @@
 #include "exceptions.hpp"
 
 #include <string.h>
+#include <iostream>
 
 
 SockActions::SockActions(Router* r)
@@ -59,8 +60,7 @@ void SockActions::login(int port, char* id)
 
 	if(id != 0)
 	{
-		m->node1 = new char[strlen(id) + 1];
-		strcpy(m->node1, id);
+		m->node1 = strcopy(id);
 	}
 
 	network__send(router->getController(), mess__toString(m));
@@ -86,22 +86,24 @@ void SockActions::logout()
 }
 
 
-void SockActions::link()
+void SockActions::link(Client *t)
 {
+	std::cerr << "LINK" << std::endl;
 	Message* m;
 	mess__init(&m);
 	m->type = LINK;
 
 	m->node1 = strcopy(router->getName());
 
-	RouteTable::iterator t;
+	//~ RouteTable::iterator t;
 
-	for(t = router->getRouteTable().begin();
-		t != router->getRouteTable().end();
-		++t)
-	{
-		network__send((*t).second.client(), mess__toString(m));
-	}
+	//~ for(t = router->getRouteTable().begin();
+		//~ t != router->getRouteTable().end();
+		//~ ++t)
+	//~ {
+	//~ network__send((*t).second.client(), mess__toString(m));
+	//~ }
+	network__send(t, mess__toString(m));
 }
 void SockActions::vector(char* id, char * vect)
 {
