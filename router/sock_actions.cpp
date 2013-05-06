@@ -88,7 +88,6 @@ void SockActions::logout()
 
 void SockActions::link(Client *t)
 {
-	std::cerr << "LINK" << std::endl;
 	Message* m;
 	mess__init(&m);
 	m->type = LINK;
