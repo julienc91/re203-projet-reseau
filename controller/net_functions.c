@@ -13,6 +13,8 @@ void input_event(network *net, char *string)
 
 void connection_event(network *net, Client *client, char *string)
 {
+	printf("<connection on socket '%d' : '%s'>\n", (int)client->sock, string);
+	
 	//Necessaire pour les tests via telnet
 	int i = strlen(string);
 	while (i>=0 && string[i] != '*')
@@ -37,7 +39,7 @@ void connection_event(network *net, Client *client, char *string)
 
 void disconnection_event(network *net, Client *client)
 {
-	printf("Deconnexion \n");
+	printf("<disconnection from socket '%d' of client '%s'>\n", (int)client->sock, client->id);
 	struct Message *message = mess__parse(mess__treatInput("log out*"));
 	strcopy2(&message->node1, client__get_id(client));
 	exec__sock_message(message);
@@ -45,6 +47,8 @@ void disconnection_event(network *net, Client *client)
 
 void message_event(network *net, Client *client, char *string)
 {
+		printf("<message from '%s', socket '%d' : '%s'>\n", client->id, (int)client->sock, string);
+		
 		//Necessaire pour les tests via telnet
 		int i = strlen(string);
 		while (i>=0 && string[i] != '*')

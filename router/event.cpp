@@ -26,7 +26,7 @@ void Event::input(network *net, char *buffer)
 
 void Event::connect(network *net, Client *c, char *buffer)
 {
-	std::cout << "<connection on socket: '" << c->sock << "' : '" << buffer << "'>" << std::endl;
+	std::cout << "<connection on socket '" << c->sock << "' : '" << buffer << "'>" << std::endl;
 
 	strcpy(c->id, buffer + 10);
 
@@ -39,7 +39,7 @@ void Event::connect(network *net, Client *c, char *buffer)
 
 void Event::disconnect(network *net, Client *c)
 {
-	std::cout << "<disconnection from socket: '" << c->sock << "'>" << std::endl;
+	std::cout << "<disconnection from socket '" << c->sock << "' of client '"<< c->id <<"'>" << std::endl;
 }
 
 void Event::message(network *net, Client *c, char *buffer)
