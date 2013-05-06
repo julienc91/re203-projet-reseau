@@ -92,7 +92,7 @@ void Exec::prompt_message(Message* m)
 
 		case ROUTETABLE:
 			//affichage
-			//disp->routetable(router->getRoutetable());
+			disp->routetable(router->getRouteTable());
 			std::cout << "TODO" << std::endl; // TODO
 			break;
 

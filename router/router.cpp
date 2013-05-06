@@ -12,6 +12,7 @@ Router* glob__router = 0;
 Router::Router(char* name, char* conf)
 {
     _name = new std::string(name);
+    seqnum = 0;
 
    	// * * * * lecture fichier config * * * *
 	config = config__readRouter(conf);
@@ -207,7 +208,7 @@ void Router::parseNeighborhood(char* str_orig)
 			Client *c = network__connect(net, ip, atoi(strtok(NULL, ":")));
 			routeTable[s].setClient(c);
 			routeTable[s].isNeighbor() = true;
-			
+
 			this->saction->link(c);
 		}
 		else

@@ -294,8 +294,8 @@ struct Message* mess__parse(char* mess_src)
 			tmp2 = strtok(NULL, " ");
 			mess_dest->n_parameter = atoi(tmp2);
 
-			strtok(NULL, " ");
-			mess_dest->s_parameter = strstr(mess_src, tmp2) + strlen(tmp2) + 1;
+
+			mess_dest->s_parameter = strcopy(strtok(NULL, "\0") + 5); //strstr(mess_src, tmp2) + strlen(tmp2) + 1;
 			break;
 
 		case 23:

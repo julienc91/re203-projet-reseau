@@ -1,7 +1,7 @@
 #ifndef _DISPLAY_HPP
 #define _DISPLAY_HPP
 #include <map>
-
+#include "routetable.hpp"
 
 class Display
 {
@@ -21,7 +21,7 @@ class Display
 		void route_hop(int num, char * node);
 		void route_result(int qt, double rtt);
 
-		void routetable(std::map<void,void>);
+		void routetable(RouteTable rt);
 };
 
 #endif
