@@ -32,6 +32,11 @@ void connection_event(network *net, Client *client, char *string)
 	}
 	strcopy2(&message->s_parameter, client__get_address(client));
 	message = exec__sock_message(message);
+	if (message == NULL) {
+		fprintf(stderr, "[CONTROLLER] Connexion failed.\n");
+		network__send(client, "log out"); // proper disconnection (?)
+		return;
+	}
 	client__set_id(client, message->node1);
 
 	network__send(client, mess__toString(message));
