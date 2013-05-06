@@ -19,6 +19,7 @@ void PromptActions::message(Message* mess)
 	struct Message* packet;
 	mess__init(&packet);
 
+	packet->type = PACKET;
 	packet->seqnum = router->newSeqnum(); // devra faire l'incrémentation'
 	packet->node1 = strcopy(router->getName()); //source
 	packet->node2 = strcopy(mess->node1); // destination
@@ -48,6 +49,7 @@ void PromptActions::ping(Message* mess)
 	struct Message* ll_ping; // ping de bas niveau (low level)
 	mess__init(&ll_ping);
 
+	ll_ping->type = PING;
 	ll_ping->seqnum = router->newSeqnum();
 	ll_ping->node1 = strcopy(router->getName());
 	ll_ping->node2 = strcopy(mess->node1);
@@ -77,6 +79,7 @@ void PromptActions::route(Message* mess)
 	struct Message* ll_ping; // ping de bas niveau (low level)
 	mess__init(&ll_ping);
 
+	ll_ping->type = PING;
 	ll_ping->seqnum = router->newSeqnum();
 	ll_ping->node1 = strcopy(router->getName());
 	ll_ping->node2 = strcopy(mess->node1);

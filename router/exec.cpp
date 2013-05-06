@@ -29,6 +29,11 @@ void Exec::prompt_message(Message* m)
 
 	switch(m->type)
 	{
+
+		case POLL:
+			router->sockActions()->poll();
+			break;
+
 		case MESSAGE:
 			try
 			{
