@@ -2,6 +2,7 @@
 #include "exceptions.hpp"
 #include <cstring>
 
+#include <unistd.h>
 #include <iostream>
 extern "C"
 {
@@ -75,6 +76,7 @@ void PromptActions::ping(Message* mess)
 	{
 		ll_ping->seqnum = router->newSeqnum();
 		network__send(c, mess__toString(ll_ping)); //segfault tant qu'on a pas un vrai c
+		sleep(1);
 	}
 }
 
@@ -85,7 +87,7 @@ void PromptActions::route(Message* mess)
 	mess__init(&ll_ping);
 
 	ll_ping->type = PING;
-	ll_ping->seqnum = router->newSeqnum();
+
 	ll_ping->node1 = strcopy(router->getName());
 	ll_ping->node2 = strcopy(mess->node1);
 
@@ -102,10 +104,12 @@ void PromptActions::route(Message* mess)
 	}
 
 	int i = 1;
-	while(i < 100) // max ttl ? temps ? tant qu'on n'a pas reçu de réponse favorable à notre route ?
+	while(i < 10) // max ttl ? temps ? tant qu'on n'a pas reçu de réponse favorable à notre route ?
 	//peut être exécuter dans un thread avec incrémentation et comparaison d'une variable dans la classe (mutex)
 	{
-		ll_ping->n_parameter = i;
+		ll_ping->n_parameter = i++;
+		ll_ping->seqnum = router->newSeqnum();
 		network__send(c, mess__toString(ll_ping));
+		sleep(1);
 	}
 }

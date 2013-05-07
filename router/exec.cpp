@@ -55,16 +55,18 @@ void Exec::prompt_message(Message* m)
 		case PING:
 			try
 			{
-				router->promptActions()->ping(m);
 				pingCount = router->getConfiguration()->defaultPingPacketCount;
+				router->promptActions()->ping(m);
 			}
 			catch(UnknownDest&)
 			{
+				pingCount = 0;
 				disp->err_unknown();
 				return;
 			}
 			catch(HostUnreachable&)
 			{
+				pingCount = 0;
 				disp->err_unreachable();
 				return;
 			}
@@ -76,15 +78,15 @@ void Exec::prompt_message(Message* m)
 			//actions sur réseau
 			try
 			{
-				router->promptActions()->route(m);
-				isWaitingForRoute = true;
-				routeDest = strcopy(m->node2);
 				routeCount = 0;
-
-				disp->route_init(m->node1, m->node2);
+				isWaitingForRoute = true;
+				routeDest = strcopy(m->node1);
+				disp->route_init(router->getName(), m->node1);
+				router->promptActions()->route(m);
 			}
 			catch(UnknownDest&)
 			{
+				isWaitingForRoute = false;
 				disp->err_unknown();
 				return;
 			}
@@ -227,7 +229,7 @@ void Exec::sock_message(Message* m)
 				if(pingCount > 0)
 				{
 					pingCount--;
-					disp->ping_echo(m->node1, m->node2, *pingTimeTables); // à changer
+					disp->ping_echo(m->node2, m->node1, *pingTimeTables); // à changer
 
 					if(pingCount == 0)
 					{
