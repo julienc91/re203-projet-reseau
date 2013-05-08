@@ -8,6 +8,12 @@ extern "C"
 }
 
 
+#include <chrono>
+#include <map>
+typedef std::chrono::high_resolution_clock hdclock;
+typedef std::chrono::milliseconds milliseconds;
+
+
 class Router;
 class Display;
 
@@ -28,7 +34,10 @@ class Exec
 		time_t routeTime;
 
 		int pingCount; // pour savoir quand on reçoit un ping issu de la commande manuelle
-		time_t * pingTimeTables;
+		std::map<int, hdclock::time_point> pingTimeTables;
+		int pingMin, pingMax, pingAvg, pingSucc;
+
+		hdclock::time_point messageTime;
 };
 
 #endif

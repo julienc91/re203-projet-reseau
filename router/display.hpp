@@ -14,7 +14,7 @@ class Display
 		void mess_not_deliv(int deltamax);
 		void mess_received(char* mess);
 
-		void ping_echo(char * n1, char * n2, time_t time);
+		void ping_echo(char * n1, char * n2, int time);
 		void ping_result(double success, double failure, double min, double avg, double max);
 
 		void route_init(char * n1, char * n2);

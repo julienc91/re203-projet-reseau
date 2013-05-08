@@ -7,6 +7,7 @@
 
 #include <cstring>
 #include <cstdlib>
+#include <climits>
 
 Exec::Exec(Router* r)
 {
@@ -15,8 +16,11 @@ Exec::Exec(Router* r)
 	routeDest = 0;
 	routeCount = 0;
 	pingCount = 0;
-	pingTimeTables = new time_t[router->getConfiguration()->defaultPingPacketCount];
 
+	pingMin = INT_MAX;
+	pingMax = INT_MIN;
+	pingAvg = 0;
+	pingSucc = 0;
 	disp = new Display();
 }
 
@@ -37,6 +41,7 @@ void Exec::prompt_message(Message* m)
 		case MESSAGE:
 			try
 			{
+				messageTime = hdclock::now();
 				router->promptActions()->message(m);
 			}
 			catch(UnknownDest&)
@@ -56,7 +61,7 @@ void Exec::prompt_message(Message* m)
 			try
 			{
 				pingCount = router->getConfiguration()->defaultPingPacketCount;
-				router->promptActions()->ping(m);
+				router->promptActions()->ping(m, pingTimeTables);
 			}
 			catch(UnknownDest&)
 			{
@@ -163,7 +168,7 @@ void Exec::sock_message(Message* m)
 				{
 					// cool, tout s'est bien passé
 					// prendre la timestamp et ...
-					disp->mess_deliv(0); // TODO
+					disp->mess_deliv(std::chrono::duration_cast<milliseconds>(hdclock::now() - messageTime).count()); // TODO
 				}
 				else if(m->accept == TOOFAR)
 				{
@@ -228,18 +233,34 @@ void Exec::sock_message(Message* m)
 				// ou bein faire la différence avec une hashmap de seqnum ?
 				if(pingCount > 0)
 				{
+					int msDuration = std::chrono::duration_cast<milliseconds>(hdclock::now() - pingTimeTables[m->seqnum]).count();
+					if(msDuration > pingMax)
+					{
+						pingMax = msDuration;
+					}
+					else if(msDuration < pingMin)
+					{
+						pingMin = msDuration;
+					}
+
+					pingSucc += 1;
+					pingAvg += msDuration;
 					pingCount--;
-					disp->ping_echo(m->node2, m->node1, *pingTimeTables); // à changer
+					disp->ping_echo(m->node2, m->node1, msDuration); // à changer
+					pingTimeTables.erase(m->seqnum);
+
 
 					if(pingCount == 0)
 					{
-						// taux de succès: TODO
-						double success=0;
-						double failure=0;
-						double min=0;
-						double avg=0;
-						double max=0;
-						disp->ping_result(success, failure, min, avg, max);
+						disp->ping_result(pingSucc * 100 / router->getConfiguration()->defaultPingPacketCount,
+											100 - pingSucc * 100 / router->getConfiguration()->defaultPingPacketCount,
+											pingMin,
+											pingAvg / router->getConfiguration()->defaultPingPacketCount,
+											pingMax);
+
+						pingMin = INT_MAX;
+						pingMax = INT_MIN;
+						pingAvg = 0;
 					}
 				}
 				else if(isWaitingForRoute)

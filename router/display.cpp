@@ -41,10 +41,10 @@ void Display::mess_received(char* mess)
 	std::cout << mess << std::endl;
 }
 
-void Display::ping_echo(char* n1, char* n2, time_t time)
+void Display::ping_echo(char* n1, char* n2, int time)
 {
 	// -> from N1 to N3 time=hh:mm:ss.ms
-	std::cout << "\t-> from " << n1 << " to " << n2 << " time=" << std::endl;
+	std::cout << "\t-> from " << n1 << " to " << n2 << " time=" << time << std::endl;
 }
 
 void Display::ping_result(double success, double failure, double min, double avg, double max)

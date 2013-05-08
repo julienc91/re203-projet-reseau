@@ -49,7 +49,7 @@ void PromptActions::message(Message* mess)
 }
 
 
-void PromptActions::ping(Message* mess)
+void PromptActions::ping(Message* mess, std::map<int, hdclock::time_point>& pingTimeTables)
 {
 	struct Message* ll_ping; // ping de bas niveau (low level)
 	mess__init(&ll_ping);
@@ -75,6 +75,8 @@ void PromptActions::ping(Message* mess)
 	for (int i = 0; i < router->getConfiguration()->defaultPingPacketCount; i++)
 	{
 		ll_ping->seqnum = router->newSeqnum();
+		pingTimeTables[ll_ping->seqnum] = hdclock::now();
+
 		network__send(c, mess__toString(ll_ping)); //segfault tant qu'on a pas un vrai c
 		sleep(1);
 	}
