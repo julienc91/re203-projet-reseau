@@ -22,6 +22,7 @@ Agraph_t* graph__open(char* filename);
 void graph__close(Agraph_t* graph);
 
 int graph__save(Agraph_t* graph, char* filename);
+void graph__show(Agraph_t *graph);
 
 void graph__setWeight(Agraph_t* graph, Agedge_t* edge, int weight);
 int graph__getWeight(Agraph_t* graph, Agedge_t* edge);

@@ -78,7 +78,7 @@ void exec__prompt_message(struct Message *m)
 			//actions sur réseau
 			/*NONE*/
 			//affichage
-			agwrite(graph, stdout);
+			graph__show(graph);
 			//disp__topology();
 			break;
 
