@@ -30,10 +30,15 @@ void Event::connect(network *net, Client *c, char *buffer)
 
 	strcpy(c->id, buffer + 10);
 
-	struct Message *m = mess__parse(mess__treatInput(buffer));
+	Messages *m = mess__multiline_parse(buffer);
 
 	if (!m) return;
-	glob__router->exec->sock_message(m);
+	
+	for (unsigned int i = 0; i < m->nb_messages; i++)
+	{
+		if (m->messages[i] != NULL)
+			glob__router->exec->sock_message(m->messages[i]);
+	}	
 
 }
 
@@ -46,12 +51,19 @@ void Event::message(network *net, Client *c, char *buffer)
 {
 	std::cout << "<message from '" << c->id << "', socket " << c->sock <<" : '" << buffer << "'>" << std::endl;
 
-	struct Message *m = mess__parse(mess__treatInput(buffer));
+	Messages *m = mess__multiline_parse(buffer);
 
 	if (!m) return;
-	if(m->type == VECTOR)
+	
+	for (unsigned int i = 0; i < m->nb_messages; i++)
 	{
-		m->node1 = strcopy(c->id);
+		if (m->messages[i] != NULL)
+		{
+			if(m->messages[i]->type == VECTOR)
+			{
+				m->messages[i]->node1 = strcopy(c->id);
+			}
+			glob__router->exec->sock_message(m->messages[i]);
+		}
 	}
-	glob__router->exec->sock_message(m);
 }

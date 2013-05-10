@@ -77,7 +77,7 @@ char* mess__escape(char* mess_src)
 char* mess__unescape(char* mess_src)
 {
 	int count = 0, n = strlen(mess_src);
-	char* mess_unescp = malloc(n * sizeof(char)); // TODO: à affiner
+	char* mess_unescp = malloc((n+1) * sizeof(char)); // TODO: à affiner
 
 	for(int i = 0; i <= n; i++)
 	{
@@ -93,6 +93,56 @@ char* mess__unescape(char* mess_src)
 
 	return mess_unescp;
 }
+
+Messages *mess__multiline_parse(char *mess_src)
+{
+    Messages *m = malloc(sizeof(*m));
+    m->messages = malloc(sizeof(*(m->messages)) * MESSAGE__MAX_MESSAGES);
+    m->nb_messages = 0;
+    
+    int count = 0, n = strlen(mess_src);
+	char* mess_unescp = malloc((n+1) * sizeof(char)); // TODO: à affiner
+
+	for(int i = 0; i < n; i++)
+	{
+        mess_unescp[count++] = mess_src[i];
+
+		if(mess_src[i] == '\n' ||
+         (i > 0 && (mess_src[i-1] =! '\\' && i+1 <= n && mess_src[i] == '*')))
+		{
+
+            mess_unescp[count] = '\0';
+            count = 0;
+            
+            if (m->nb_messages + 1 >= MESSAGE__MAX_MESSAGES)
+            {
+                fprintf(stderr,"Error: messages limit reached.\n");
+
+                break;
+            }
+            m->messages[m->nb_messages++] = mess__parse(mess__treatInput(mess_unescp));
+		}
+
+	}
+
+    if (count > 0)
+    {
+        mess_unescp[count] = '\0';
+        if (m->nb_messages + 1 >= MESSAGE__MAX_MESSAGES)
+        {
+            fprintf(stderr,"Error: messages limit reached.\n");
+        }
+        else
+        {
+            m->messages[m->nb_messages++] = mess__parse(mess__treatInput(mess_unescp));
+        }
+    }
+
+    free(mess_unescp);
+
+	return m;
+}
+
 // fait l'allocation de mess_dest
 struct Message* mess__parse(char* mess_src)
 {
@@ -473,6 +523,8 @@ char* mess__toString(struct Message* mess)
 
 void mess__free(struct Message** mess)
 {
+    if (*mess == NULL) return;
+    
 	if((*mess)->s_parameter != NULL)
 	{
 		free((*mess)->s_parameter);
@@ -487,6 +539,21 @@ void mess__free(struct Message** mess)
 	}
 
 	free((*mess));
+    *mess = NULL;
+}
+
+void mess__free_messages(Messages **m)
+{
+    if (*m == NULL) return;
+    
+    unsigned int i;
+    for (i = 0; i < (*m)->nb_messages; i++)
+    {
+        if ((*m)->messages[i] != NULL) 
+            mess__free(&((*m)->messages[i]));
+    }
+    free(*m);
+    *m = NULL;
 }
 
 

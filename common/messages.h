@@ -56,19 +56,30 @@ enum MessageType
 };
 
 
-struct Message
+typedef struct Message
 {
 	enum MessageType type;
 	char *s_parameter;
 	char *node1, *node2;
 	int n_parameter, seqnum;
 	enum Acceptance accept;
-};
+} Message;
+
+typedef struct Messages
+{
+    unsigned int nb_messages;
+    Message **messages;
+}Messages;
+
+#define MESSAGE__MAX_MESSAGES 50
 
 void mess__init(struct Message** mess);
 void mess__free(struct Message** mess);
+void mess__free_messages(Messages **m);
 
 struct Message* mess__parse(char* mess_src);
+Messages *mess__multiline_parse(char *mess_src);
+
 
 char* mess__escape(char* mess_src);
 char* mess__unescape(char* mess_src);

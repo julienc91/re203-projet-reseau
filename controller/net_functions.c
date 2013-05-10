@@ -16,30 +16,41 @@ void connection_event(network *net, Client *client, char *string)
 	printf("<connection on socket '%d' : '%s'>\n", (int)client->sock, string);
 	
 	//Necessaire pour les tests via telnet
-	int i = strlen(string);
-	while (i>=0 && string[i] != '*')
-	{
-		i--;
-	}
-	string[i+1] = '\0';
-	struct Message *message = mess__parse(mess__treatInput(string));
+	//~ int i = strlen(string);
+	//~ while (i>=0 && string[i] != '*')
+	//~ {
+		//~ i--;
+	//~ }
+	//~ string[i+1] = '\0';
+	
+	//struct Message *message = mess__parse(mess__treatInput(string));
+	Messages *m = mess__multiline_parse(string);
 
-	if (message->type == NONE)
-	{
-		network__disconnect(net, client);
-		printf("Message de type NONE\n");
-		return ;
-	}
-	strcopy2(&message->s_parameter, client__get_address(client));
-	message = exec__sock_message(message);
-	if (message == NULL) {
-		fprintf(stderr, "[CONTROLLER] Connexion failed.\n");
-		network__send(client, "log out"); // proper disconnection (?)
-		return;
-	}
-	client__set_id(client, message->node1);
+	if (m == NULL) return;
 
-	network__send(client, mess__toString(message));
+	unsigned int k;
+	for (k = 0; k < m->nb_messages; k++)
+	{
+		Message *message = m->messages[k];
+			if (message == NULL) continue;
+			
+		if (message->type == NONE)
+		{
+			network__disconnect(net, client);
+			printf("Message de type NONE\n");
+			return ;
+		}
+		strcopy2(&message->s_parameter, client__get_address(client));
+		message = exec__sock_message(message);
+		if (message == NULL) {
+			fprintf(stderr, "[CONTROLLER] Connexion failed.\n");
+			network__send(client, "log out"); // proper disconnection (?)
+			return;
+		}
+		client__set_id(client, message->node1);
+
+		network__send(client, mess__toString(message));
+	}
 }
 
 void disconnection_event(network *net, Client *client)
@@ -62,19 +73,28 @@ void message_event(network *net, Client *client, char *string)
 		}
 		string[i+1] = '\0';
 
-		struct Message *message = mess__parse(mess__treatInput(string));
+		Messages *m = mess__multiline_parse(string);
+		if (m == NULL) return;
 
-		if (message->type == NONE)
+		unsigned int k;
+		for (k = 0; k < m->nb_messages; k++)
 		{
-			printf("Message de type NONE\n");
-			return ;
-		}
-		strcopy2(&message->node1, client__get_id(client));
-		message = exec__sock_message(message);
+				Message *message = m->messages[k];
+					if (message == NULL) continue;
+					
+				if (message->type == NONE)
+				{
+					printf("Message de type NONE\n");
+					return ;
+				}
+				strcopy2(&message->node1, client__get_id(client));
+				message = exec__sock_message(message);
 
-		network__send(client, mess__toString(message));
-		if(message->type == BYE)
-		{
-			network__disconnect(net, client);
+				network__send(client, mess__toString(message));
+				if(message->type == BYE)
+				{
+					network__disconnect(net, client);
+					return;
+				}
 		}
 }
