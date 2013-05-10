@@ -39,7 +39,7 @@ void Event::connect(network *net, Client *c, char *buffer)
 		if (m->messages[i] != NULL)
 			glob__router->exec->sock_message(m->messages[i]);
 	}	
-
+	mess__free_messages(&m);
 }
 
 void Event::disconnect(network *net, Client *c)
@@ -66,4 +66,5 @@ void Event::message(network *net, Client *c, char *buffer)
 			glob__router->exec->sock_message(m->messages[i]);
 		}
 	}
+	mess__free_messages(&m);
 }
