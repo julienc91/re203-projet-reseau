@@ -161,6 +161,21 @@ typedef struct Message
 } Message;
 \end{lstlisting}
 
+\subsection{La gestion des sockets}
+
+\subsubsection{La structure \texttt{Client}}
+
+\underline{Fichiers :} \texttt{common/client.c}, \texttt{common/client.h}\\
+
+La structure \texttt{Client} sert de base à la gestion des communications par socket. Elle permet l'association d'un routeur par son identifiant à une socket (qui contient à la fois l'adresse IP et le port à utiliser pour établir une communication avec ce client). Les fonctions fournies avec ce module permettent la récupération du port, de l'adresse et de l'identifiant d'un client, la mise à jour de l'identifiant ou encore la comparaison de deux \texttt{Client}s.
+
+La fonction \texttt{getsockname} de la bibliothèque \texttt{sys/socket.h}, en addition des fonctions \texttt{inet\_ntoa} et \texttt{ntohs}, permet de récupérer séparément, et sans difficulté majeure, l'adresse et le numéro de port depuis une socket.
+
+\subsubsection{Les sockets}
+
+\underline{Fichiers :} \texttt{common/net.c}, \texttt{common/net.h}, \texttt{common/sock.h}\\
+
+
 \section{Le contrôleur}
 
 
