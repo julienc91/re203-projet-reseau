@@ -1,0 +1,210 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage{lscape}
+\usepackage{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[francais]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{gantt}
+\usepackage{tikz}
+\usepackage{tikz-uml}
+\usepackage{relsize}
+\usepackage{color}
+\usepackage[hidelinks]{hyperref}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\usepackage{listings}
+\usepackage{float}
+%\usepackage{kpfonts}
+
+\usepackage{graphicx}
+%\usepackage{rotating}
+
+\lstset{
+  language=C++,
+  basicstyle=\footnotesize,
+  backgroundcolor=\color{white},
+  keywordstyle=\color{red},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  numberstyle=\color{red},
+  morekeywords={string},
+  frame=BL,
+  aboveskip=1em,
+  belowskip=2em,
+}
+\lstset{
+  literate={ù}{{\`u}}1
+  {é}{{\'e}}1
+  {è}{{\'e}}1
+  {à}{{\`a}}1
+}
+
+
+\lstdefinelanguage{tikzuml}{language=[LaTeX]TeX, classoffset=0, morekeywords={umlbasiccomponent, umlprovidedinterface, umlrequiredinterface, umldelegateconnector, umlassemblyconnector, umlVHVassemblyconnector, umlHVHassemblyconnector, umlnote, umlusecase, umlactor, umlinherit, umlassoc, umlVHextend, umlinclude, umlstateinitial, umlbasicstate, umltrans, umlstatefinal, umlVHtrans, umlHVtrans, umldatabase, umlmulti, umlobject, umlfpart, umlcreatecall, umlclass, umlvirt, umlunicompo, umlimport, umlaggreg}, classoffset=1, morekeywords={umlcomponent, umlsystem, umlstate, umlseqdiag, umlcall, umlcallself, umlfragment, umlpackage}, classoffset=0,  sensitive=true, morecomment=[l]{\%}}
+
+\geometry{margin=2.5cm}
+\geometry{headheight=15pt}
+
+\usepackage{fancyhdr}
+\usepackage{fancyvrb}
+\usepackage{float}
+\usepackage[footnote,smaller]{acronym}
+
+\pagestyle{fancy}
+\rhead{RE203 - Projet de Réseau}
+
+% \acrodef{LABRI}{Laboratoire Bordelais de Recherche en Informatique}
+
+\begin{document}
+
+\begin{titlepage}
+  \begin{center}
+
+    \textsc{\LARGE RE203 - Projet de Réseau}\\[2cm]
+    \textsc{\large Rapport Final}\\[3cm]
+    Maxime \textsc{Bellier} \ \ \ Jean-Michaël \textsc{Celerier}\\
+    Julien \textsc{Chaumont} \ \ \ Bazire \textsc{Houssin} \ \ \ Sylvain \textsc{Vaglica}\\[1cm]
+    \textsc{Groupe 3}\\[1.5cm]
+    \textsc{\large 23/05/2013 }\\[1.5cm] %TODO
+    \includegraphics[width=8cm]{logo.png}
+
+  \end{center}
+  \vspace{3cm}
+
+\end{titlepage}
+
+\clearpage
+
+\section*{Introduction}
+
+Ce rapport final pour le projet de réseau RE203 fait suite au rapport intermédiaire délivré le 23 avril dernier. Il sera ici question de l'implémentation mise en \oe uvre par notre groupe, l'explication du sujet ayant été développée précédemment.
+
+\section{Le bloc commun}
+
+Étant donné que le développement des deux parties du projet (contrôleur et routeur) a été réalisé respectivement dans les langages C et C++, il a été décidé d'établir une sorte bibliothèque commune sur laquelle se baser. Cette partie comprend:
+\begin{itemize}
+ \item une invite de commande
+ \item un système de gestion des fichiers de configuration
+ \item des fonctions de traitement des messages reçus et à envoyer
+ \item une API pour la gestion des sockets
+ \item quelques fonctions utilitaires
+\end{itemize}
+
+Chacun de ces blocs est indépendant des autres, ce qui assure une intégration facilitée dans le contrôleur comme dans le routeur. Une telle organisation permet d'introduire un certain degré d'abstraction tout en limitant la redondance 
+de code entre les deux composantes du projet.
+
+\subsection{Le prompt}
+
+\underline{Fichiers :} \texttt{common/prompt.c}, \texttt{common/prompt.h}\\
+
+L'invite de commande, ou \textit{prompt} en Anglais, permet la communication entre le contrôleur ou le routeur, et l'utilisateur. Il suffit pour cela de regarder constamment sur l'entrée standard et de traiter les commandes saisies par l'utilisateur. Afin de ne pas bloquer le programme sur l'écoute du fichier \texttt{stdin}, il faut pouvoir exécuter cette tâche en parallèle, d'où l'utilisation de la bibliothèque \texttt{pthread} ici.
+
+Les fonctions définies dans les fichiers sus-mentionnés assurent la création de ce thread et l'écoute sur l'entrée standard. Le paramètre à fournir à la fonction d'initialisation est un pointeur de fonction. Lorsqu'une information arrive, elle est mise en mémoire et convertie en un \texttt{Message}\footnote{Se référer à la partie \ref{message}}, et c'est à la fonction dont le pointeur est passé en paramètre de gérer les actions à effectuer suite à la réception de ce message.
+
+De cette manière, contrôleur et routeur ont seulement à gérer la fonction de traitement des messages utilisateur (chaque programme devant comprendre des commandes qui lui sont spécifiques), mais la tâche de récupération des instructions de l'utilisateur est quant à elle unifiée.
+
+\subsection{Traitement des fichiers de configuration}
+
+\underline{Fichiers :} \texttt{common/config.c}, \texttt{common/config.h}\\
+
+Le sujet demandait à ce que routeur comme contrôleur puissent être paramétrés depuis un fichier de configuration. Ce module permet la lecture de ces fichiers. La bibliothèque C \texttt{T-Rex}\footnote{Publiée sous licence libre \textit{zlib}, consultable à l'adresse \url{http://sourceforge.net/projects/tiny-rex/}}, qui permet la manipulation d'expressions régulières, a été utilisée dans ce cadre afin de faciliter la reconnaissance des différentes lignes possibles dans les fichiers de configuration.
+
+Dans le code du routeur (respectivement du contrôleur), il suffit d'appeler la fonction \texttt{config\_\_readRouter} (respectivement \texttt{config\_\_readController}). En interne, ces fonctions ouvrent le fichier de configuration indiqué, le lisent ligne par ligne, identifient les mots-clés à l'aide des expressions régulières, et remplissent une variable de type \texttt{Configuration} avec les informations contenues dans le fichier. Cette structure de données est déclarée de la manière suivante:
+
+\begin{lstlisting}
+enum SoftwareType { ROUTER, CONTROLLER };
+
+typedef struct Configuration
+{
+	enum SoftwareType type;
+	char controllerAddress[20];
+	int  routerPort;
+	int  controllerPort;
+	int  pollTimeoutValue;
+	int  controllerUpdateInterval;
+	int  routerUpdateInterval;
+	int  defaultTTLValue;
+	int  defaultPingPacketCount;
+	int  defaultPacketTimeoutValue;
+	int  defaultDVTimeoutValue;
+} Configuration;
+\end{lstlisting}
+
+A la fin de la lecture, il ne reste plus qu'à retourner au programme appelant un pointeur vers la structure remplie, qui n'aura alors qu'à consulter la valeur de ses différents attributs.
+
+Notez que la structure \texttt{Configuration} contient des attributs concernant aussi bien le contrôleur que le routeur. C'est au programme de veiller à n'utiliser que les attributs le concernant, les autres attributs n'ayant aucune garantie d'avoir été initialisés à une valeur cohérente (précisons cependant qu'il n'y a aucune raison pour que le contrôleur ait besoin des informations propres aux routeurs, et inversement).
+
+\subsection{Le système des \texttt{Messages}}
+\label{message}
+
+\underline{Fichiers :} \texttt{common/messages.c}, \texttt{common/messages.h}\\
+
+Les \texttt{Messages} correspondent à une structure de données relative aux informations reçues et transmises par le contrôleur, le routeur ou l'utilisateur. Ce module permet notamment:
+\begin{itemize}
+ \item L'allocation et la libération dynamique d'un message
+ \item L'échappement d'une chaîne de caractères (caractères "*" et "\textbackslash"), à utiliser lors de l'envoi d'un \texttt{Message}, et l'opération inverse pour la réception
+ \item Le parsing, c'est-à-dire la reconnaissance de la commande contenue dans le \texttt{Message} (là aussi, la bibliothèque \texttt{T-Rex} est mise à contribution)
+\end{itemize}
+La structure \texttt{Message} contient toutes les informations nécessaires au traitement ultérieur.
+
+\begin{lstlisting}
+typedef struct Message
+{
+	enum MessageType type;  //Type du message (login, poll, ping, load, ...)
+	char *s_parameter;      //Paramètre de la commande (identifiants, ...)
+	int  n_parameter;       //Paramètre de la commande (numéro de port, ...)
+	char *node1, *node2;    //Identifiants de l'émetteur et du récepteur
+	int  seqnum;            //Numéro de séquence
+	enum Acceptance accept; //Type de retour
+} Message;
+\end{lstlisting}
+
+\subsection{La gestion des sockets}
+
+\subsubsection{La structure \texttt{Client}}
+
+\underline{Fichiers :} \texttt{common/client.c}, \texttt{common/client.h}\\
+
+La structure \texttt{Client} sert de base à la gestion des communications par socket. Elle permet l'association d'un routeur par son identifiant à une socket (qui contient à la fois l'adresse IP et le port à utiliser pour établir une communication avec ce client). Les fonctions fournies avec ce module permettent la récupération du port, de l'adresse et de l'identifiant d'un client, la mise à jour de l'identifiant ou encore la comparaison de deux \texttt{Client}s.
+
+La fonction \texttt{getsockname} de la bibliothèque \texttt{sys/socket.h}, en addition des fonctions \texttt{inet\_ntoa} et \texttt{ntohs}, permet de récupérer séparément, et sans difficulté majeure, l'adresse et le numéro de port depuis une socket.
+
+\subsubsection{Les sockets}
+
+\underline{Fichiers :} \texttt{common/net.c}, \texttt{common/net.h}, \texttt{common/sock.h}\\
+
+Il s'agit certainement du pilier du projet, puisque c'est ce module qui assure la communication entre les routeurs et/ou le contrôleur en réseau. L'idée était en fait de réaliser une couche d'abstraction au-dessus de la bibliothèque \texttt{sys/socket.h}.
+
+La structure de données utilisée ici se nomme \texttt{network}, et représente le réseau.
+\begin{lstlisting}
+struct network_s{
+  short status; //Réseau ouvert ou fermé
+  SOCKET server;//Socket du serveur
+  int max;      //Nombre maximum de sockets à ouvrir
+  Client *clients; //Clients connectés
+  unsigned int nb_clients; //Taille du tableau précédent
+
+  /* Fonctions d'événement */
+  //Fonction à appeler lorsque l'entrée standard a été utilisée
+  input_event_function input_event;
+  //Fonction à appeler lors de la connexion d'un client
+  connection_event_function connection_event;
+  //Fonction à appeler lors de la déconnexion d'un client
+  disconnection_event_function disconnection_event;
+  //Fonction à appeler lors de la réception d'un message
+  message_event_function message_event;
+};
+\end{lstlisting}
+
+Une fois les fonctions d'initialisation appelées, la fonction \texttt{network\_\_update} permet l'écoute \textit{non bloquante} (à l'aide de la fonction de multiplexage de la librairie standard \texttt{select}) sur le port indiqué. A chaque événement (\textit{ie} connexion ou déconnexion d'un client, réception d'un message, \dots), la fonction continue le traitement en analysant le type de l'événement qui l'aura réveillé et en appelant les fonctions correspondantes dont les pointeurs sont indiqués dans la structure \texttt{network} utilisée. Ce sera le rôle de ces fonctions de gérer les actions à mettre en place, ce qui dépend évidemment de s'il s'agit du contrôleur ou d'un routeur, et doivent donc être implémentées et initialisées directement depuis le programme utilisant le module.
+
+\section{Le contrôleur}
+
+
+\section{Les routeurs}
+
+
+\end{document}
