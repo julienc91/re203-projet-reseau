@@ -99,7 +99,7 @@ Messages *mess__multiline_parse(char *mess_src)
     Messages *m = malloc(sizeof(*m));
     m->messages = malloc(sizeof(*(m->messages)) * MESSAGE__MAX_MESSAGES);
     m->nb_messages = 0;
-    
+
     int count = 0, n = strlen(mess_src);
 	char* mess_unescp = malloc((n+1) * sizeof(char)); // TODO: à affiner
 
@@ -113,7 +113,7 @@ Messages *mess__multiline_parse(char *mess_src)
 
             mess_unescp[count] = '\0';
             count = 0;
-            
+
             if (m->nb_messages + 1 >= MESSAGE__MAX_MESSAGES)
             {
                 fprintf(stderr,"Error: messages limit reached.\n");
@@ -180,7 +180,8 @@ struct Message* mess__parse(char* mess_src)
 		"pong seqnum \\d* src \\w* dst \\w* ttl \\d*",
 		"pong seqnum \\d* src \\w* dst \\w* ttlzero",
 		"ping \\w*",
-		"quit"
+		"quit",
+		"neighborhood newlist \\[\\]"
 	};
 
 	TRex* trex_current_regex;
@@ -188,7 +189,7 @@ struct Message* mess__parse(char* mess_src)
 	int match = 0;
 	char * ptr, *tmp2;
 
-	for(i = 0; i < 30; i++) // trouver le moyen de staticifier ça
+	for(i = 0; i < 31; i++) // trouver le moyen de staticifier ça
 	{
 		trex_current_regex = trex_compile(regex_strtable[i], NULL);
 		if(trex_match(trex_current_regex, mess_src))
@@ -425,6 +426,12 @@ struct Message* mess__parse(char* mess_src)
 			mess_dest->type = QUIT;
 			break;
 
+		case 30:
+			mess_dest->type = NEIGHBORHOOD;
+			mess_dest->s_parameter = malloc(sizeof(char));
+			mess_dest->s_parameter[0] = 0;
+			break;
+
 		default:
 			mess_dest->type = NONE;
 			fprintf(stderr, "ERREUR: Message invalide.\n");
@@ -524,7 +531,7 @@ char* mess__toString(struct Message* mess)
 void mess__free(struct Message** mess)
 {
     if (*mess == NULL) return;
-    
+
 	if((*mess)->s_parameter != NULL)
 	{
 		free((*mess)->s_parameter);
@@ -545,11 +552,11 @@ void mess__free(struct Message** mess)
 void mess__free_messages(Messages **m)
 {
     if (*m == NULL) return;
-    
+
     unsigned int i;
     for (i = 0; i < (*m)->nb_messages; i++)
     {
-        if ((*m)->messages[i] != NULL) 
+        if ((*m)->messages[i] != NULL)
             mess__free(&((*m)->messages[i]));
     }
     free(*m);

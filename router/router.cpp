@@ -25,6 +25,7 @@ Router::Router(char* name, char* conf)
 
 	init(); // windows compatibility
 
+	std::chrono::seconds controllerTimeout( getConfiguration()->controllerUpdateInterval );
 
 	// * * * * ouverture serveur * * * *
 	net = network__open(config->routerPort);
@@ -36,20 +37,22 @@ Router::Router(char* name, char* conf)
 	net->message_event = Event::message;
 
 	// * * * * connexion sortante * * * *
-	std::cout << "Connection to controller : "<< config->controllerAddress << ":" << config->controllerPort << std::endl;
-	controller = network__connect(net, config->controllerAddress, config->controllerPort); //localhost à changer
 
-	if (!controller)
-	{
-		std::cerr << "Connection failed." << std::endl;
-	}
-	else
-	{
-		strcpy(controller->id, "controlleur");
-		std::cout << "Connected on socket " << controller->sock << std::endl;
 
-		sockActions()->login(config->routerPort, name);
-	}
+	do
+	{
+		std::cout << "Connection to controller : "<< config->controllerAddress << ":" << config->controllerPort << std::endl;
+		controller = network__connect(net, config->controllerAddress, config->controllerPort); //localhost à changer
+		if(!controller)
+			std::this_thread::sleep_for(controllerTimeout);
+	} while(!controller);
+
+
+	strcpy(controller->id, "controlleur");
+	std::cout << "Connected on socket " << controller->sock << std::endl;
+
+	sockActions()->login(config->routerPort, name);
+
 
 	// * * * * gestion stdin   * * * *
 	void (Exec::*meth)(Message* m) = &Exec::prompt_message;
@@ -220,58 +223,67 @@ void Router::parseNeighborhood(char* str_orig)
 {
 	char *str = strcopy(str_orig + 1); // pour le [
 	str[strlen(str) - 1] = 0; // pour le ]
-	std::vector<char*> v;
-	// 1 : on extrait chaque groupe d'infos (séparés par ;)
-	char * r = strtok(str, ";");
-	if(r != NULL)
-		v.push_back(r);
 
-	while((r = strtok(NULL, ";")) != NULL)
+	if(strcmp(str, "") != 0)
 	{
-		v.push_back(r);
-	}
+		std::vector<char*> v;
+		// 1 : on extrait chaque groupe d'infos (séparés par ;)
+		char * r = strtok(str, ";");
+		if(r != NULL)
+			v.push_back(r);
 
-	// à ce moment, on a dans v : | a,b,c,d  | e,f,g,h |  par ex.
-	// (si vect = [a,b,c,d;e,f,g,h;...])
-
-	std::vector<char*>::iterator i;
-	std::vector<std::string> routerNames;
-
-	// On ajoute ceux qui ne sont pas dans la table
-	for(i = v.begin(); i != v.end(); ++i)
-	{
-		std::string s(strtok((*i), ","));
-		routerNames.push_back(s);
-		if(s != std::string(getName()))
+		while((r = strtok(NULL, ";")) != NULL)
 		{
-			if(routeTable.find(s) == routeTable.end())
-			{
-				routeTable[s] = Entry(s, s, atoi(strtok(NULL, ",")));
+			v.push_back(r);
+		}
 
-				char * ip = strtok(strtok(NULL, ","), ":");
-				Client *c = network__connect(net, ip, atoi(strtok(NULL, ":")));
-				routeTable[s].setClient(c);
-				routeTable[s].isNeighbor() = true;
+		// à ce moment, on a dans v : | a,b,c,d  | e,f,g,h |  par ex.
+		// (si vect = [a,b,c,d;e,f,g,h;...])
 
-				this->saction->link(c);
-			}
-			else
+		std::vector<char*>::iterator i;
+		std::vector<std::string> routerNames;
+
+		// On ajoute ceux qui ne sont pas dans la table
+		for(i = v.begin(); i != v.end(); ++i)
+		{
+			std::string s(strtok((*i), ","));
+			routerNames.push_back(s);
+			if(s != std::string(getName()))
 			{
-				routeTable[s].dist() = atoi(strtok(NULL, ","));
+				if(routeTable.find(s) == routeTable.end())
+				{
+					routeTable[s] = Entry(s, s, atoi(strtok(NULL, ",")));
+
+					char * ip = strtok(strtok(NULL, ","), ":");
+					Client *c = network__connect(net, ip, atoi(strtok(NULL, ":")));
+					routeTable[s].setClient(c);
+					routeTable[s].isNeighbor() = true;
+
+					this->saction->link(c);
+				}
+				else
+				{
+					routeTable[s].dist() = atoi(strtok(NULL, ","));
+				}
 			}
 		}
-	}
 
 
-	RouteTable::iterator k;
-	// On enlève ceux qui n'y sont plus
-	for(k = routeTable.begin(); k != routeTable.end(); k++)
-	{
-		if(std::find(routerNames.begin(), routerNames.end(), (*k).first) == routerNames.end() && routeTable[(*k).first].isNeighbor())
+		RouteTable::iterator k;
+		// On enlève ceux qui n'y sont plus
+		for(k = routeTable.begin(); k != routeTable.end(); k++)
 		{
-			network__disconnect(net, (*k).second.client());
-			routeTable.erase(k);
+			if(std::find(routerNames.begin(), routerNames.end(), (*k).first) == routerNames.end() && routeTable[(*k).first].isNeighbor())
+			{
+				network__disconnect(net, (*k).second.client());
+				routeTable.erase(k);
+			}
+			// TODO enlever ceux qui ont en first hop un de ceux qui viennent d'être enlevés
 		}
+	}
+	else // on vide la table de routage
+	{
+		routeTable.clear();
 	}
 }
 
