@@ -8,6 +8,7 @@ extern "C" {
 #include "../common/config.h"
 }
 
+#include <thread>
 #include "entry.hpp"
 #include "prompt.hpp"
 #include "event.hpp"
@@ -25,7 +26,7 @@ class Router
 		Router(const Router * data);
 		~Router();
 
-		void mainLoop();
+
 
 		int newSeqnum();
 		char* getName();
@@ -43,6 +44,9 @@ class Router
 
 		network* getNetwork();
 
+		void controllerLoop();
+		void routerLoop();
+		void mainLoop();
 	private:
 		std::string *_name;
 		RouteTable routeTable;
@@ -57,5 +61,12 @@ class Router
 		int seqnum;
 		Prompt prompt;
 		Exec *exec;
+
+
+		std::thread *controllerLoopThread;
+		std::thread *routerLoopThread;
+		std::thread *mainLoopThread;
+
+		bool runControllerLoop, runRouterLoop, runMainLoop;
 };
 #endif

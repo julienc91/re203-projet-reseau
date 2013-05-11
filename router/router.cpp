@@ -6,6 +6,7 @@
 #include <vector>
 #include <cstdlib>
 #include <algorithm>
+#include <chrono>
 
 Router* glob__router = 0;
 
@@ -55,7 +56,16 @@ Router::Router(char* name, char* conf)
 	prompt.start(exec, meth);
 
 	// début
-	mainLoop();
+	runControllerLoop = true;
+	runRouterLoop = true;
+	runMainLoop = true;
+
+	mainLoopThread = new std::thread(&Router::mainLoop, this);
+	controllerLoopThread = new std::thread(&Router::controllerLoop, this);
+	routerLoopThread = new std::thread(&Router::routerLoop, this);
+
+	label:
+		goto label;
 }
 
 Router::Router(const Router * data)
@@ -72,6 +82,12 @@ Router::~Router()
 
 	end(); // windows compatibility
 
+	runControllerLoop = false;
+	runRouterLoop = false;
+	runMainLoop = false;
+	routerLoopThread->join();
+	controllerLoopThread->join();
+	mainLoopThread->join();
     delete _name;
     delete exec;
     delete saction;
@@ -81,9 +97,32 @@ Router::~Router()
 void Router::mainLoop()
 {
 	// * * * * gestion serveur * * * *
-	while(network__is_opened(net))
+	while(network__is_opened(net) && runRouterLoop)
 	{
 		network__update(net);
+	}
+}
+
+void Router::controllerLoop()
+{
+	std::chrono::seconds poll_time( getConfiguration()->controllerUpdateInterval );
+	while(runControllerLoop)
+	{
+		std::this_thread::sleep_for(poll_time); // j'aime quand on peut lire le code
+		sockActions()->poll();
+	}
+}
+
+void Router::routerLoop()
+{
+	std::chrono::seconds vect_time( getConfiguration()->routerUpdateInterval );
+	while(runRouterLoop)
+	{
+		std::this_thread::sleep_for(vect_time); // j'aime quand on peut lire le code
+
+		char * vect_str = routeTable.vector();
+		for(RouteTable::iterator i = routeTable.begin(); i != routeTable.end(); i++)
+			sockActions()->vector((char*) (*i).first.c_str(), vect_str);
 	}
 }
 
