@@ -81,6 +81,29 @@
 
 Ce rapport final pour le projet de réseau RE203 fait suite au rapport intermédiaire délivré le 23 avril dernier. Il sera ici question de l'implémentation mise en \oe uvre par notre groupe, l'explication du sujet ayant été développée précédemment.
 
+\section{Le bloc commun}
+
+Etant donné que le développement des deux parties du projet (contr\^oleur et routeur) a été réalisé respectivement dans les langages C et C++, il a été décidé d'établir une sorte bibliothèque commune sur laquelle se baser. Cette partie comprend:
+\begin{itemize}
+ \item une invite de commande
+ \item un système de gestion des fichiers de configuration
+ \item des fonctions de traitement des messages reçus et à envoyer
+ \item une API pour la gestion des sockets
+ \item quelques fonctions utilitaires
+\end{itemize}
+
+Chacun de ces blocs est indépendant des autres, ce qui assure une intégration facilitée dans le contrôleur comme dans le routeur.
+
+\subsection{Le prompt}
+
+\underline{Fichiers :} \texttt{common/prompt.c}, \texttt{common/prompt.h}\\
+
+L'invite de commande, ou \textit{prompt} en Anglais, permet la communication entre le contrôleur ou le routeur, et l'utilisateur. Il suffit pour cela de regarder constamment sur l'entrée standard et de traiter les commandes saisies par l'utilisateur. Afin de ne pas bloquer le programme sur l'écoute du fichier \texttt{stdin}, il faut pouvoir exécuter cette tâche en parallèle, d'où l'utilisation de la bibliothèque \texttt{pthread} ici.
+
+Les fonctions définies dans les fichiers sus-mentionnés assurent la création de ce thread et l'écoute sur l'entrée standard. Le paramètre à fournir à la fonction d'initialisation est un pointeur de fonction. Lorsqu'une information arrive, elle est mise en mémoire et convertie en un \texttt{Message}\footnote{Se référer à la partie \ref{message}}, et c'est à la fonction dont le pointeur est passé en paramètre de gérer les actions à effectuer suite à la réception de ce message.
+
+De cette manière, contr\^oleur et routeur ont seulement à gérer la fonction de traitement des messages utilisateur (chaque programme devant comprendre des commandes qui lui sont spécifiques), mais la t\^ache de récupération des instructions de l'utilisateur est quant à elle unifiée.
+
 \section{Le contrôleur}
 
 
