@@ -10,6 +10,7 @@
 \usepackage{tikz-uml}
 \usepackage{relsize}
 \usepackage{color}
+\usepackage[hidelinks]{hyperref}
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
@@ -83,7 +84,7 @@ Ce rapport final pour le projet de réseau RE203 fait suite au rapport interméd
 
 \section{Le bloc commun}
 
-Etant donné que le développement des deux parties du projet (contr\^oleur et routeur) a été réalisé respectivement dans les langages C et C++, il a été décidé d'établir une sorte bibliothèque commune sur laquelle se baser. Cette partie comprend:
+Étant donné que le développement des deux parties du projet (contrôleur et routeur) a été réalisé respectivement dans les langages C et C++, il a été décidé d'établir une sorte bibliothèque commune sur laquelle se baser. Cette partie comprend:
 \begin{itemize}
  \item une invite de commande
  \item un système de gestion des fichiers de configuration
@@ -102,7 +103,37 @@ L'invite de commande, ou \textit{prompt} en Anglais, permet la communication ent
 
 Les fonctions définies dans les fichiers sus-mentionnés assurent la création de ce thread et l'écoute sur l'entrée standard. Le paramètre à fournir à la fonction d'initialisation est un pointeur de fonction. Lorsqu'une information arrive, elle est mise en mémoire et convertie en un \texttt{Message}\footnote{Se référer à la partie \ref{message}}, et c'est à la fonction dont le pointeur est passé en paramètre de gérer les actions à effectuer suite à la réception de ce message.
 
-De cette manière, contr\^oleur et routeur ont seulement à gérer la fonction de traitement des messages utilisateur (chaque programme devant comprendre des commandes qui lui sont spécifiques), mais la t\^ache de récupération des instructions de l'utilisateur est quant à elle unifiée.
+De cette manière, contrôleur et routeur ont seulement à gérer la fonction de traitement des messages utilisateur (chaque programme devant comprendre des commandes qui lui sont spécifiques), mais la tâche de récupération des instructions de l'utilisateur est quant à elle unifiée.
+
+\subsection{Traitement des fichiers de configuration}
+
+\underline{Fichiers :} \texttt{common/config.c}, \texttt{common/config.h}\\
+
+Le sujet demandait à ce que routeur comme contrôleur puissent être paramétrés depuis un fichier de configuration. Ce module permet la lecture de ces fichiers. La bibliothèque C \texttt{T-Rex}\footnote{Publiée sous licence libre \textit{zlib}, consultable à l'adresse \url{http://sourceforge.net/projects/tiny-rex/}}, qui permet la manipulation d'expressions régulières, a été utilisée dans ce cadre afin de faciliter la reconnaissance des différentes lignes possibles dans les fichiers de configuration.
+
+Dans le code du routeur (respectivement du contrôleur), il suffit d'appeler la fonction \texttt{config\_\_readRouter} (respectivement \texttt{config\_\_readController}). En interne, ces fonctions ouvrent le fichier de configuration indiqué, le lisent ligne par ligne, identifient les mots-clés à l'aide des expressions régulières, et remplissent une variable de type \texttt{Configuration} avec les informations contenues dans le fichier. Cette structure de données est déclarée de la manière suivante:
+\begin{lstlisting}
+enum SoftwareType { ROUTER, CONTROLLER };
+
+typedef struct Configuration
+{
+	enum SoftwareType type;
+	char controllerAddress[20];
+	int routerPort;
+	int controllerPort;
+	int pollTimeoutValue;
+	int controllerUpdateInterval;
+	int routerUpdateInterval;
+	int defaultTTLValue;
+	int defaultPingPacketCount;
+	int defaultPacketTimeoutValue;
+	int defaultDVTimeoutValue;
+} Configuration;
+\end{lstlisting}
+
+A la fin de la lecture, il ne reste plus qu'à retourner au programme appelant un pointeur vers la structure remplie, qui n'aura alors qu'à consulter la valeur de ses différents attributs.
+
+Notez que la structure \texttt{Configuration} contient des attributs concernant aussi bien le contrôleur que le routeur. C'est au programme de veiller à n'utiliser que les attributs le concernant, les autres attributs n'ayant aucune garantie d'avoir été initialisés à une valeur cohérente (précisons cependant qu'il n'y a aucune raison pour que le contrôleur ait besoin des informations propres aux routeurs, et inversement).
 
 \section{Le contrôleur}
 
