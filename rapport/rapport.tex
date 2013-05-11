@@ -112,6 +112,7 @@ De cette manière, contrôleur et routeur ont seulement à gérer la fonction de
 Le sujet demandait à ce que routeur comme contrôleur puissent être paramétrés depuis un fichier de configuration. Ce module permet la lecture de ces fichiers. La bibliothèque C \texttt{T-Rex}\footnote{Publiée sous licence libre \textit{zlib}, consultable à l'adresse \url{http://sourceforge.net/projects/tiny-rex/}}, qui permet la manipulation d'expressions régulières, a été utilisée dans ce cadre afin de faciliter la reconnaissance des différentes lignes possibles dans les fichiers de configuration.
 
 Dans le code du routeur (respectivement du contrôleur), il suffit d'appeler la fonction \texttt{config\_\_readRouter} (respectivement \texttt{config\_\_readController}). En interne, ces fonctions ouvrent le fichier de configuration indiqué, le lisent ligne par ligne, identifient les mots-clés à l'aide des expressions régulières, et remplissent une variable de type \texttt{Configuration} avec les informations contenues dans le fichier. Cette structure de données est déclarée de la manière suivante:
+
 \begin{lstlisting}
 enum SoftwareType { ROUTER, CONTROLLER };
 
@@ -119,21 +120,46 @@ typedef struct Configuration
 {
 	enum SoftwareType type;
 	char controllerAddress[20];
-	int routerPort;
-	int controllerPort;
-	int pollTimeoutValue;
-	int controllerUpdateInterval;
-	int routerUpdateInterval;
-	int defaultTTLValue;
-	int defaultPingPacketCount;
-	int defaultPacketTimeoutValue;
-	int defaultDVTimeoutValue;
+	int  routerPort;
+	int  controllerPort;
+	int  pollTimeoutValue;
+	int  controllerUpdateInterval;
+	int  routerUpdateInterval;
+	int  defaultTTLValue;
+	int  defaultPingPacketCount;
+	int  defaultPacketTimeoutValue;
+	int  defaultDVTimeoutValue;
 } Configuration;
 \end{lstlisting}
 
 A la fin de la lecture, il ne reste plus qu'à retourner au programme appelant un pointeur vers la structure remplie, qui n'aura alors qu'à consulter la valeur de ses différents attributs.
 
 Notez que la structure \texttt{Configuration} contient des attributs concernant aussi bien le contrôleur que le routeur. C'est au programme de veiller à n'utiliser que les attributs le concernant, les autres attributs n'ayant aucune garantie d'avoir été initialisés à une valeur cohérente (précisons cependant qu'il n'y a aucune raison pour que le contrôleur ait besoin des informations propres aux routeurs, et inversement).
+
+\subsection{Le système des \texttt{Messages}}
+\label{message}
+
+\underline{Fichiers :} \texttt{common/messages.c}, \texttt{common/messages.h}\\
+
+Les \texttt{Messages} correspondent à une structure de données relative aux informations reçues et transmises par le contrôleur, le routeur ou l'utilisateur. Ce module permet notamment:
+\begin{itemize}
+ \item L'allocation et la libération dynamique d'un message
+ \item L'échappement d'une chaîne de caractères (caractères "*" et "\textbackslash"), à utiliser lors de l'envoi d'un \texttt{Message}, et l'opération inverse pour la réception
+ \item Le parsing, c'est-à-dire la reconnaissance de la commande contenue dans le \texttt{Message} (là aussi, la bibliothèque \texttt{T-Rex} est mise à contribution)
+\end{itemize}
+La structure \texttt{Message} contient toutes les informations nécessaires au traitement ultérieur.
+
+\begin{lstlisting}
+typedef struct Message
+{
+	enum MessageType type;  //Type du message (login, poll, ping, load, ...)
+	char *s_parameter;      //Paramètre de la commande (identifiants, ...)
+	int  n_parameter;       //Paramètre de la commande (numéro de port, ...)
+	char *node1, *node2;    //Identifiants de l'émetteur et du récepteur
+	int  seqnum;            //Numéro de séquence
+	enum Acceptance accept; //Type de retour
+} Message;
+\end{lstlisting}
 
 \section{Le contrôleur}
 
