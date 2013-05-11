@@ -195,20 +195,23 @@ void Router::parseVector(char* str_orig, char* node_orig)
 	for(i = v.begin(); i != v.end(); ++i)
 	{
 		std::string s(strtok((*i), ","));
-		int dist = atoi(strtok(NULL, ","));
+		if(s != std::string(getName()))
+		{
+			int dist = atoi(strtok(NULL, ","));
 
-		if(routeTable.find(s) != routeTable.end())
-		{
-			if(dist < routeTable[s].dist())
+			if(routeTable.find(s) != routeTable.end())
 			{
-				routeTable[s].dist() = dist;
-				routeTable[s].nextHop() = sourceNode;
+				if(dist < routeTable[s].dist())
+				{
+					routeTable[s].dist() = dist;
+					routeTable[s].nextHop() = sourceNode;
+				}
 			}
-		}
-		else
-		{
-			routeTable[s] = Entry(s, sourceNode, dist + routeTable[sourceNode].dist());
-			// exception si sourceNode pas dans hashtable ? peu probable
+			else
+			{
+				routeTable[s] = Entry(s, sourceNode, dist + routeTable[sourceNode].dist());
+				// exception si sourceNode pas dans hashtable ? peu probable
+			}
 		}
 	}
 }
@@ -239,20 +242,23 @@ void Router::parseNeighborhood(char* str_orig)
 	{
 		std::string s(strtok((*i), ","));
 		routerNames.push_back(s);
-		if(routeTable.find(s) == routeTable.end())
+		if(s != std::string(getName()))
 		{
-			routeTable[s] = Entry(s, s, atoi(strtok(NULL, ",")));
+			if(routeTable.find(s) == routeTable.end())
+			{
+				routeTable[s] = Entry(s, s, atoi(strtok(NULL, ",")));
 
-			char * ip = strtok(strtok(NULL, ","), ":");
-			Client *c = network__connect(net, ip, atoi(strtok(NULL, ":")));
-			routeTable[s].setClient(c);
-			routeTable[s].isNeighbor() = true;
+				char * ip = strtok(strtok(NULL, ","), ":");
+				Client *c = network__connect(net, ip, atoi(strtok(NULL, ":")));
+				routeTable[s].setClient(c);
+				routeTable[s].isNeighbor() = true;
 
-			this->saction->link(c);
-		}
-		else
-		{
-			routeTable[s].dist() = atoi(strtok(NULL, ","));
+				this->saction->link(c);
+			}
+			else
+			{
+				routeTable[s].dist() = atoi(strtok(NULL, ","));
+			}
 		}
 	}
 
