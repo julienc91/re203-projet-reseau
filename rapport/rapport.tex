@@ -93,7 +93,8 @@ Ce rapport final pour le projet de réseau RE203 fait suite au rapport interméd
  \item quelques fonctions utilitaires
 \end{itemize}
 
-Chacun de ces blocs est indépendant des autres, ce qui assure une intégration facilitée dans le contrôleur comme dans le routeur.
+Chacun de ces blocs est indépendant des autres, ce qui assure une intégration facilitée dans le contrôleur comme dans le routeur. Une telle organisation permet d'introduire un certain degré d'abstraction tout en limitant la redondance 
+de code entre les deux composantes du projet.
 
 \subsection{Le prompt}
 
@@ -175,6 +176,30 @@ La fonction \texttt{getsockname} de la bibliothèque \texttt{sys/socket.h}, en a
 
 \underline{Fichiers :} \texttt{common/net.c}, \texttt{common/net.h}, \texttt{common/sock.h}\\
 
+Il s'agit certainement du pilier du projet, puisque c'est ce module qui assure la communication entre les routeurs et/ou le contrôleur en réseau. L'idée était en fait de réaliser une couche d'abstraction au-dessus de la bibliothèque \texttt{sys/socket.h}.
+
+La structure de données utilisée ici se nomme \texttt{network}, et représente le réseau.
+\begin{lstlisting}
+struct network_s{
+  short status; //Réseau ouvert ou fermé
+  SOCKET server;//Socket du serveur
+  int max;      //Nombre maximum de sockets à ouvrir
+  Client *clients; //Clients connectés
+  unsigned int nb_clients; //Taille du tableau précédent
+
+  /* Fonctions d'événement */
+  //Fonction à appeler lorsque l'entrée standard a été utilisée
+  input_event_function input_event;
+  //Fonction à appeler lors de la connexion d'un client
+  connection_event_function connection_event;
+  //Fonction à appeler lors de la déconnexion d'un client
+  disconnection_event_function disconnection_event;
+  //Fonction à appeler lors de la réception d'un message
+  message_event_function message_event;
+};
+\end{lstlisting}
+
+Une fois les fonctions d'initialisation appelées, la fonction \texttt{network\_\_update} permet l'écoute \textit{non bloquante} (à l'aide de la fonction de multiplexage de la librairie standard \texttt{select}) sur le port indiqué. A chaque événement (\textit{ie} connexion ou déconnexion d'un client, réception d'un message, \dots), la fonction continue le traitement en analysant le type de l'événement qui l'aura réveillé et en appelant les fonctions correspondantes dont les pointeurs sont indiqués dans la structure \texttt{network} utilisée. Ce sera le rôle de ces fonctions de gérer les actions à mettre en place, ce qui dépend évidemment de s'il s'agit du contrôleur ou d'un routeur, et doivent donc être implémentées et initialisées directement depuis le programme utilisant le module.
 
 \section{Le contrôleur}
 
