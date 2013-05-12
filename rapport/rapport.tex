@@ -220,9 +220,39 @@ Dans la pratique, le programme agit sur une variable globale de type \texttt{Agr
 
 Un structure de table de hachage est utilisée dans le code du contrôleur. Son rôle est de faire le lien entre l'identifiant d'un routeur (son nom) et la structure \texttt{Client} qui lui est associée et qui permet la communication. Pour cela, cette partie du code source se base sur la bibliothèque \textit{Hash-Table}\footnote{Publiée sous licence libre GNU/GPL par Ankur Shrivastava, consultable à l'adresse \url{https://github.com/ankurs/Hash-Table/}} en C, qui a le grand avantage d'être très simple d'utilisation, en plus d'avoir une documentation bien exhaustive. Après initialisation de la structure, celle-ci est mise à jour à chaque connexion et déconnexion d'un routeur sur le réseau. Dans le cas d'une connexion, rappelons que le bloc de gestion des sockets gère de lui-même l'allocation et l'initialisation d'une structure \texttt{Client}.
 
-Travailler sur une telle structure de données permet d'optimiser la complexité temporelle de la recherche des informations de connexion d'un routeur donné.
+Travailler sur une telle structure de données permet d'optimiser la complexité temporelle de la recherche des informations de connexion d'un routeur donné. Comme pour le graphe du réseau, le contrôleur travaille sur une variable globale pour gérer la table de hachage.
 
 \subsection{Traitement des commandes}
+
+\underline{Fichiers :} \texttt{controller/exec.c}, \texttt{controller/exec.h}\\
+
+Comme évoqué précédemment, les commandes envoyées par l'utilisateur et par les routeurs sont respectivement réceptionnées par le \textit{prompt} et par le module de gestion des sockets. Le code propre au contrôleur doit ensuite être capable de traiter ces commandes. Pour cela, les deux fonctions \texttt{exec\_\_prompt\_message} et \texttt{exec\_\_sock\_message}, appelés par les modules sus-cités, ont pour rôle de traiter l'action demandée, à savoir:
+\begin{itemize}
+ \item Dans le cadre d'un message venant du \textit{prompt}:
+ \begin{itemize}
+  \item[$\bullet$] Chargement de la topologie du réseau depuis un fichier vers une structure de graphe
+  \item[$\bullet$] Enregistrement de la structure de graphe courante dans un fichier
+  \item[$\bullet$] Affichage du graphe du réseau dans le terminal
+  \item[$\bullet$] Ajout/modification/suppression d'une connexion dans le graphe du réseau
+  \item[$\bullet$] Déconnexion d'un routeur
+  \item[$\bullet$] Demande de l'arrêt du contrôleur
+ \end{itemize}
+ \item Dans le cadre d'un message venant d'une socket:
+ \begin{itemize}
+  \item[$\bullet$] Connexion d'un routeur
+  \item[$\bullet$] Demande de \textit{poll}
+  \item[$\bullet$] Déconnexion d'un routeur
+ \end{itemize}
+\end{itemize}
+Ces fonctions se chargent simplement, selon la nature de la demande, d'appeler les fonctions des autres modules (par exemple l'ajout d'une arête dans le graphe lors de la demande d'ajout d'une connexion entre deux routeurs, ou encore l'ajout des informations de connexion d'un routeur à la table de hachage lors de la connexion d'un routeur au réseau), en faisant dans certains cas quelques vérifications d'intégrité (est-ce que le routeur indiqué existe? le pointeur passé en paramètre est-il valide? \dots).
+
+\subsubsection*{Précisions sur la demande de \textit{poll}}
+
+Le \textit{poll}, qui consiste à renvoyer au routeur appelant la liste de ses voisins ainsi que le coût de leurs liaisons respectives, utilise directement le graphe du réseau. Pour construire cette liste, il faut parcourir la liste des voisins du routeur dans le graphe. La librairie \textit{graphviz} facilite cette opération en proposant des fonctions de parcours des arêtes d'un sommet donné (initialisation avec \texttt{agfstedge}, puis parcours avec \texttt{agnxtedge}). Il ne reste plus qu'à récupérer le nom du sommet au bout de l'arête courante, le poids de ladite arête, et concaténer le tout selon la syntaxe demandée.
+
+Notons tout de même que, même si la topologie chargée indique la propriété de voisinage sur deux routeurs donnés, il se peut que le second routeur ne se soit pas encore connecté au réseau. Dans ce cas, il ne faut pas l'ajouter au voisinage puisque celui-ci est, pour une durée indéterminée, injoignable. Cette difficulté est aisément contournée en ajoutant une information booléenne dans chaque n\oe ud du graphe, indiquant si oui ou non le routeur associé est connecté (initialisé à $0$ puis mis à $1$ lors de la connexion, et enfin à $0$ lors de la déconnexion).
+
+Le sujet précise également que la liste retournée doit être nulle si le voisinage du routeur n'a pas été modifié depuis le dernier \textit{poll}. Pour vérifier cette propriété, on utilise là aussi une information booléenne dans chaque n\oe ud du graphe, qui précise si le voisinage du routeur associé a été ou non modifié depuis la dernière demande de mise à jour. Celle-ci est d'abord mise à $0$ avant le premier \textit{poll}, puis à $1$ après chaque nouvelle demande. La mise à $0$ est également effectuée sur tous les routeurs voisins d'un routeur venant de se connecter ou de se déconnecter, ainsi que sur tous les routeurs concernés par un ajout, suppression ou modification d'arête. De cette façon, il n'y a qu'à vérifier la valeur de ce booléen pour savoir si la procédure doit être faite en entier, ou s'il suffit de renvoyer une liste vide.
 
 \section{Les routeurs}
 
