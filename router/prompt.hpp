@@ -4,17 +4,22 @@ extern "C"
 {
 	#include "../common/messages.h"
 }
-#include <pthread.h>
+#include <thread>
 #include "exec.hpp"
 
 class Prompt
 {
 	public:
+		Prompt();
 		~Prompt();
 
 		void start(Exec* object, void (Exec::*mess_handler) (Message*));
+		void main_thread(void* v);
+
+		void stop();
 
 	private:
-		pthread_t* thread;
+		std::thread* thread;
+		bool isRunning;
 };
 #endif

@@ -24,6 +24,11 @@ Exec::Exec(Router* r)
 	disp = new Display();
 }
 
+Exec::~Exec()
+{
+	delete disp;
+}
+
 void Exec::prompt_message(Message* m)
 {
 	if(m == NULL || m->type == NONE)
@@ -103,6 +108,10 @@ void Exec::prompt_message(Message* m)
 			std::cout << "TODO" << std::endl; // TODO
 			break;
 
+		case QUIT:
+			router->sockActions()->logout();
+			break;
+
 		default:
 			std::cout << "ERREUR: Action non reconnue" << std::endl;
 			break;
@@ -133,7 +142,7 @@ void Exec::sock_message(Message* m)
 
 		case BYE:
 			// quitter le logiciel
-			exit(0);
+			router->stop();
 			break;
 
 		//**** routeur <-> routeur ****//

@@ -1,7 +1,7 @@
 #include "sock_actions.hpp"
 #include "exceptions.hpp"
 
-#include <string.h>
+#include <cstring>
 #include <iostream>
 
 
@@ -64,6 +64,7 @@ void SockActions::login(int port, char* id)
 	}
 
 	network__send(router->getController(), mess__toString(m));
+	mess__free(&m);
 }
 
 
@@ -74,6 +75,7 @@ void SockActions::poll()
 	m->type = POLL;
 
 	network__send(router->getController(), mess__toString(m));
+	mess__free(&m);
 }
 
 void SockActions::logout()
@@ -83,6 +85,7 @@ void SockActions::logout()
 	m->type = LOGOUT;
 
 	network__send(router->getController(), mess__toString(m));
+	mess__free(&m);
 }
 
 
@@ -94,15 +97,8 @@ void SockActions::link(Client *t)
 
 	m->node1 = strcopy(router->getName());
 
-	//~ RouteTable::iterator t;
-
-	//~ for(t = router->getRouteTable().begin();
-		//~ t != router->getRouteTable().end();
-		//~ ++t)
-	//~ {
-	//~ network__send((*t).second.client(), mess__toString(m));
-	//~ }
 	network__send(t, mess__toString(m));
+	mess__free(&m);
 }
 void SockActions::vector(char* id, char * vect)
 {
@@ -116,6 +112,7 @@ void SockActions::vector(char* id, char * vect)
 		t != router->getRouteTable().end();
 		++t)
 	{
-		network__send((*t).second.client(), mess__toString(m));
+		if(strcmp((*t).first.c_str(), id) != 0) // il ne faut pas qu'on envoie à n2 sa distance vers lui-même p.ex.
+			network__send((*t).second.client(), mess__toString(m));
 	}
 }

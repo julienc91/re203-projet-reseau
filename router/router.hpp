@@ -45,6 +45,9 @@ class Router
 		void controllerLoop();
 		void routerLoop();
 		void mainLoop();
+
+		bool isRunning();
+		void stop();
 	private:
 		std::string *_name;
 		RouteTable routeTable;
@@ -66,5 +69,7 @@ class Router
 		std::thread *mainLoopThread;
 
 		bool runControllerLoop, runRouterLoop, runMainLoop;
+
+		bool _isRunning;
 };
 #endif

@@ -12,6 +12,7 @@ Router* glob__router = 0;
 
 Router::Router(char* name, char* conf)
 {
+	_isRunning = true;
     _name = new std::string(name);
     seqnum = 0;
 
@@ -37,8 +38,6 @@ Router::Router(char* name, char* conf)
 	net->message_event = Event::message;
 
 	// * * * * connexion sortante * * * *
-
-
 	do
 	{
 		std::cout << "Connection to controller : "<< config->controllerAddress << ":" << config->controllerPort << std::endl;
@@ -66,9 +65,6 @@ Router::Router(char* name, char* conf)
 	mainLoopThread = new std::thread(&Router::mainLoop, this);
 	controllerLoopThread = new std::thread(&Router::controllerLoop, this);
 	routerLoopThread = new std::thread(&Router::routerLoop, this);
-
-	label:
-		goto label;
 }
 
 Router::Router(const Router * data)
@@ -78,6 +74,29 @@ Router::Router(const Router * data)
 
 Router::~Router()
 {
+	// Fermeture stdio
+	prompt.stop();
+
+	std::cout << "Début ~Router" << std::endl;
+	// threads
+	runControllerLoop = false;
+	runRouterLoop = false;
+	runMainLoop = false;
+	mainLoopThread->join(); // trop long avec le timeout
+	std::cout << "1" << std::endl;
+	//routerLoopThread->join();
+	std::cout << "2" << std::endl;
+	//controllerLoopThread->join();
+	std::cout << "3" << std::endl;
+
+	delete routerLoopThread;
+	delete controllerLoopThread;
+	delete mainLoopThread;
+
+	std::cout << "on est là" << std::endl;
+
+
+
 	// * * * * fermeture serveur * * * *
 
 	network__close(net);
@@ -85,22 +104,22 @@ Router::~Router()
 
 	end(); // windows compatibility
 
-	runControllerLoop = false;
-	runRouterLoop = false;
-	runMainLoop = false;
-	routerLoopThread->join();
-	controllerLoopThread->join();
-	mainLoopThread->join();
+	delete config;
     delete _name;
     delete exec;
     delete saction;
     delete paction;
+	std::cout << "FINISH" << std::endl;
 }
 
+void Router::stop()
+{
+	_isRunning = false;
+}
 void Router::mainLoop()
 {
 	// * * * * gestion serveur * * * *
-	while(network__is_opened(net) && runRouterLoop)
+	while(network__is_opened(net) && runMainLoop)
 	{
 		network__update(net);
 	}
@@ -109,23 +128,25 @@ void Router::mainLoop()
 void Router::controllerLoop()
 {
 	std::chrono::seconds poll_time( getConfiguration()->controllerUpdateInterval );
+	std::this_thread::sleep_for(std::chrono::seconds(1));
 	while(runControllerLoop)
 	{
-		std::this_thread::sleep_for(poll_time); // j'aime quand on peut lire le code
 		sockActions()->poll();
+		std::this_thread::sleep_for(poll_time); // j'aime quand on peut lire le code
 	}
 }
 
 void Router::routerLoop()
 {
 	std::chrono::seconds vect_time( getConfiguration()->routerUpdateInterval );
+	std::this_thread::sleep_for(std::chrono::seconds(1));
 	while(runRouterLoop)
 	{
-		std::this_thread::sleep_for(vect_time); // j'aime quand on peut lire le code
-
 		char * vect_str = routeTable.vector();
 		for(RouteTable::iterator i = routeTable.begin(); i != routeTable.end(); i++)
 			sockActions()->vector((char*) (*i).first.c_str(), vect_str);
+
+		std::this_thread::sleep_for(vect_time);
 	}
 }
 
@@ -290,4 +311,9 @@ void Router::parseNeighborhood(char* str_orig)
 network* Router::getNetwork()
 {
 	return this->net;
+}
+
+bool Router::isRunning()
+{
+	return _isRunning;
 }

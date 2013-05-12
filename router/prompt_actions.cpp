@@ -37,15 +37,19 @@ void PromptActions::message(Message* mess)
 	}
 	catch(UnknownDest)
 	{
+		mess__free(&packet);
 		throw;
 	}
 
 
-	if (network__send(c, mess__toString(packet)) < 0){
+	if (network__send(c, mess__toString(packet)) < 0)
+	{
 		std::cerr << "[CONTROLLER] Error while sending message '" << mess__toString(packet)
 				  << "' to '" <<  c->id << "' on socket '" << (int)c->sock << "'\n",
 		network__debug(router->getNetwork());
 	}
+
+	mess__free(&packet);
 }
 
 
@@ -69,6 +73,7 @@ void PromptActions::ping(Message* mess, std::map<int, hdclock::time_point>& ping
 	}
 	catch(UnknownDest)
 	{
+		mess__free(&ll_ping);
 		throw;
 	}
 
@@ -80,6 +85,8 @@ void PromptActions::ping(Message* mess, std::map<int, hdclock::time_point>& ping
 		network__send(c, mess__toString(ll_ping)); //segfault tant qu'on a pas un vrai c
 		sleep(1);
 	}
+
+	mess__free(&ll_ping);
 }
 
 
@@ -102,6 +109,7 @@ void PromptActions::route(Message* mess)
 	}
 	catch(UnknownDest)
 	{
+		mess__free(&ll_ping);
 		throw;
 	}
 
@@ -114,4 +122,6 @@ void PromptActions::route(Message* mess)
 		network__send(c, mess__toString(ll_ping));
 		sleep(1);
 	}
+
+	mess__free(&ll_ping);
 }

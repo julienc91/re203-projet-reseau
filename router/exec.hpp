@@ -21,6 +21,7 @@ class Exec
 {
 	public:
 		Exec(Router*);
+		~Exec();
 		void prompt_message(Message* m);
 		void sock_message(Message* m);
 
