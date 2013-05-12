@@ -10,6 +10,8 @@
 \usepackage{tikz-uml}
 \usepackage{relsize}
 \usepackage{color}
+\usepackage[boxed]{algorithm2e}
+\usepackage{tabularx}
 \usepackage[hidelinks]{hyperref}
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
@@ -98,7 +100,9 @@ de code entre les deux composantes du projet.
 
 \subsection{Le prompt}
 
-\underline{Fichiers :} \texttt{common/prompt.c}, \texttt{common/prompt.h}\\
+\begin{tabularx}{\linewidth}{lX}
+\underline{Fichiers :} & \texttt{common/prompt.c}, \texttt{common/prompt.h}
+\end{tabularx}\\
 
 L'invite de commande, ou \textit{prompt} en Anglais, permet la communication entre le contrôleur ou le routeur, et l'utilisateur. Il suffit pour cela de regarder constamment sur l'entrée standard et de traiter les commandes saisies par l'utilisateur. Afin de ne pas bloquer le programme sur l'écoute du fichier \texttt{stdin}, il faut pouvoir exécuter cette tâche en parallèle, d'où l'utilisation de la bibliothèque \texttt{pthread} ici.
 
@@ -108,7 +112,9 @@ De cette manière, contrôleur et routeur ont seulement à gérer la fonction de
 
 \subsection{Traitement des fichiers de configuration}
 
-\underline{Fichiers :} \texttt{common/config.c}, \texttt{common/config.h}\\
+\begin{tabularx}{\linewidth}{lX}
+\underline{Fichiers :} & \texttt{common/config.c}, \texttt{common/config.h}\\
+\end{tabularx}\\
 
 Le sujet demandait à ce que routeur comme contrôleur puissent être paramétrés depuis un fichier de configuration. Ce module permet la lecture de ces fichiers. La bibliothèque C \texttt{T-Rex}\footnote{Publiée sous licence libre \textit{zlib} par Alberto Demichelis, consultable à l'adresse \url{http://sourceforge.net/projects/tiny-rex/}}, qui permet la manipulation d'expressions régulières, a été utilisée dans ce cadre afin de faciliter la reconnaissance des différentes lignes possibles dans les fichiers de configuration.
 
@@ -140,7 +146,9 @@ Notez que la structure \texttt{Configuration} contient des attributs concernant 
 \subsection{Le système des \texttt{Messages}}
 \label{message}
 
-\underline{Fichiers :} \texttt{common/messages.c}, \texttt{common/messages.h}\\
+\begin{tabularx}{\linewidth}{lX}
+\underline{Fichiers :} & \texttt{common/messages.c}, \texttt{common/messages.h}\\
+\end{tabularx}\\
 
 Les \texttt{Messages} correspondent à une structure de données relative aux informations reçues et transmises par le contrôleur, le routeur ou l'utilisateur. Ce module permet notamment:
 \begin{itemize}
@@ -167,7 +175,9 @@ typedef struct Message
 
 \subsubsection{La structure \texttt{Client}}
 
-\underline{Fichiers :} \texttt{common/client.c}, \texttt{common/client.h}\\
+\begin{tabularx}{\linewidth}{lX}
+\underline{Fichiers :} & \texttt{common/client.c}, \texttt{common/client.h}\\
+\end{tabularx}\\
 
 La structure \texttt{Client} sert de base à la gestion des communications par socket. Elle permet l'association d'un routeur par son identifiant à une socket (qui contient à la fois l'adresse IP et le port à utiliser pour établir une communication avec ce client). Les fonctions fournies avec ce module permettent la récupération du port, de l'adresse et de l'identifiant d'un client, la mise à jour de l'identifiant ou encore la comparaison de deux \texttt{Client}s.
 
@@ -175,7 +185,9 @@ La fonction \texttt{getsockname} de la bibliothèque \texttt{sys/socket.h}, en a
 
 \subsubsection{Les sockets}
 
-\underline{Fichiers :} \texttt{common/net.c}, \texttt{common/net.h}, \texttt{common/sock.h}\\
+\begin{tabularx}{\linewidth}{lX}
+\underline{Fichiers :} & \texttt{common/net.c}, \texttt{common/net.h}, \texttt{common/sock.h}\\
+\end{tabularx}\\
 
 Il s'agit certainement du pilier du projet, puisque c'est ce module qui assure la communication entre les routeurs et/ou le contrôleur en réseau. L'idée était en fait de réaliser une couche d'abstraction au-dessus de la bibliothèque \texttt{sys/socket.h}.
 
@@ -208,7 +220,9 @@ En se basant sur le code du bloc commun, il est plus facile d'écrire un code pr
 
 \subsection{Gestion des graphes}
 
-\underline{Fichiers :} \texttt{controller/graphlib.c}, \texttt{controller/graphlib.h}\\
+\begin{tabularx}{\linewidth}{lX}
+\underline{Fichiers :} & \texttt{controller/graphlib.c}, \texttt{controller/graphlib.h}\\
+\end{tabularx}\\
 
 La première action à effectuer sur le contrôleur est le chargement de la topologie d'un réseau sous la forme d'un fichier au format \textit{dot}. A cet effet, il a fallu mettre en place un système de gestion de graphes facilitant les interactions entre le format \textit{dot} et la représentation en mémoire: la librairie de graphes de \textit{graphviz}\footnote{Publiée sous licence libre Eclipse, consultable à l'adresse \url{http://www.graphviz.org/}} était incontestablement la plus apte à répondre à ce problème. Dans un souci de propreté du code, une couche d'abstraction a été, ici aussi, mise en place au dessus de \textit{graphviz}.
 
@@ -216,15 +230,77 @@ Dans la pratique, le programme agit sur une variable globale de type \texttt{Agr
 
 \subsection{Table des routeurs}
 
-\underline{Fichiers :} \texttt{controller/info\_table.c}, \texttt{controller/info\_table.h}\\
+\begin{tabularx}{\linewidth}{lX}
+\underline{Fichiers :} & \texttt{controller/info\_table.c}, \texttt{controller/info\_table.h}\\
+\end{tabularx}\\
 
 Un structure de table de hachage est utilisée dans le code du contrôleur. Son rôle est de faire le lien entre l'identifiant d'un routeur (son nom) et la structure \texttt{Client} qui lui est associée et qui permet la communication. Pour cela, cette partie du code source se base sur la bibliothèque \textit{Hash-Table}\footnote{Publiée sous licence libre GNU/GPL par Ankur Shrivastava, consultable à l'adresse \url{https://github.com/ankurs/Hash-Table/}} en C, qui a le grand avantage d'être très simple d'utilisation, en plus d'avoir une documentation bien exhaustive. Après initialisation de la structure, celle-ci est mise à jour à chaque connexion et déconnexion d'un routeur sur le réseau. Dans le cas d'une connexion, rappelons que le bloc de gestion des sockets gère de lui-même l'allocation et l'initialisation d'une structure \texttt{Client}.
 
-Travailler sur une telle structure de données permet d'optimiser la complexité temporelle de la recherche des informations de connexion d'un routeur donné.
+Travailler sur une telle structure de données permet d'optimiser la complexité temporelle de la recherche des informations de connexion d'un routeur donné. Comme pour le graphe du réseau, le contrôleur travaille sur une variable globale pour gérer la table de hachage.
 
 \subsection{Traitement des commandes}
 
-\section{Les routeurs}
+\begin{tabularx}{\linewidth}{lX}
+\underline{Fichiers :} & \texttt{controller/exec.c}, \texttt{controller/exec.h}\\
+\end{tabularx}\\
+
+Comme évoqué précédemment, les commandes envoyées par l'utilisateur et par les routeurs sont respectivement réceptionnées par le \textit{prompt} et par le module de gestion des sockets.
+Le code propre au contrôleur doit ensuite être capable de traiter ces commandes.
+
+Pour cela, les deux fonctions \texttt{exec\_\_prompt\_message} et \texttt{exec\_\_sock\_message}, appelés par les modules sus-cités, ont pour rôle de traiter l'action demandée, à savoir:
+\begin{itemize}
+ \item Dans le cadre d'un message venant du \textit{prompt}:
+ \begin{itemize}
+  \item[$\bullet$] Chargement de la topologie du réseau depuis un fichier vers une structure de graphe
+  \item[$\bullet$] Enregistrement de la structure de graphe courante dans un fichier
+  \item[$\bullet$] Affichage du graphe du réseau dans le terminal
+  \item[$\bullet$] Ajout/modification/suppression d'une connexion dans le graphe du réseau
+  \item[$\bullet$] Déconnexion d'un routeur
+  \item[$\bullet$] Demande de l'arrêt du contrôleur
+ \end{itemize}
+ \item Dans le cadre d'un message venant d'une socket:
+ \begin{itemize}
+  \item[$\bullet$] Connexion d'un routeur
+  \item[$\bullet$] Demande de \textit{poll}
+  \item[$\bullet$] Déconnexion d'un routeur
+ \end{itemize}
+\end{itemize}
+Ces fonctions se chargent simplement, selon la nature de la demande, d'appeler les fonctions des autres modules
+(par exemple l'ajout d'une arête dans le graphe lors de la demande d'ajout d'une connexion entre deux routeurs, ou encore l'ajout des informations de connexion d'un routeur à la table de hachage lors de la connexion d'un routeur au réseau), en faisant dans certains cas quelques vérifications d'intégrité (est-ce que le routeur indiqué existe? le pointeur passé en paramètre est-il valide? \dots).
+
+\subsubsection*{Précisions sur la demande de \textit{poll}}
+
+Le \textit{poll}, qui consiste à renvoyer au routeur appelant la liste de ses voisins ainsi que le coût de leurs liaisons respectives, utilise directement le graphe du réseau. Pour construire cette liste, il faut parcourir la liste des voisins du routeur dans le graphe. La librairie \textit{graphviz} facilite cette opération en proposant des fonctions de parcours des arêtes d'un sommet donné (initialisation avec \texttt{agfstedge}, puis parcours avec \texttt{agnxtedge}). Il ne reste plus qu'à récupérer le nom du sommet au bout de l'arête courante, le poids de ladite arête, et concaténer le tout selon la syntaxe demandée.
+
+Notons tout de même que, même si la topologie chargée indique la propriété de voisinage sur deux routeurs donnés, il se peut que le second routeur ne se soit pas encore connecté au réseau. Dans ce cas, il ne faut pas l'ajouter au voisinage puisque celui-ci est, pour une durée indéterminée, injoignable. Cette difficulté est aisément contournée en ajoutant une information booléenne dans chaque n\oe ud du graphe, indiquant si oui ou non le routeur associé est connecté (initialisé à $0$ puis mis à $1$ lors de la connexion, et enfin à $0$ lors de la déconnexion).
+
+Le sujet précise également que la liste retournée doit être nulle si le voisinage du routeur n'a pas été modifié depuis le dernier \textit{poll}. Pour vérifier cette propriété, on utilise là aussi une information booléenne dans chaque n\oe ud du graphe, qui précise si le voisinage du routeur associé a été ou non modifié depuis la dernière demande de mise à jour. Celle-ci est d'abord mise à $0$ avant le premier \textit{poll}, puis à $1$ après chaque nouvelle demande. La mise à $0$ est également effectuée sur tous les routeurs voisins d'un routeur venant de se connecter ou de se déconnecter, ainsi que sur tous les routeurs concernés par un ajout, suppression ou modification d'arête. De cette façon, il n'y a qu'à vérifier la valeur de ce booléen pour savoir si la procédure doit être faite en entier, ou s'il suffit de renvoyer une liste vide.
+
+\subsection{Résumé du fonctionnement du contrôleur}
+
+L'algorithme suivant résume brièvement le fonctionnement du contrôleur. L'intégralité du traitement des commandes, de la réception à l'exécution puis à la génération de la réponse, est exécuté dans les différents sous-modules.
+
+\begin{algorithm}[H]
+ initialization(graph, hash\_table, network)\;
+ \While{is\_opened(network)} {
+    \tcc{these instructions are executed in a separated thread}
+ 	message = prompt\_\_new\_message()\;
+ 	\If{message\_\_is\_not\_empty(message) $ {\bf and} $ message\_\_is\_valid(message)}{
+ 		exec\_\_prompt\_message(message)\;
+ 	}
+ 	\BlankLine
+ 	\tcc{and these ones are executed in the main thread}
+ 	message = network\_\_new\_message()\;
+ 	\If{message\_\_is\_not\_empty(message) $ {\bf and} $ message\_\_is\_valid(message)}{
+ 		exec\_\_network\_message(message)\;
+ 	}
+ 	\BlankLine
+ 	\tcc{in this way, both are executed in the same time without creating any deadlock}
+ }
+ close(graph, hash\_table, network)\;
+\end{algorithm}
+
+\section{Les routeurs} %TODO
 
 De même que pour le contrôleur, une partie du code du routeur se base sur le code commun présenté précédemment.
 
@@ -234,11 +310,12 @@ entre les deux langages, il est parfois nécessaire de connaître quelques astuc
 De plus, nous nous sommes efforcés d'adopter une architecture MVC (Modèle-Vue-Contrôleur) : nous avons entièrement séparé les classes qui servent
 à l'entrée - sortie, des classes qui servent à la gestion du logiciel, et la majorité des appels passent par une classe contrôleur.
 
-\subsection{Diagramme de classes}
-
 \subsection{La classe Router}
 
-\underline{Classe : \texttt{Router}}\\
+\begin{tabularx}{\linewidth}{lX}
+\underline{Fichiers :} & \texttt{router/router.cpp}, \texttt{router/router.hpp}\\
+\underline{Classe :} & \texttt{Router}\\
+\end{tabularx}\\
 
 Cette classe est la classe principale du programme. Elle est instanciée dans le main, et instancie par la suite toutes les autres
 classes du logiciel; c'est le contrôleur (au sens MVC) du logiciel.
@@ -248,7 +325,10 @@ qui servent à communiquer périodiquement avec le contrôleur et les autres rou
 
 \subsection{La table de routage : RouteTable}
 
-\underline{Classes : \texttt{RouteTable}, \texttt{Entry}}\\
+\begin{tabularx}{\linewidth}{lX}
+\underline{Fichiers :} & \texttt{router/routetable.cpp}, \texttt{router/routetable.hpp}, \texttt{router/entry.cpp}, \texttt{router/entry.hpp}\\
+\underline{Classes :} & \texttt{Router}, \texttt{Entry}\\
+\end{tabularx}\\
 
 Nous avons utilisé pour la table de routage un simple tableau associatif (le \textbf{map} du C++).
 Nous associons au nom du routeur voisin une structure, \texttt{Entry}, qui contient différentes informations nécessaires
@@ -259,7 +339,10 @@ le prochain saut à effectuer pour rejoindre un noeud.
 
 \subsection{Gestion des messages}
 
-\underline{Classes : \texttt{Event}, \texttt{Exec}}\\
+\begin{tabularx}{\linewidth}{lX}
+\underline{Fichiers :} & \texttt{router/event.cpp}, \texttt{router/event.hpp}, \texttt{router/exec.cpp}, \texttt{router/exec.hpp}\\
+\underline{Classes :} & \texttt{Event}, \texttt{Exec}\\
+\end{tabularx}\\
 
 Grâce à l'architecture choisie, la gestion de la communication est sensiblement semblable à celle utilisée dans le
 routeur.
@@ -274,6 +357,8 @@ est incompatible avec une méthode d'instance, qui contient un paramètre caché
 Il a donc été nécessaire d'avoir une variable globale vers la classe \texttt{Router} pour accéder à toutes les informations nécessaires (table de routage...) dans la classe \texttt{Event}.
 Ce n'est certes pas une bonne pratique de programmation, mais cela permet de n'avoir qu'un seul code pour le routeur et le contrôleur.
 
+Pour information, les messages à gérer au prompt sont : \textit{ping}, \textit{route} et \textit{message}, mais nous en avons rajouté, tels que quit pour quitter le logiciel, et poll pour forcer la mise à jour du voisinnage.7
+
 \texttt{Exec} contient la logique des opérations à réaliser (ex. : si le message est de type neighborhood, et que son niveau d'acceptation est OK, alors ne rien faire, sinon faire le traitement nécessaire sur le message).
 
 Mais la plupart du traitement se déroule dans des classes séparées : \texttt{PromptActions} et \texttt{SockActions}.
@@ -286,7 +371,10 @@ Ce sont elles qui forment les messages à envoyer par le réseau, notamment, en 
 
 \subsection{Classes annexes}
 
-\underline{Classes : \texttt{Display}, \texttt{exceptions diverses et variées}}\\
+\begin{tabularx}{\linewidth}{lX}
+\underline{Fichiers :} & \texttt{router/display.cpp}, \texttt{router/display.hpp}, \texttt{router/exceptions.hpp}\\
+\underline{Classe :} & \texttt{Display}, \texttt{Exceptions diverses et variées}\\
+\end{tabularx}\\
 
 Display sert à l'affichage des données du programme, des réponses aux messages, des messages d'erreurs, tel que spécifié dans le sujet.
 Exceptions est une liste de dérivés de \texttt{std::exception}, instanciés, de manière à pouvoir s'en servir très simplement.
@@ -305,4 +393,10 @@ catch(UnknownDest&) // récupération
 \end{lstlisting}
 
 Cela permet un code clair.
+
+\subsection{Diagramme de classes} %TODO
+
+\section*{Conclusion} %TODO
+
+%tests, valgrind, réponse au sujet, code propre
 \end{document}
