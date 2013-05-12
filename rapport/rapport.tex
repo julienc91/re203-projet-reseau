@@ -93,7 +93,7 @@ Ce rapport final pour le projet de réseau RE203 fait suite au rapport interméd
  \item quelques fonctions utilitaires
 \end{itemize}
 
-Chacun de ces blocs est indépendant des autres, ce qui assure une intégration facilitée dans le contrôleur comme dans le routeur. Une telle organisation permet d'introduire un certain degré d'abstraction tout en limitant la redondance 
+Chacun de ces blocs est indépendant des autres, ce qui assure une intégration facilitée dans le contrôleur comme dans le routeur. Une telle organisation permet d'introduire un certain degré d'abstraction tout en limitant la redondance
 de code entre les deux composantes du projet.
 
 \subsection{Le prompt}
@@ -226,5 +226,83 @@ Travailler sur une telle structure de données permet d'optimiser la complexité
 
 \section{Les routeurs}
 
+De même que pour le contrôleur, une partie du code du routeur se base sur le code commun présenté précédemment.
 
+Néanmoins, le défi repose dans le fait que le routeur est écrit en C++, et que bien qu'il y ait un fort lien de parenté
+entre les deux langages, il est parfois nécessaire de connaître quelques astuces pour pouvoir interfacer les deux codes.
+
+De plus, nous nous sommes efforcés d'adopter une architecture MVC (Modèle-Vue-Contrôleur) : nous avons entièrement séparé les classes qui servent
+à l'entrée - sortie, des classes qui servent à la gestion du logiciel, et la majorité des appels passent par une classe contrôleur.
+
+\subsection{Diagramme de classes}
+
+\subsection{La classe Router}
+
+\underline{Classe : \texttt{Router}}\\
+
+Cette classe est la classe principale du programme. Elle est instanciée dans le main, et instancie par la suite toutes les autres
+classes du logiciel; c'est le contrôleur (au sens MVC) du logiciel.
+
+Elle contient notamment la table de routage, ainsi que la plupart des classes qui gèrent les messages, et gère les threads
+qui servent à communiquer périodiquement avec le contrôleur et les autres routeurs (par le biais des commandes \texttt{poll} et \texttt{vector}).
+
+\subsection{La table de routage : RouteTable}
+
+\underline{Classes : \texttt{RouteTable}, \texttt{Entry}}\\
+
+Nous avons utilisé pour la table de routage un simple tableau associatif (le \textbf{map} du C++).
+Nous associons au nom du routeur voisin une structure, \texttt{Entry}, qui contient différentes informations nécessaires
+à la communication avec ces clients.
+
+\texttt{Entry} contient un pointeur vers un \texttt{Client}, présenté précédemment, la distance entre deux noeuds, ainsi que
+le prochain saut à effectuer pour rejoindre un noeud.
+
+\subsection{Gestion des messages}
+
+\underline{Classes : \texttt{Event}, \texttt{Exec}}\\
+
+Grâce à l'architecture choisie, la gestion de la communication est sensiblement semblable à celle utilisée dans le
+routeur.
+
+Le prompt (classe\texttt{Prompt}) ainsi que la pseudo-classe \texttt{net} de la partie commune communiquent avec la classe \texttt{Exec},
+ qui est chargée de la compréhension et de l'application des actions requises lors de la réception d'un message.
+
+Nous avons utilisé de plus le même système d'évènements qu'en C, ce qui a posé des problèmes d'incompatibilité de prototypes : en effet,
+nous avons créé la classe Event qui contient les évènements à exécuter en cas d'opération sur le réseau. Mais le prototype attendu par la fonction C
+est incompatible avec une méthode d'instance, qui contient un paramètre caché \textbf{this}.
+
+Il a donc été nécessaire d'avoir une variable globale vers la classe \texttt{Router} pour accéder à toutes les informations nécessaires (table de routage...) dans la classe \texttt{Event}.
+Ce n'est certes pas une bonne pratique de programmation, mais cela permet de n'avoir qu'un seul code pour le routeur et le contrôleur.
+
+\texttt{Exec} contient la logique des opérations à réaliser (ex. : si le message est de type neighborhood, et que son niveau d'acceptation est OK, alors ne rien faire, sinon faire le traitement nécessaire sur le message).
+
+Mais la plupart du traitement se déroule dans des classes séparées : \texttt{PromptActions} et \texttt{SockActions}.
+
+\texttt{PromptActions} contient les actions à réaliser pour un message rentré à la main, et \texttt{SockActions} en fait de
+même pour un message reçu par le réseau.
+
+A la différence de \texttt{Exec}, ces deux classes manipulent directement les fonctions contenues dans \texttt{net.c}.
+Ce sont elles qui forment les messages à envoyer par le réseau, notamment, en remplissant les membres de la structure Message.
+
+\subsection{Classes annexes}
+
+\underline{Classes : \texttt{Display}, \texttt{exceptions diverses et variées}}\\
+
+Display sert à l'affichage des données du programme, des réponses aux messages, des messages d'erreurs, tel que spécifié dans le sujet.
+Exceptions est une liste de dérivés de \texttt{std::exception}, instanciés, de manière à pouvoir s'en servir très simplement.
+
+Elle est entièrement contenue dans un fichier header.
+
+Par exemple, voici l'utilisation de l'exception pour l'absence d'un routeur dans la table de routage : Unknown destination.
+La casse est impoortante.
+
+\begin{lstlisting}
+throw unknownDest; // envoi
+\end{lstlisting}
+
+\begin{lstlisting}
+catch(UnknownDest&) // récupération
+\end{lstlisting}
+
+Cela permet un code clair.
 \end{document}

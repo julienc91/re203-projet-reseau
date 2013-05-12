@@ -26,8 +26,6 @@ class Router
 		Router(const Router * data);
 		~Router();
 
-
-
 		int newSeqnum();
 		char* getName();
 		void setName(char*);
