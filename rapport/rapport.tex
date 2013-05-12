@@ -10,6 +10,7 @@
 \usepackage{tikz-uml}
 \usepackage{relsize}
 \usepackage{color}
+\usepackage[boxed]{algorithm2e}
 \usepackage[hidelinks]{hyperref}
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
@@ -253,6 +254,32 @@ Le \textit{poll}, qui consiste à renvoyer au routeur appelant la liste de ses v
 Notons tout de même que, même si la topologie chargée indique la propriété de voisinage sur deux routeurs donnés, il se peut que le second routeur ne se soit pas encore connecté au réseau. Dans ce cas, il ne faut pas l'ajouter au voisinage puisque celui-ci est, pour une durée indéterminée, injoignable. Cette difficulté est aisément contournée en ajoutant une information booléenne dans chaque n\oe ud du graphe, indiquant si oui ou non le routeur associé est connecté (initialisé à $0$ puis mis à $1$ lors de la connexion, et enfin à $0$ lors de la déconnexion).
 
 Le sujet précise également que la liste retournée doit être nulle si le voisinage du routeur n'a pas été modifié depuis le dernier \textit{poll}. Pour vérifier cette propriété, on utilise là aussi une information booléenne dans chaque n\oe ud du graphe, qui précise si le voisinage du routeur associé a été ou non modifié depuis la dernière demande de mise à jour. Celle-ci est d'abord mise à $0$ avant le premier \textit{poll}, puis à $1$ après chaque nouvelle demande. La mise à $0$ est également effectuée sur tous les routeurs voisins d'un routeur venant de se connecter ou de se déconnecter, ainsi que sur tous les routeurs concernés par un ajout, suppression ou modification d'arête. De cette façon, il n'y a qu'à vérifier la valeur de ce booléen pour savoir si la procédure doit être faite en entier, ou s'il suffit de renvoyer une liste vide.
+
+\subsection{Résumé du fonctionnement du contrôleur}
+
+L'algorithme suivant résume brièvement le fonctionnement du contrôleur. L'intégralité du traitement des commandes, de la réception à l'exécution puis à la génération de la réponse, est exécuté dans les différents modules.
+
+\IncMargin{1em}
+\begin{algorithm}[H]
+ initialization(graph, hash\_table, network)\;
+ \While{is\_opened(network)} {
+    \tcc{these instructions are executed in a separated thread}
+ 	message = prompt\_\_new\_message()\;
+ 	\If{message\_\_is\_not\_empty(message) $ {\bf and} $ message\_\_is\_valid(message)}{
+ 		exec\_\_prompt\_message(message)\;
+ 	}
+ 	\BlankLine
+ 	\tcc{and these ones are executed in the main thread}
+ 	message = network\_\_new\_message()\;
+ 	\If{message\_\_is\_not\_empty(message) $ {\bf and} $ message\_\_is\_valid(message)}{
+ 		exec\_\_network\_message(message)\;
+ 	}
+ 	\BlankLine
+ 	\tcc{in this way, both are executed in the same time without creating any deadlock}
+ }
+ close(graph, hash\_table, network)\;
+\end{algorithm}
+\DecMargin{1em}
 
 \section{Les routeurs}
 
