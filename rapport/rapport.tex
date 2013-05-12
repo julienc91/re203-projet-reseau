@@ -147,6 +147,7 @@ Les \texttt{Messages} correspondent à une structure de données relative aux in
  \item L'allocation et la libération dynamique d'un message
  \item L'échappement d'une chaîne de caractères (caractères "*" et "\textbackslash"), à utiliser lors de l'envoi d'un \texttt{Message}, et l'opération inverse pour la réception
  \item Le parsing, c'est-à-dire la reconnaissance de la commande contenue dans le \texttt{Message} (là aussi, la bibliothèque \texttt{T-Rex} est mise à contribution)
+ \item La gestion du TTL
 \end{itemize}
 La structure \texttt{Message} contient toutes les informations nécessaires au traitement ultérieur.
 
@@ -203,6 +204,19 @@ Une fois les fonctions d'initialisation appelées, la fonction \texttt{network\_
 
 \section{Le contrôleur}
 
+En se basant sur le code du bloc commun, il est plus facile d'écrire un code propre et bien organisé. Cette seconde partie détaille l'implémentation du contrôleur.
+
+\subsection{Gestion des graphes}
+
+\underline{Fichiers :} \texttt{controller/graphlib.c}, \texttt{controller/graphlib.h}\\
+
+La première action à effectuer sur le contrôleur est le chargement de la topologie d'un réseau sous la forme d'un fichier au format \textit{dot}. A cet effet, il a fallu mettre en place un système de gestion de graphes facilitant les interactions entre le format \textit{dot} et la représentation en mémoire: la librairie de graphes de \textit{graphviz}\footnote{\url{http://www.graphviz.org/}} était incontestablement la plus apte à répondre à ce problème. Dans un souci de propreté du code, une couche d'abstraction a été, ici aussi, mise en place au dessus de \textit{graphviz}.
+
+Dans la pratique, le programme agit sur une variable globale de type \texttt{Agraph_t}. Cette structure contient en fait l'arbre correspondant à la topologie du réseau chargé, où chaque n\oe ud est un routeur, et où chaque arête indique le voisinage de deux routeurs et est labelisée du poids du chemin représenté. \textit{graphviz} offre toutes les fonctions nécessaires au traitement d'une telle variable, de son initialisation à l'aide d'un fichier \textit{.dot} à sa sauvegarde, et évidemment l'ajout/suppression/modification de tout n\oe ud ou arête.
+
+\subsection{Table des n\oe uds}
+
+\subsection{Traitement des commandes}
 
 \section{Les routeurs}
 
