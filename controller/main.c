@@ -44,7 +44,6 @@ int main(int argc, char **argv)
 	}
 	fprintf(stderr, "exit main loop\n");
 
-	//~ pthread_join(*prompt_th1, NULL);
 	//~ printf("Prompt quitté\n");
 
 	// * * * * fermeture serveur * * * *

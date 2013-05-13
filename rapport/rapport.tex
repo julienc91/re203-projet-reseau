@@ -139,7 +139,7 @@ typedef struct Configuration
 } Configuration;
 \end{lstlisting}
 
-A la fin de la lecture, il ne reste plus qu'à retourner au programme appelant un pointeur vers la structure remplie, qui n'aura alors qu'à consulter la valeur de ses différents attributs.
+A la fin de la lecture, il ne reste plus qu'à retourner au programme appelant un pointeur vers la structure remplie, qui n'aura alors qu'à consulter la valeur de ces différents attributs.
 
 Notez que la structure \texttt{Configuration} contient des attributs concernant aussi bien le contrôleur que le routeur. C'est au programme de veiller à n'utiliser que les attributs le concernant, les autres attributs n'ayant aucune garantie d'avoir été initialisés à une valeur cohérente (précisons cependant qu'il n'y a aucune raison pour que le contrôleur ait besoin des informations propres aux routeurs, et inversement).
 
@@ -214,6 +214,7 @@ struct network_s{
 
 Une fois les fonctions d'initialisation appelées, la fonction \texttt{network\_\_update} permet l'écoute \textit{non bloquante} (à l'aide de la fonction de multiplexage de la librairie standard \texttt{select}) sur le port indiqué. A chaque événement (\textit{ie} connexion ou déconnexion d'un client, réception d'un message, \dots), la fonction continue le traitement en analysant le type de l'événement qui l'aura réveillé et en appelant les fonctions correspondantes dont les pointeurs sont indiqués dans la structure \texttt{network} utilisée. Ce sera le rôle de ces fonctions de gérer les actions à mettre en place, ce qui dépend évidemment de s'il s'agit du contrôleur ou d'un routeur, et doivent donc être implémentées et initialisées directement depuis le programme utilisant le module.
 
+\newpage
 \section{Le contrôleur}
 
 En se basant sur le code du bloc commun, il est plus facile d'écrire un code propre et bien organisé. Cette seconde partie détaille l'implémentation du contrôleur.
@@ -279,7 +280,7 @@ Le sujet précise également que la liste retournée doit être nulle si le vois
 \subsection{Résumé du fonctionnement du contrôleur}
 
 L'algorithme suivant résume brièvement le fonctionnement du contrôleur. L'intégralité du traitement des commandes, de la réception à l'exécution puis à la génération de la réponse, est exécuté dans les différents sous-modules.
-
+\\
 \begin{algorithm}[H]
  initialization(graph, hash\_table, network)\;
  \While{is\_opened(network)} {
@@ -305,7 +306,7 @@ L'algorithme suivant résume brièvement le fonctionnement du contrôleur. L'int
 De même que pour le contrôleur, une partie du code du routeur se base sur le code commun présenté précédemment. Néanmoins, le défi repose dans le fait que le routeur est écrit en C++, et que bien qu'il y ait un fort lien de parenté entre les deux langages, il est parfois nécessaire de connaître quelques astuces pour pouvoir interfacer les deux codes.
 
 De plus, il a été fait en sorte que le code suive une architecture MVC (Modèle-Vue-Contrôleur), en séparant les classes qui servent
-à l'entrée/sortie des classes qui servent à la gestion du logiciel. La majorité des appels passe par une classe contrôleur.
+à l'entrée/sortie et celles qui servent à la gestion du logiciel. La majorité des appels passe par une classe contrôleur.
 
 \subsection{La classe Router}
 
@@ -354,8 +355,7 @@ Il a donc été nécessaire d'avoir une variable globale vers la classe \texttt{
 
 Pour information, les messages à gérer au prompt sont \textit{ping}, \textit{route} et \textit{message}, mais d'autres ont été ajoutés, tels que \textit{quit} pour quitter le logiciel, et \textit{poll} pour forcer la mise à jour du voisinage.
 
-\texttt{Exec} contient la logique des opérations à réaliser (par exemple, si le message est de type \texttt{neighborhood} et que son niveau d'acceptation est \texttt{OK}, alors on ne fait rien, sinon on fait le traitement nécessaire sur le message). Mais la plupart du traitement se déroule dans des classes séparées : \texttt{PromptActions} et \texttt{SockActions}. \texttt{PromptActions} contient les actions à réaliser pour un message rentré à la main, et \texttt{SockActions} en fait de
-même pour un message reçu par le réseau.
+\texttt{Exec} contient la logique des opérations à réaliser (par exemple, si le message est de type \texttt{neighborhood} et que son niveau d'acceptation est \texttt{OK}, alors on ne fait rien, sinon on fait le traitement nécessaire sur le message). Mais la plus grande partie du traitement se déroule dans des classes séparées : \texttt{PromptActions} et \texttt{SockActions}. \texttt{PromptActions} contient les actions à réaliser pour un message rentré à la main, et \texttt{SockActions} en fait de même pour un message reçu par le réseau.
 
 A la différence de \texttt{Exec}, ces deux classes manipulent directement les fonctions contenues dans \texttt{net.c}.
 Ce sont elles qui forment les messages à envoyer par le réseau, en remplissant notamment les membres de la structure Message.
@@ -377,7 +377,10 @@ Par exemple, voici l'utilisation de l'exception pour l'absence d'un routeur dans
 % ]
 La gestion des exceptions de cette manière ajoute à la clarté du code.
 
-\subsection{Diagramme de classes} %TODO
+\subsection{Diagramme de classes}
+
+Afin de récapituler plus simplement cette partie, le diagramme de classes du routeur est donné en figure \ref{diagclasses}.
+
 \begin{figure}[H]
 \begin{center}
 \begin{tikzpicture}
@@ -411,7 +414,7 @@ La gestion des exceptions de cette manière ajoute à la clarté du code.
 \umlunicompo[mult=1..*]{RouteTable}{Entry}
 \end{tikzpicture}
 \caption{Diagramme de classes du routeur}
-\label{diag_api_chords}
+\label{diagclasses}
 \end{center}
 \end{figure}
 \section*{Conclusion} %TODO
