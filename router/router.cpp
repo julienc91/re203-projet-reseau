@@ -42,7 +42,7 @@ Router::Router(char* name, char* conf)
 	do
 	{
 		std::cout << "Connection to controller : "<< config->controllerAddress << ":" << config->controllerPort << std::endl;
-		controller = network__connect(net, config->controllerAddress, config->controllerPort); //localhost à changer
+		controller = network__connect(net, config->controllerAddress, config->controllerPort);
 		if(!controller)
 			std::this_thread::sleep_for(controllerTimeout);
 	} while(!controller);
@@ -65,7 +65,7 @@ Router::Router(char* name, char* conf)
 
 	mainLoopThread = new std::thread(&Router::mainLoop, this);
 	controllerLoopThread = new std::thread(&Router::controllerLoop, this);
-	//routerLoopThread = new std::thread(&Router::routerLoop, this);
+	routerLoopThread = new std::thread(&Router::routerLoop, this);
 }
 
 Router::Router(const Router * data)
@@ -145,11 +145,12 @@ void Router::routerLoop()
 	{
 		for(RouteTable::iterator i = routeTable.begin(); i != routeTable.end(); i++)
 		{
-			if((*i).second.isNeighbor())
+			if((*i).second.isNeighbor() && (*i).second.isComplete())
 			{
 				char * vect_str = routeTable.vector((*i).first);
-				std::cout << "\nici\n" << (*i).first << " " << (*i).second.client()->id << "\n";
-				sockActions()->vector((char*) (*i).first.c_str(), vect_str);
+				//std::cout << "\nici\n" << (*i).first << " " << (*i).second.client()->id << "\n";
+				if(strcmp(vect_str, "[]") != 0)
+					sockActions()->vector((char*) (*i).first.c_str(), vect_str);
 			}
 		}
 		std::this_thread::sleep_for(vect_time);
@@ -231,10 +232,21 @@ void Router::parseVector(char* str_orig, char* node_orig)
 
 			if(routeTable.find(s) != routeTable.end()) // si on le trouve
 			{
-				if(dist < routeTable[s].dist() || routeTable[s].dist() < 0)
+				if((routeTable[s].isNeighbor() && dist < routeTable[s].dist()) ||
+					(!routeTable[s].isNeighbor() && dist + routeTable[sourceNode].dist() < routeTable[s].dist()) ||
+					routeTable[s].dist() < 0)
 				{
-					routeTable[s].dist() = dist;
+
 					routeTable[s].nextHop() = sourceNode;
+					if(s.compare(sourceNode) != 0)
+					{
+						routeTable[s].dist() = dist + routeTable[sourceNode].dist();
+					}
+					else
+					{
+						routeTable[s].dist() = dist;
+					}
+
 				}
 			}
 			else
@@ -261,7 +273,6 @@ void Router::parseNeighborhood(char* str_orig)
 
 		while((r = strtok(NULL, ";")) != NULL)
 		{
-			std::cout << "Vecteur de noms : " << r << std::endl;
 			v.push_back(r);
 		}
 
@@ -287,7 +298,6 @@ void Router::parseNeighborhood(char* str_orig)
 					char * ip = strtok(strtok(NULL, ","), ":");
 					int port = atoi(strtok(NULL, ":"));
 					Client *c = network__connect(net, ip, port);
-					std::cout << "\nNom qu'on ajoute: " << s << "\n" << ip << ":" << port << "\n" ;
 					strcpy(c->id, s.c_str());
 					routeTable[s].setClient(c);
 					routeTable[s].isNeighbor() = true;
@@ -301,7 +311,6 @@ void Router::parseNeighborhood(char* str_orig)
 					char * ip = strtok(strtok(NULL, ","), ":");
 					int port = atoi(strtok(NULL, ":"));
 					Client *c = network__connect(net, ip, port);
-					std::cout << "\nNom qu'on ajoute (cas 2): " << s << "\n" << ip << ":" << port << "\n" ;
 					strcpy(c->id, s.c_str());
 					routeTable[s].setClient(c);
 					routeTable[s].isNeighbor() = true;

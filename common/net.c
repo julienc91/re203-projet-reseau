@@ -1,10 +1,10 @@
 /**
  * \file net.c
  * \brief Network manager
- * 
+ *
  * Opens a server socket and manages connections
  * as an array of "Client"s.
- * 
+ *
  */
 
 #include "../common/net.h"
@@ -66,10 +66,10 @@ void end(void)
 /**
  * \fn network *network__open(unsigned int port)
  * \brief Initializes the network and open the listening socket
- * 
+ *
  * \param port Port used by the server socket.
  * \return A network object.
- * 
+ *
  * Set the network status to opened.
  */
 network *network__open(unsigned int port){
@@ -88,7 +88,7 @@ network *network__open(unsigned int port){
  * \fn void network__close(network *net)
  * \brief Close every connections and the server socket.
  * \param net A network object.
- * 
+ *
  * Set the network status to closed.
  */
 void network__close(network *net){
@@ -130,7 +130,7 @@ void network__free(network *net){
  * \param address IP address of the client.
  * \param port Port that the client is listening to.
  * \return A Client object, which can be used to specify its "id", if the connexion was successful, NULL otherwise.
- * 
+ *
  * The new Client is added to the network array.
  */
 Client *network__connect(network *net, const char *address, const unsigned int port){
@@ -164,7 +164,9 @@ void network__disconnect (network *net, Client *c){
  */
 int network__send(Client *c, const char *message)
 {
+	#ifdef __ROUTER_DEBUG
   fprintf(stderr, "<Sending message to '%s' on socket '%d': '%s'>\n", c->id, (int)c->sock, message);
+  #endif
   char* mess2 = mess__treatOutput(strcopy(message));
   if(!mess2)
        return NETWORK__SEND_ERROR;
@@ -195,9 +197,9 @@ int network__broadcast  (network *net, const char *message){
  * \fn void network__update(network *net)
  * \brief Updates the network and raises events.
  * \param net A network object
- * Should be used in the main loop of the program 
+ * Should be used in the main loop of the program
  * (continue while the server is opened).
- * This function will raise events (function pointers) 
+ * This function will raise events (function pointers)
  * which must be set in the network object.
  */
 void network__update(network *net){
@@ -459,7 +461,7 @@ static int read_client(SOCKET sock, char *buffer)
 /**
  * \fn static int write_client(SOCKET sock, char *buffer)
  * \brief Writes a socket.
- * \return 0 if successful, NETWORK__SEND_ERROR otherwise. 
+ * \return 0 if successful, NETWORK__SEND_ERROR otherwise.
  */
 static int write_client(SOCKET sock, const char *buffer)
 {
@@ -471,7 +473,7 @@ static int write_client(SOCKET sock, const char *buffer)
     return 0;
 }
 
-/** 
+/**
  * \fn void network__debug(network *net)
  * \brief Display a debug message describing the network state.
  * \param net A network object.
@@ -481,7 +483,7 @@ void network__debug(network *net){
     if (net->status==NETWORK__CLOSED){
         fprintf(stderr, "'closed'\n");
     } else {
-        fprintf(stderr, "'opened'\n"); 
+        fprintf(stderr, "'opened'\n");
     }
     fprintf(stderr, "[DEBUG] Server socket : '%d'\n", (int)net->server);
     fprintf(stderr, "[DEBUG] %d client(s) connected :\n", net->nb_clients);
@@ -490,4 +492,3 @@ void network__debug(network *net){
         fprintf(stderr, "[DEBUG] (%d) id='%s', socket=''\n", i, net->clients[i].id, (int)net->clients[i].sock);
     }
 }
-

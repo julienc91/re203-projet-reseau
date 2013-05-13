@@ -26,8 +26,9 @@ void Event::input(network *net, char *buffer)
 
 void Event::connect(network *net, Client *c, char *buffer)
 {
+	#ifdef __ROUTER_DEBUG
 	std::cout << "<connection on socket '" << c->sock << "' : '" << buffer << "'>" << std::endl;
-
+	#endif
 	Messages *m = mess__multiline_parse(buffer);
 
 	if (!m) return;
@@ -47,8 +48,9 @@ void Event::disconnect(network *net, Client *c)
 
 void Event::message(network *net, Client *c, char *buffer)
 {
+	#ifdef __ROUTER_DEBUG
 	std::cout << "<message from '" << c->id << "', socket " << c->sock <<" : '" << buffer << "'>" << std::endl;
-
+	#endif
 	Messages *m = mess__multiline_parse(buffer);
 
 	if (!m) return;

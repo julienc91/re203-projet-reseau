@@ -114,7 +114,6 @@ void SockActions::linkAck(Client* t)
 
 void SockActions::vector(char* id, char * vect)
 {
-	std::cout << "on m'appelle\n";
 	Message* m;
 	mess__init(&m);
 	m->type = VECTOR;

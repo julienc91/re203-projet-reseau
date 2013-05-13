@@ -36,7 +36,7 @@ char* RouteTable::vector(std::string client)
 	s << "[";
 	for(RouteTable::iterator i = begin(); i != end(); i++)
 	{
-		if (client.compare((*i).first) != 0)
+		if (client.compare((*i).first) != 0 && (*i).second.isComplete())
 		{
 			if (added)
 				s << ";";
