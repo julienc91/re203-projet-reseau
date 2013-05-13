@@ -165,6 +165,7 @@ void network__disconnect (network *net, Client *c){
  */
 int network__send(Client *c, const char *message)
 {
+  fprintf(stderr, "<Sending message to '%s' on socket '%d': '%s'>\n", c->id, (int)c->sock, message);
   char* mess2 = mess__treatOutput(strcopy(message));
   if(!mess2)
        return NETWORK__SEND_ERROR;
