@@ -38,13 +38,9 @@ int main(int argc, char **argv)
 	// * * * * gestion serveur * * * *
 	while(network__is_opened(net))
 	{
-	  //fprintf(stderr, ".");	
-	  //network__update(net);
-	
+        network__update(net);
 	}
 	fprintf(stderr, "exit main loop\n");
-
-	//~ printf("Prompt quitté\n");
 
 	// * * * * fermeture serveur * * * *
 	
