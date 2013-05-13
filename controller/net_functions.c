@@ -14,7 +14,7 @@ void input_event(network *net, char *string)
 void connection_event(network *net, Client *client, char *string)
 {
 	printf("<connection on socket '%d' : '%s'>\n", (int)client->sock, string);
-	
+
 	//Necessaire pour les tests via telnet
 	int i = strlen(string);
 	while (i>=0 && string[i] != '*')
@@ -22,7 +22,7 @@ void connection_event(network *net, Client *client, char *string)
 		i--;
 	}
 	string[i+1] = '\0';
-	
+
 	Messages *m = mess__multiline_parse(string);
 
 	if (m == NULL) return;
@@ -32,7 +32,7 @@ void connection_event(network *net, Client *client, char *string)
 	{
 		Message *message = m->messages[k];
 			if (message == NULL) continue;
-			
+
 		if (message->type == NONE)
 		{
 			network__disconnect(net, client);
@@ -52,7 +52,7 @@ void connection_event(network *net, Client *client, char *string)
 
 		network__send(client, mess__toString(message));
 	}
-	
+
 	mess__free_messages(&m);
 }
 
@@ -67,7 +67,7 @@ void disconnection_event(network *net, Client *client)
 void message_event(network *net, Client *client, char *string)
 {
 		printf("<message from '%s', socket '%d' : '%s'>\n", client->id, (int)client->sock, string);
-		
+
 		//Necessaire pour les tests via telnet
 		int i = strlen(string);
 		while (i>=0 && string[i] != '*')
@@ -84,11 +84,10 @@ void message_event(network *net, Client *client, char *string)
 		{
 				Message *message = m->messages[k];
 					if (message == NULL) continue;
-					
-				if (message->type == NONE)
+
+				if (message->type == NONE || message->type == VECTOR || message->type == PACKET || message->type == PING || message->type == PONG)
 				{
-					printf("Message de type NONE\n");
-					mess__free_messages(&m);
+					fprintf(stderr, "Message invalide pour le contrôleur\n");
 					continue ;
 				}
 				strcopy2(&message->node1, client__get_id(client));
@@ -104,6 +103,6 @@ void message_event(network *net, Client *client, char *string)
 					return;
 				}
 		}
-		
+
 		mess__free_messages(&m);
 }

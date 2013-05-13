@@ -28,8 +28,6 @@ void Event::connect(network *net, Client *c, char *buffer)
 {
 	std::cout << "<connection on socket '" << c->sock << "' : '" << buffer << "'>" << std::endl;
 
-	strcpy(c->id, buffer + 10);
-
 	Messages *m = mess__multiline_parse(buffer);
 
 	if (!m) return;
