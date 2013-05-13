@@ -59,7 +59,10 @@ enum MessageType
 	QUIT
 };
 
-
+/**
+ * \struct Message
+ * \brief Message object
+ */
 typedef struct Message
 {
 	enum MessageType type;
@@ -69,6 +72,12 @@ typedef struct Message
 	enum Acceptance accept;
 } Message;
 
+/**
+ * \struct Messages
+ * \brief Messages object
+ *
+ * An array of Message.
+ */
 typedef struct Messages
 {
     unsigned int nb_messages;
