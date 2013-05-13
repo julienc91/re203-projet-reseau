@@ -1,3 +1,9 @@
+/**
+ * \file messages.c
+ * \brief Data structure for messages between controller/router/user
+ * 
+ */
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -44,7 +50,6 @@ static char* regex_strtable[] =
 	"vector \\[\\]"
 };
 
-
 char *str_sub (const char *s, unsigned int start, unsigned int end);
 
 void mess__base__init(void)
@@ -58,6 +63,10 @@ void mess__base__init(void)
 	isEverythingInitialized = 1;
 }
 
+/**
+ *  \brief Creates a new empty message
+ *  \param mess Variable to initialize.
+ */
 void mess__init(struct Message** mess)
 {
 	if(!isEverythingInitialized) mess__base__init();
@@ -71,6 +80,11 @@ void mess__init(struct Message** mess)
      (*mess)->accept = NOT;
 }
 
+/**
+ *  \brief Get a message's weight
+ *  \param mess Message
+ *  \return WEIGHT_ERROR if an error occured, the message's weight otherwise.
+ */
 int mess__getWeight(struct Message* mess)
 {
 	if(!isEverythingInitialized) mess__base__init();
@@ -79,6 +93,11 @@ int mess__getWeight(struct Message* mess)
      return mess->n_parameter;
 }
 
+/**
+ *  \brief Get a message's TTL
+ *  \param mess Message
+ *  \return TTL_ERROR if an error occured, the message's TTL otherwise.
+ */
 int mess__getAndDecTTL(struct Message* mess)
 {
 	if(!isEverythingInitialized) mess__base__init();
@@ -87,7 +106,12 @@ int mess__getAndDecTTL(struct Message* mess)
      return (mess->n_parameter)--;
 }
 
-
+/**
+ *  \brief Get a message's acceptance
+ *  \param mess Message
+ *  \return ACCEPTANCE_ERROR if an error occured, the message's acceptance
+ *   otherwise.
+ */
 int mess__getAcceptance(struct Message* mess)
 {
 	if(!isEverythingInitialized) mess__base__init();
@@ -95,9 +119,13 @@ int mess__getAcceptance(struct Message* mess)
 	  return ACCEPTANCE_ERROR;
      return mess->accept;
 }
-/*
+
+/**
+ * \brief Escape a string from special chars
+ * \param mess_src The string to escape.
+ * \return A new string containing the original string once escaped.
  *
- * A utiliser lors de l'envoi, première chose à faire dans autre sens : appeller unescape.
+ * Should be used before sending any message.
  */
 char* mess__escape(char* mess_src)
 {
@@ -134,7 +162,13 @@ char* mess__escape(char* mess_src)
      return mess_escp;
 }
 
-/** à utiliser lors de la réception*/
+/**
+ * \brief Remove escape chars from a string
+ * \param mess_src The string to unescape.
+ * \return A new string containing the original string once unescaped.
+ *
+ * Should be used with messages received by the host.
+ */
 char* mess__unescape(char* mess_src)
 {
 	if(!isEverythingInitialized) mess__base__init();
@@ -158,6 +192,11 @@ char* mess__unescape(char* mess_src)
      return mess_unescp;
 }
 
+/**
+ * \brief Parse a multiline string
+ * \param mess_src The string to parse.
+ * \return A Message created from the parameter.
+ */
 Messages *mess__multiline_parse(char *mess_src)
 {
 	if(!isEverythingInitialized) mess__base__init();
@@ -210,7 +249,11 @@ Messages *mess__multiline_parse(char *mess_src)
      return m;
 }
 
-// fait l'allocation de mess_dest
+/**
+ * \brief Parse a string
+ * \param mess_src The string to parse.
+ * \return A Message created from the parameter.
+ */
 struct Message* mess__parse(char* mess_src)
 {
 	if(!isEverythingInitialized) mess__base__init();
@@ -482,6 +525,11 @@ struct Message* mess__parse(char* mess_src)
      return mess_dest;
 }
 
+/**
+ * \brief Convert a message into a string
+ * \param mess The message to convert.
+ * \return A string corresponding to the message's type.
+ */
 char* mess__toString(struct Message* mess)
 {
 	if(!isEverythingInitialized) mess__base__init();
@@ -569,7 +617,10 @@ char* mess__toString(struct Message* mess)
      return out;
 }
 
-
+/**
+ * \brief Free a Message from the memory
+ * \param mess The message to free.
+ */
 void mess__free(struct Message** mess)
 {
 	if(!isEverythingInitialized) mess__base__init();
@@ -592,6 +643,10 @@ void mess__free(struct Message** mess)
      *mess = NULL;
 }
 
+/**
+ * \brief Free a Messages from the memory
+ * \param m The messages to free.
+ */
 void mess__free_messages(Messages **m)
 {
 	if(!isEverythingInitialized) mess__base__init();
@@ -607,7 +662,12 @@ void mess__free_messages(Messages **m)
      *m = NULL;
 }
 
-
+/**
+ * \brief Debug function
+ * \param m The messages to work with.
+ *
+ * Should not be used by the user.
+ */
 void mess__debug(struct Message* m)
 {
 	if(!isEverythingInitialized) mess__base__init();
@@ -636,6 +696,12 @@ void mess__debug(struct Message* m)
      }
 }
 
+/**
+ * \brief Treat an input message
+ * \param src The message received.
+ * \return A new string containing the unescaped message and without 
+ *  the final '*'.
+ */
 char* mess__treatInput(char * src)
 {
 	if(!isEverythingInitialized) mess__base__init();
@@ -651,6 +717,12 @@ char* mess__treatInput(char * src)
      return src;
 }
 
+/**
+ * \brief Treat an output message
+ * \param src The message to send.
+ * \return A new string containing the escaped message and with 
+ *  the final '*'.
+ */
 char* mess__treatOutput(char * src)
 {
 	if(!isEverythingInitialized) mess__base__init();
@@ -666,7 +738,7 @@ char* mess__treatOutput(char * src)
      final[strlen(src)] = '*';
      final[strlen(src) + 1] = '\0';
 
-     free(src); //eh oui, à un endroit au moins, la mémoire est gérée
+     free(src);
      return final;
 }
 
@@ -675,13 +747,20 @@ char* mess__treatOutput(char * src)
 /* Utilitaires */
 //*///*/*/*////*/
 
+/**
+ * \brief Extract a substring from a string
+ * \param s The string to work with.
+ * \param start The index of the first char in the substring.
+ * \param end The index of the last char in the substring.
+ * \return A new string containing the wanted substring.
+ */
 char *str_sub (const char *s, unsigned int start, unsigned int end)
 {
      if(!s)
 	  return NULL;
      char *new_s = NULL;
 
-     if (s != NULL && start < end)
+     if (s != NULL && start < end && end <= strlen(s))
      {
 	  new_s = malloc (sizeof (*new_s) * (end - start + 2));
 	  if (new_s != NULL)

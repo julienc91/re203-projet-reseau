@@ -4,10 +4,14 @@
 #include "sock.h"
 
 /* * * * client * * * */
+/**
+ * \struct Client
+ * \brief Client object
+ */
 typedef struct
 {
-  SOCKET sock;
-  char id[BUF_SIZE];
+  SOCKET sock; // socket infos
+  char id[BUF_SIZE]; // client's id
 }Client;
 
 int      client__compare     (Client *a, Client *b);
