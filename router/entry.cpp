@@ -10,19 +10,23 @@ using namespace std;
 Entry::Entry(string name, string nextHop, int dist)
   : _name(name),
     _nextHop(nextHop),
-    _dist(dist)
+    _dist(dist),
+    _neighbor(false)
 {
 }
 
 Entry::Entry()
+  : _neighbor(false)
 {
 }
 
 
-Entry::Entry(const Entry *data){
+Entry::Entry(const Entry *data)
+{
     _name       = data->_name;
     _nextHop    = data->_nextHop;
     _dist       = data->_dist;
+    _neighbor   = data->_neighbor;
 }
 
 string &Entry::name(){

@@ -105,7 +105,6 @@ void Exec::prompt_message(Message* m)
 		case ROUTETABLE:
 			//affichage
 			disp->routetable(router->getRouteTable());
-			std::cout << "TODO" << std::endl; // TODO
 			break;
 
 		case QUIT:
@@ -150,12 +149,20 @@ void Exec::sock_message(Message* m, Client* t)
 			if(m->accept == OK) // on recoit la réponse de celui avec lequel on a voulu créer un lien
 			{
 				// p-ê faire opérations sur hashtable ? marquer l'autre comme actif ?
+
 			}
 			else // on demande de créer un lien
 			{
 				// de même avec l'autre (on doit avoir le client d'ou ça vient ! sinon message pas très utile...)
+				std::string s(m->node1);
+				if(router->getRouteTable().find(s) == router->getRouteTable().end())
+				{
+					router->getRouteTable()[s] = Entry(s, s, INT_MIN);
+					strcpy(t->id, m->node1);
+					router->getRouteTable()[s].isNeighbor() = true;
+					router->getRouteTable()[s].setClient(t);
+				}
 				router->sockActions()->linkAck(t);
-
 			}
 			break;
 
