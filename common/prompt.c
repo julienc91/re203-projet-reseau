@@ -6,9 +6,9 @@
 #include <string.h>
 
 #ifdef __cplusplus
-pthread_t* prompt__start(void (*mess_handler) (void*, struct Message*))
+pthread_t* prompt__start(int (*mess_handler) (void*, struct Message*))
 #else
-pthread_t* prompt__start(void (*mess_handler) (struct Message*))
+pthread_t* prompt__start(int (*mess_handler) (struct Message*))
 #endif
 {
 	pthread_t* prompt_thread = malloc(sizeof(pthread_t));

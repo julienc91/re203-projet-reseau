@@ -1,6 +1,10 @@
 #ifndef __MESSAGES_H_
 #define __MESSAGES_H_
 
+#define WEIGHT_ERROR -1
+#define TTL_ERROR -1
+#define ACCEPTANCE_ERROR -1
+
 
 enum Acceptance
 {

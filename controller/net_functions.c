@@ -93,6 +93,8 @@ void message_event(network *net, Client *client, char *string)
 				}
 				strcopy2(&message->node1, client__get_id(client));
 				message = exec__sock_message(message);
+				if(!message)
+				     return;
 
 				network__send(client, mess__toString(message));
 				if(message->type == BYE)

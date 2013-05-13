@@ -20,7 +20,6 @@ int main(void)
 		network__update(net);
 	}
 
-	//~ pthread_join(*prompt_th1, NULL);
 	//~ printf("Prompt quitté\n");
 
 	// * * * * fermeture serveur * * * *

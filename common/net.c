@@ -166,6 +166,8 @@ void network__disconnect (network *net, Client *c){
 int network__send(Client *c, const char *message)
 {
   char* mess2 = mess__treatOutput(strcopy(message));
+  if(!mess2)
+       return NETWORK__SEND_ERROR;
   return write_client (c->sock, mess2);
 }
 
