@@ -374,11 +374,46 @@ Par exemple, voici l'utilisation de l'exception pour l'absence d'un routeur dans
 \\
 \verb[ throw unknownDest; // envoi [\\
 \verb[ catch(UnknownDest&) // récupération [\\
-
+% ]
 La gestion des exceptions de cette manière ajoute à la clarté du code.
 
 \subsection{Diagramme de classes} %TODO
+\begin{figure}[H]
+\begin{center}
+\begin{tikzpicture}
+\umlclass[x=0, y=0]{Router}{
+}{}
+\umlclass[x=-2, y=2]{Prompt}{
+}{}
+\umlclass[x=0, y=-2]{Event}{
+}{}
+\umlclass[x=3, y=2]{Exec}{
+}{}
+\umlclass[x=6, y=2]{Display}{
+}{}
+\umlclass[x=4, y=0]{PromptActions}{
+}{}
+\umlclass[x=3, y=-2]{SockActions}{
+}{}
+\umlclass[x=-3, y=-2]{RouteTable}{
+}{}
+\umlclass[x=-3, y=-5]{Entry}{
+}{}
 
+\umlunicompo[]{Router}{Prompt}
+\umlunicompo[]{Router}{Event}
+\umlunicompo[]{Router}{Exec}
+\umlunicompo[]{Router}{PromptActions}
+\umlunicompo[]{Router}{SockActions}
+\umlunicompo[]{Router}{RouteTable}
+
+\umlunicompo[]{Exec}{Display}
+\umlunicompo[mult=1..*]{RouteTable}{Entry}
+\end{tikzpicture}
+\caption{Diagramme de classes du routeur}
+\label{diag_api_chords}
+\end{center}
+\end{figure}
 \section*{Conclusion} %TODO
 
 %tests, valgrind, réponse au sujet, code propre
