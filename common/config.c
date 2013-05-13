@@ -1,3 +1,11 @@
+/**
+ * \file config.c
+ * \brief Configuration file manager
+ * 
+ * Reads configuration files using a Configuration variable.
+ * 
+ */
+
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
@@ -5,6 +13,14 @@
 #include "../trex/trex.h"
 
 #include "config.h"
+
+/**
+ * \brief Read the controller's configuration file
+ * \return A pointer to a Configuration variable, initialized with the contents
+ * of the configuration file.
+ * \warning The controller's configuration file must exist before calling
+ * this function, and be named "controller.cfg".
+ */
 Configuration* config__readController(void)
 {
 	FILE * pFile;
@@ -39,6 +55,14 @@ Configuration* config__readController(void)
 
 }
 
+/**
+ * \brief Read the router's configuration file
+ * \param file Path to the router's configuration file.
+ * \return A pointer to a Configuration variable, initialized with the contents
+ * of the configuration file.
+ * \warning If path is NULL, the function will use the file "router.cfg", which
+ * must exist.
+ */
 Configuration* config__readRouter(char* file)
 {
 	FILE * pFile;
@@ -80,6 +104,11 @@ Configuration* config__readRouter(char* file)
 
 }
 
+/**
+ * \brief Read a line in a configuration file
+ * \param conf The Configuration structure whose data have to be initialized.
+ * \param mess_src The line to read, extracted trom the configuration file.
+ */
 void config__readLine(Configuration* conf, char* mess_src)
 {
 	static char* regex_strtable[] =

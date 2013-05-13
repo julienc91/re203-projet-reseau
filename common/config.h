@@ -2,6 +2,10 @@
 #define __CONFIG_H
 enum SoftwareType { ROUTER, CONTROLLER };
 
+/**
+ * \struct Configuration
+ * \brief Configuration object
+ */
 typedef struct Configuration
 {
 	enum SoftwareType type;
@@ -21,6 +25,7 @@ typedef struct Configuration
 Configuration* config__readController(void);
 Configuration* config__readRouter(char* file);
 
+//Private function
 void config__readLine(Configuration*, char* line);
 
 #endif
