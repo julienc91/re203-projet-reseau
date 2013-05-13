@@ -145,8 +145,11 @@ void Router::routerLoop()
 
 		for(RouteTable::iterator i = routeTable.begin(); i != routeTable.end(); i++)
 		{
-			char * vect_str = routeTable.vector((*i).first);
-			sockActions()->vector((char*) (*i).first.c_str(), vect_str);
+			if((*i).second.isNeighbor())
+			{
+				char * vect_str = routeTable.vector((*i).first);
+				sockActions()->vector((char*) (*i).first.c_str(), vect_str);
+			}
 		}
 		std::this_thread::sleep_for(vect_time);
 	}
@@ -225,9 +228,9 @@ void Router::parseVector(char* str_orig, char* node_orig)
 		{
 			int dist = atoi(strtok(NULL, ","));
 
-			if(routeTable.find(s) != routeTable.end())
+			if(routeTable.find(s) != routeTable.end()) // si on le trouve
 			{
-				if(dist < routeTable[s].dist())
+				if(dist < routeTable[s].dist() || routeTable[s].dist() < 0)
 				{
 					routeTable[s].dist() = dist;
 					routeTable[s].nextHop() = sourceNode;

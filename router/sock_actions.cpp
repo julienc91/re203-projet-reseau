@@ -120,4 +120,5 @@ void SockActions::vector(char* id, char * vect)
 	m->s_parameter = strcopy(vect);
 
 	network__send(router->getRouteTable()[std::string(id)].client(), mess__toString(m));
+	mess__free(&m);
 }
