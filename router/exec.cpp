@@ -158,6 +158,7 @@ void Exec::sock_message(Message* m, Client* t)
 				if(router->getRouteTable().find(s) == router->getRouteTable().end())
 				{
 					router->getRouteTable()[s] = Entry(s, s, INT_MIN);
+					std::cout << "nom du client dans link " << m->node1 << "\n";
 					strcpy(t->id, m->node1);
 					router->getRouteTable()[s].isNeighbor() = true;
 					router->getRouteTable()[s].setClient(t);
