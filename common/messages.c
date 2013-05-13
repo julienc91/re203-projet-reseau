@@ -12,8 +12,56 @@
 #include "messages.h"
 #include "util.h"
 
+int isEverythingInitialized = 0;
+TRex** trex_regexes;
+static char* regex_strtable[] =
+{
+	"load .*",
+	"save .*",
+	"show topology",
+	"add link \\w* \\w* \\d*",
+	"update link \\w* \\w* \\d*",
+	"del link \\w* \\w*",
+	"disconnect \\w*",
+	"message \\w* \".*\"",
+	"route \\w*",
+	"routetable",
+	"log in as \\w* port \\d*",
+	"log in port \\d*",
+	"log out",
+	"greeting \\w*",
+	"bye",
+	"poll",
+	"neighborhood newlist \\[.*\\]", //pourrait être amélioré pour vérifier directement si c'est bon
+	"neighborhood ok",
+	"link id \\w*",
+	"link ok",
+	"vector \\[.*\\]",
+	"vector ok",
+	"packet seqnum \\d* src \\w* dst \\w* ttl \\d* data .*",
+	"packet seqnum \\d* src \\w* dst \\w* ok",
+	"packet seqnum \\d* src \\w* dst \\w* toofar",
+	"ping seqnum \\d* src \\w* dst \\w* ttl \\d*",
+	"pong seqnum \\d* src \\w* dst \\w* ttl \\d*",
+	"pong seqnum \\d* src \\w* dst \\w* ttlzero",
+	"ping \\w*",
+	"quit",
+	"neighborhood newlist \\[\\]",
+	"vector \\[\\]"
+};
 
 char *str_sub (const char *s, unsigned int start, unsigned int end);
+
+void mess__base__init(void)
+{
+	int i;
+	trex_regexes = malloc(sizeof(TRex*) * 32);
+	for(i = 0; i < 32; i++) // trouver le moyen de staticifier ça
+	{
+		trex_regexes[i] = trex_compile(regex_strtable[i], NULL);
+	}
+	isEverythingInitialized = 1;
+}
 
 /**
  *  \brief Creates a new empty message
@@ -21,6 +69,7 @@ char *str_sub (const char *s, unsigned int start, unsigned int end);
  */
 void mess__init(struct Message** mess)
 {
+	if(!isEverythingInitialized) mess__base__init();
      *mess = malloc(sizeof(struct Message));
      (*mess)->type = NONE;
      (*mess)->s_parameter = NULL;
@@ -38,6 +87,7 @@ void mess__init(struct Message** mess)
  */
 int mess__getWeight(struct Message* mess)
 {
+	if(!isEverythingInitialized) mess__base__init();
      if(!mess)
 	  return WEIGHT_ERROR;
      return mess->n_parameter;
@@ -50,6 +100,7 @@ int mess__getWeight(struct Message* mess)
  */
 int mess__getAndDecTTL(struct Message* mess)
 {
+	if(!isEverythingInitialized) mess__base__init();
      if(!mess)
 	  return TTL_ERROR;
      return (mess->n_parameter)--;
@@ -63,6 +114,7 @@ int mess__getAndDecTTL(struct Message* mess)
  */
 int mess__getAcceptance(struct Message* mess)
 {
+	if(!isEverythingInitialized) mess__base__init();
      if(!mess)
 	  return ACCEPTANCE_ERROR;
      return mess->accept;
@@ -77,6 +129,7 @@ int mess__getAcceptance(struct Message* mess)
  */
 char* mess__escape(char* mess_src)
 {
+	if(!isEverythingInitialized) mess__base__init();
      if(!mess_src)
 	  return NULL;
      int count = 0, i;
@@ -118,6 +171,7 @@ char* mess__escape(char* mess_src)
  */
 char* mess__unescape(char* mess_src)
 {
+	if(!isEverythingInitialized) mess__base__init();
      if(!mess_src)
 	  return NULL;
      int count = 0, n = strlen(mess_src);
@@ -145,6 +199,7 @@ char* mess__unescape(char* mess_src)
  */
 Messages *mess__multiline_parse(char *mess_src)
 {
+	if(!isEverythingInitialized) mess__base__init();
      if(!mess_src)
 	  return NULL;
      Messages *m = malloc(sizeof(*m));
@@ -201,62 +256,23 @@ Messages *mess__multiline_parse(char *mess_src)
  */
 struct Message* mess__parse(char* mess_src)
 {
+	if(!isEverythingInitialized) mess__base__init();
      if(!mess_src)
 	  return NULL;
      struct Message* mess_dest;
      mess__init(&mess_dest);
 
-     static char* regex_strtable[] =
-	  {
-	       "load .*",
-	       "save .*",
-	       "show topology",
-	       "add link \\w* \\w* \\d*",
-	       "update link \\w* \\w* \\d*",
-	       "del link \\w* \\w*",
-	       "disconnect \\w*",
-	       "message \\w* \".*\"",
-	       "route \\w*",
-	       "routetable",
-	       "log in as \\w* port \\d*",
-	       "log in port \\d*",
-	       "log out",
-	       "greeting \\w*",
-	       "bye",
-	       "poll",
-	       "neighborhood newlist \\[.*\\]", //pourrait être amélioré pour vérifier directement si c'est bon
-	       "neighborhood ok",
-	       "link id \\w*",
-	       "link ok",
-	       "vector \\[.*\\]",
-	       "vector ok",
-	       "packet seqnum \\d* src \\w* dst \\w* ttl \\d* data .*",
-	       "packet seqnum \\d* src \\w* dst \\w* ok",
-	       "packet seqnum \\d* src \\w* dst \\w* toofar",
-	       "ping seqnum \\d* src \\w* dst \\w* ttl \\d*",
-	       "pong seqnum \\d* src \\w* dst \\w* ttl \\d*",
-	       "pong seqnum \\d* src \\w* dst \\w* ttlzero",
-	       "ping \\w*",
-	       "quit",
-	       "neighborhood newlist \\[\\]",
-	       "vector \\[\\]"
-	  };
-
-     TRex* trex_current_regex;
      int i;
      int match = 0;
      char * ptr, *tmp2;
 
      for(i = 0; i < 32; i++) // trouver le moyen de staticifier ça
      {
-	  trex_current_regex = trex_compile(regex_strtable[i], NULL);
-	  if(trex_match(trex_current_regex, mess_src))
+	  if(trex_match(trex_regexes[i], mess_src))
 	  {
 	       match = 1;
-	       trex_free(trex_current_regex);
 	       break;
 	  }
-	  trex_free(trex_current_regex);
      }
      if(match == 0) i = -1;
 
@@ -516,6 +532,7 @@ struct Message* mess__parse(char* mess_src)
  */
 char* mess__toString(struct Message* mess)
 {
+	if(!isEverythingInitialized) mess__base__init();
      if(!mess)
 	  return NULL;
      char * out = malloc(sizeof(char) * (50 + ((mess->s_parameter != NULL)? strlen(mess->s_parameter) : 0)));
@@ -606,6 +623,7 @@ char* mess__toString(struct Message* mess)
  */
 void mess__free(struct Message** mess)
 {
+	if(!isEverythingInitialized) mess__base__init();
      if (*mess == NULL) return;
 
      if((*mess)->s_parameter != NULL)
@@ -631,6 +649,7 @@ void mess__free(struct Message** mess)
  */
 void mess__free_messages(Messages **m)
 {
+	if(!isEverythingInitialized) mess__base__init();
      if (*m == NULL) return;
 
      unsigned int i;
@@ -651,6 +670,7 @@ void mess__free_messages(Messages **m)
  */
 void mess__debug(struct Message* m)
 {
+	if(!isEverythingInitialized) mess__base__init();
      if(m != NULL)
      {
 	  printf("Message: %d %d %d\n", m->type, m->n_parameter, m->accept);
@@ -684,6 +704,7 @@ void mess__debug(struct Message* m)
  */
 char* mess__treatInput(char * src)
 {
+	if(!isEverythingInitialized) mess__base__init();
      if(!src)
 	  return NULL;
      // On enlève les \\ et \*
@@ -704,6 +725,7 @@ char* mess__treatInput(char * src)
  */
 char* mess__treatOutput(char * src)
 {
+	if(!isEverythingInitialized) mess__base__init();
      if(!src)
 	  return NULL;
      // On rajoute les \\ et \*

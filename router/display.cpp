@@ -77,7 +77,7 @@ void Display::route_result(int qt, double rtt)
 	std::cout << "\t\tRTT = " << rtt << "ms" << std::endl;
 }
 
-void Display::routetable(RouteTable rt)
+void Display::routetable(RouteTable& rt)
 {
 	std::cout << "\tName\t|\tNext\t|\tDist" << std::endl;
 	RouteTable::iterator i;
