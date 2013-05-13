@@ -142,10 +142,12 @@ void Router::routerLoop()
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 	while(runRouterLoop)
 	{
-		char * vect_str = routeTable.vector();
-		for(RouteTable::iterator i = routeTable.begin(); i != routeTable.end(); i++)
-			sockActions()->vector((char*) (*i).first.c_str(), vect_str);
 
+		for(RouteTable::iterator i = routeTable.begin(); i != routeTable.end(); i++)
+		{
+			char * vect_str = routeTable.vector((*i).first);
+			sockActions()->vector((char*) (*i).first.c_str(), vect_str);
+		}
 		std::this_thread::sleep_for(vect_time);
 	}
 }
@@ -277,6 +279,7 @@ void Router::parseNeighborhood(char* str_orig)
 
 					char * ip = strtok(strtok(NULL, ","), ":");
 					Client *c = network__connect(net, ip, atoi(strtok(NULL, ":")));
+					strcpy(c->id, s.c_str());
 					routeTable[s].setClient(c);
 					routeTable[s].isNeighbor() = true;
 

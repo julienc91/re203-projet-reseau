@@ -26,6 +26,8 @@ class SockActions
 		// messages à envoyer à d'autres routeurs
 		// (envoie à tous)
 		void link(Client *t);
+		void linkAck(Client* t);
+
 		void vector(char* id, char * vect);
 
 

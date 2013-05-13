@@ -100,6 +100,18 @@ void SockActions::link(Client *t)
 	network__send(t, mess__toString(m));
 	mess__free(&m);
 }
+
+void SockActions::linkAck(Client* t)
+{
+	Message* m;
+	mess__init(&m);
+	m->type = LINK;
+	m->accept = OK;
+
+	network__send(t, mess__toString(m));
+	mess__free(&m);
+}
+
 void SockActions::vector(char* id, char * vect)
 {
 	Message* m;
@@ -107,12 +119,5 @@ void SockActions::vector(char* id, char * vect)
 	m->type = VECTOR;
 	m->s_parameter = strcopy(vect);
 
-	RouteTable::iterator t;
-	for(t = router->getRouteTable().begin();
-		t != router->getRouteTable().end();
-		++t)
-	{
-		if(strcmp((*t).first.c_str(), id) != 0) // il ne faut pas qu'on envoie à n2 sa distance vers lui-même p.ex.
-			network__send((*t).second.client(), mess__toString(m));
-	}
+	network__send(router->getRouteTable()[std::string(id)].client(), mess__toString(m));
 }
