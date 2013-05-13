@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <chrono>
+#include "display.hpp"
 
 Router* glob__router = 0;
 
@@ -142,6 +143,7 @@ void Router::routerLoop()
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 	while(runRouterLoop)
 	{
+		exec->disp->routetable(routeTable);
 
 		for(RouteTable::iterator i = routeTable.begin(); i != routeTable.end(); i++)
 		{

@@ -21,6 +21,7 @@ class Display;
 
 class Exec
 {
+	friend class Router;
 	public:
 		Exec(Router*);
 		~Exec();

@@ -21,7 +21,7 @@ class Display
 		void route_hop(int num, char * node);
 		void route_result(int qt, double rtt);
 
-		void routetable(RouteTable rt);
+		void routetable(RouteTable& rt);
 };
 
 #endif
