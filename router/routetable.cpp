@@ -28,19 +28,25 @@ Client* RouteTable::nextClient(std::string str)
 	return c;
 }
 
-char* RouteTable::vector()
+char* RouteTable::vector(std::string client)
 {
 	std::ostringstream s;
+	int added = 0;
 
 	s << "[";
 	for(RouteTable::iterator i = begin(); i != end(); i++)
 	{
-		if (i != begin())
-			s << ";";
+		if (client.compare((*i).first) != 0)
+		{
+			if (added)
+				s << ";";
 
-		s << (*i).first << "," << (*i).second.dist();
+			s << (*i).first << "," << (*i).second.dist();
+			++added;
+		}
 	}
 
 	s << "]";
+
 	return (char*) s.str().c_str();
 }

@@ -17,7 +17,7 @@ class RouteTable: public std::map<std::string, Entry>
 		RouteTable();
 		Client* nextClient(std::string s);
 
-		char* vector();
+		char* vector(std::string);
 };
 
 #endif /* ROUTETABLE_H */

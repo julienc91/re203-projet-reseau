@@ -33,12 +33,12 @@ void Event::connect(network *net, Client *c, char *buffer)
 	Messages *m = mess__multiline_parse(buffer);
 
 	if (!m) return;
-	
+
 	for (unsigned int i = 0; i < m->nb_messages; i++)
 	{
 		if (m->messages[i] != NULL)
-			glob__router->exec->sock_message(m->messages[i]);
-	}	
+			glob__router->exec->sock_message(m->messages[i], c);
+	}
 	mess__free_messages(&m);
 }
 
@@ -54,16 +54,12 @@ void Event::message(network *net, Client *c, char *buffer)
 	Messages *m = mess__multiline_parse(buffer);
 
 	if (!m) return;
-	
+
 	for (unsigned int i = 0; i < m->nb_messages; i++)
 	{
 		if (m->messages[i] != NULL)
 		{
-			if(m->messages[i]->type == VECTOR)
-			{
-				m->messages[i]->node1 = strcopy(c->id);
-			}
-			glob__router->exec->sock_message(m->messages[i]);
+			glob__router->exec->sock_message(m->messages[i], c);
 		}
 	}
 	mess__free_messages(&m);

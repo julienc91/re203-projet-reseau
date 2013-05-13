@@ -119,7 +119,7 @@ void Exec::prompt_message(Message* m)
 }
 
 
-void Exec::sock_message(Message* m)
+void Exec::sock_message(Message* m, Client* t)
 {
 	if(m == NULL || m->type == NONE)
 	{
@@ -154,6 +154,8 @@ void Exec::sock_message(Message* m)
 			else // on demande de créer un lien
 			{
 				// de même avec l'autre (on doit avoir le client d'ou ça vient ! sinon message pas très utile...)
+				router->sockActions()->linkAck(t);
+
 			}
 			break;
 
@@ -164,7 +166,7 @@ void Exec::sock_message(Message* m)
 			}
 			else
 			{
-				router->parseVector(m->s_parameter, m->node1);
+				router->parseVector(m->s_parameter, t->id);
 			}
 			break;
 

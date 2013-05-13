@@ -181,7 +181,8 @@ struct Message* mess__parse(char* mess_src)
 		"pong seqnum \\d* src \\w* dst \\w* ttlzero",
 		"ping \\w*",
 		"quit",
-		"neighborhood newlist \\[\\]"
+		"neighborhood newlist \\[\\]",
+		"vector \\[\\]"
 	};
 
 	TRex* trex_current_regex;
@@ -189,7 +190,7 @@ struct Message* mess__parse(char* mess_src)
 	int match = 0;
 	char * ptr, *tmp2;
 
-	for(i = 0; i < 31; i++) // trouver le moyen de staticifier ça
+	for(i = 0; i < 32; i++) // trouver le moyen de staticifier ça
 	{
 		trex_current_regex = trex_compile(regex_strtable[i], NULL);
 		if(trex_match(trex_current_regex, mess_src))
@@ -430,6 +431,14 @@ struct Message* mess__parse(char* mess_src)
 			mess_dest->type = NEIGHBORHOOD;
 			mess_dest->s_parameter = malloc(sizeof(char));
 			mess_dest->s_parameter[0] = 0;
+			break;
+
+		case 31:
+			mess_dest->type = VECTOR;
+			mess_dest->s_parameter = malloc(sizeof(char) * 3);
+			mess_dest->s_parameter[0] = '[';
+			mess_dest->s_parameter[1] = ']';
+			mess_dest->s_parameter[2] = 0;
 			break;
 
 		default:
