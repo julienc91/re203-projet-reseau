@@ -4,6 +4,7 @@
 #include "../common/util.h"
 #include "exec.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 void input_event(network *net, char *string)
@@ -62,6 +63,8 @@ void disconnection_event(network *net, Client *client)
 	struct Message *message = mess__parse(mess__treatInput("log out*"));
 	strcopy2(&message->node1, client__get_id(client));
 	exec__sock_message(message);
+	
+	mess__free(&message);
 }
 
 void message_event(network *net, Client *client, char *string)
@@ -105,4 +108,5 @@ void message_event(network *net, Client *client, char *string)
 		}
 
 		mess__free_messages(&m);
+		//~ free(string);
 }
