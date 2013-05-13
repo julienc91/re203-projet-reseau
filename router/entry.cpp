@@ -11,12 +11,14 @@ Entry::Entry(string name, string nextHop, int dist)
   : _name(name),
     _nextHop(nextHop),
     _dist(dist),
-    _neighbor(false)
+    _neighbor(false),
+    _dataComplete(false)
 {
 }
 
 Entry::Entry()
-  : _neighbor(false)
+  : _neighbor(false),
+  _dataComplete(false)
 {
 }
 
@@ -67,4 +69,13 @@ Client *Entry::client(){
 void Entry::setClient(Client* c)
 {
 	_client = c;
+}
+
+bool & Entry::isComplete()
+{
+	return _dataComplete;
+}
+bool  Entry::isComplete() const
+{
+	return _dataComplete;
 }

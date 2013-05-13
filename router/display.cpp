@@ -79,11 +79,11 @@ void Display::route_result(int qt, double rtt)
 
 void Display::routetable(RouteTable& rt)
 {
-	std::cout << "\tName\t|\tNext\t|\tDist" << std::endl;
+	std::cout << "\tName\t|\tNext\t|\tDist\t|\tPort" << std::endl;
 	RouteTable::iterator i;
 	for(i = rt.begin(); i != rt.end(); i++)
 	{
-		std::cout << "\t" << (*i).second.name() << "\t|\t" << (*i).second.nextHop() << "\t|\t" << (*i).second.dist() << std::endl;
+		std::cout << "\t" << (*i).second.name() << "\t|\t" << (*i).second.nextHop() << "\t|\t" << (*i).second.dist() << "\t|\t" << client__get_port((*i).second.client()) << std::endl;
 	}
 	std::cout << std::endl;
 }

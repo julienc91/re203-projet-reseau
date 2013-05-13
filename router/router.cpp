@@ -65,7 +65,7 @@ Router::Router(char* name, char* conf)
 
 	mainLoopThread = new std::thread(&Router::mainLoop, this);
 	controllerLoopThread = new std::thread(&Router::controllerLoop, this);
-	routerLoopThread = new std::thread(&Router::routerLoop, this);
+	//routerLoopThread = new std::thread(&Router::routerLoop, this);
 }
 
 Router::Router(const Router * data)
@@ -83,7 +83,7 @@ Router::~Router()
 	runControllerLoop = false;
 	runRouterLoop = false;
 	runMainLoop = false;
-	mainLoopThread->join(); // trop long avec le timeout
+	//mainLoopThread->join(); // trop long avec le timeout
 	std::cout << "1" << std::endl;
 	//routerLoopThread->join();
 	std::cout << "2" << std::endl;
@@ -245,7 +245,7 @@ void Router::parseVector(char* str_orig, char* node_orig)
 		}
 	}
 }
-
+// [a, b, c]
 void Router::parseNeighborhood(char* str_orig)
 {
 	char *str = strcopy(str_orig + 1); // pour le [
@@ -261,10 +261,13 @@ void Router::parseNeighborhood(char* str_orig)
 
 		while((r = strtok(NULL, ";")) != NULL)
 		{
+			std::cout << "Vecteur de noms : " << r << std::endl;
 			v.push_back(r);
 		}
 
-		// à ce moment, on a dans v : | a,b,c,d  | e,f,g,h |  par ex.
+
+
+		// à ce moment, on a dans v : | a,b,c:d  | e,f,g:h |  par ex.
 		// (si vect = [a,b,c,d;e,f,g,h;...])
 
 		std::vector<char*>::iterator i;
@@ -282,13 +285,27 @@ void Router::parseNeighborhood(char* str_orig)
 					routeTable[s] = Entry(s, s, atoi(strtok(NULL, ",")));
 
 					char * ip = strtok(strtok(NULL, ","), ":");
-					Client *c = network__connect(net, ip, atoi(strtok(NULL, ":")));
-					std::cout << "\nNom qu'on ajoute: " << s << "\n";
+					int port = atoi(strtok(NULL, ":"));
+					Client *c = network__connect(net, ip, port);
+					std::cout << "\nNom qu'on ajoute: " << s << "\n" << ip << ":" << port << "\n" ;
 					strcpy(c->id, s.c_str());
 					routeTable[s].setClient(c);
 					routeTable[s].isNeighbor() = true;
+					routeTable[s].isComplete() = true;
 
 					this->saction->link(c);
+				}
+				else if(!routeTable[s].isComplete())
+				{
+					routeTable[s].dist() = atoi(strtok(NULL, ","));
+					char * ip = strtok(strtok(NULL, ","), ":");
+					int port = atoi(strtok(NULL, ":"));
+					Client *c = network__connect(net, ip, port);
+					std::cout << "\nNom qu'on ajoute (cas 2): " << s << "\n" << ip << ":" << port << "\n" ;
+					strcpy(c->id, s.c_str());
+					routeTable[s].setClient(c);
+					routeTable[s].isNeighbor() = true;
+					routeTable[s].isComplete() = true;
 				}
 				else
 				{

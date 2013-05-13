@@ -25,12 +25,16 @@ public:
   bool &isNeighbor();
   bool isNeighbor() const;
 
+  bool &isComplete();
+  bool isComplete() const;
+
 private:
   std::string _name;
   std::string _nextHop;
   int _dist;
   bool _neighbor;
   Client *_client;
+  bool _dataComplete;
 
 };
 
