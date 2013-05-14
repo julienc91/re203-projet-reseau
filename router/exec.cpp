@@ -145,7 +145,9 @@ void Exec::prompt_message(Message* m)
 
 		case QUIT:
 			router->sockActions()->logout();
-            std::cerr<<"[ROUTER] Closed."<<std::endl;
+            network__close(router->getNetwork());
+            network__free(router->getNetwork());
+            std::cerr<<"[ROUTER] Closed by user."<<std::endl;
             exit(0);
 			break;
 
