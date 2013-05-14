@@ -493,6 +493,6 @@ void network__debug(network *net){
     fprintf(stderr, "[DEBUG] %d client(s) connected :\n", net->nb_clients);
     int i;
     for (i = 0; i < net->nb_clients; i++){
-        fprintf(stderr, "[DEBUG] (%d) id='%s', socket=''\n", i, net->clients[i].id, (int)net->clients[i].sock);
+        fprintf(stderr, "[DEBUG] (%d) id='%s', socket='%d'\n", i, net->clients[i].id, (int)(net->clients[i].sock));
     }
 }

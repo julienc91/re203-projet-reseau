@@ -12,6 +12,8 @@
 #include "messages.h"
 #include "util.h"
 
+#define MESS__NB_REGEXES 33
+
 int isEverythingInitialized = 0;
 TRex** trex_regexes;
 static char* regex_strtable[] =
@@ -47,7 +49,8 @@ static char* regex_strtable[] =
 	"ping \\w*",
 	"quit",
 	"neighborhood newlist \\[\\]",
-	"vector \\[\\]"
+	"vector \\[\\]",
+	"debug"
 };
 
 char *str_sub (const char *s, unsigned int start, unsigned int end);
@@ -58,8 +61,8 @@ char *str_sub (const char *s, unsigned int start, unsigned int end);
 void mess__base__init(void)
 {
 	int i;
-	trex_regexes = malloc(sizeof(TRex*) * 32);
-	for(i = 0; i < 32; i++) // trouver le moyen de staticifier ça
+	trex_regexes = malloc(sizeof(TRex*) * MESS__NB_REGEXES);
+	for(i = 0; i < MESS__NB_REGEXES; i++) // trouver le moyen de staticifier ça
 	{
 		trex_regexes[i] = trex_compile(regex_strtable[i], NULL);
 	}
@@ -72,7 +75,7 @@ void mess__base__init(void)
 void mess__base__free(void)
 {
     int i;
-    for (i = 0; i < 32; i++)
+    for (i = 0; i < MESS__NB_REGEXES; i++)
         trex_free(trex_regexes[i]);
     free (trex_regexes);
 }
@@ -284,7 +287,7 @@ struct Message* mess__parse(char* mess_src)
      int match = 0;
      char * ptr, *tmp2;
 
-     for(i = 0; i < 32; i++) // trouver le moyen de staticifier ça
+     for(i = 0; i < MESS__NB_REGEXES; i++) // trouver le moyen de staticifier ça
      {
 	  if(trex_match(trex_regexes[i], mess_src))
 	  {
@@ -531,6 +534,10 @@ struct Message* mess__parse(char* mess_src)
 	  mess_dest->s_parameter[1] = ']';
 	  mess_dest->s_parameter[2] = 0;
 	  break;
+
+     case 32:
+       	  mess_dest->type = NETWORK_DEBUG;
+       break;
 
      default:
 	  mess_dest->type = NONE;
