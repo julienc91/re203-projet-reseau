@@ -26,6 +26,8 @@ class Display
 		void route_result(int qt, double rtt);
 
 		void routetable(RouteTable& rt);
+
+		void loginMessage(char*);
 };
 
 #endif

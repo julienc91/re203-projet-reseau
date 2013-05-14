@@ -7,6 +7,8 @@ extern "C"
 	#include "../common/client.h"
 }
 
+#include <mutex>
+
 class Entry{
 public:
   Entry();
@@ -28,6 +30,9 @@ public:
   bool &isComplete();
   bool isComplete() const;
 
+  int &secondsInactive();
+  int secondsInactive() const;
+
 private:
   std::string _name;
   std::string _nextHop;
@@ -36,6 +41,7 @@ private:
   Client *_client;
   bool _dataComplete;
 
+  int _secondsInactive;
 };
 
 #endif

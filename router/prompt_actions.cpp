@@ -15,13 +15,16 @@ PromptActions::PromptActions(Router* r)
 }
 
 
-void PromptActions::message(Message* mess)
+void PromptActions::message(Message* mess, std::map<int, int>& seqnumTable)
 {
 	struct Message* packet;
 	mess__init(&packet);
 
 	packet->type = PACKET;
-	packet->seqnum = router->newSeqnum(); // devra faire l'incrémentation'
+	int seq = router->newSeqnum();
+	seqnumTable[seq] = 0;
+
+	packet->seqnum = seq; // devra faire l'incrémentation'
 	packet->node1 = strcopy(router->getName()); //source
 	packet->node2 = strcopy(mess->node1); // destination
 	packet->n_parameter = router->getConfiguration()->defaultTTLValue;

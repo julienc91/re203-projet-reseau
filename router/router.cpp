@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <chrono>
+#include <mutex>
 #include "display.hpp"
 
 Router* glob__router = 0;
@@ -87,39 +88,31 @@ Router::~Router()
 	// Fermeture stdio
 	prompt.stop();
 
-	std::cout << "Début ~Router" << std::endl;
-	// threads
 	runControllerLoop = false;
 	runRouterLoop = false;
 	runMainLoop = false;
-	//mainLoopThread->join(); // trop long avec le timeout
-	std::cout << "1" << std::endl;
-	//routerLoopThread->join();
-	std::cout << "2" << std::endl;
-	//controllerLoopThread->join();
-	std::cout << "3" << std::endl;
-
-	delete routerLoopThread;
-	delete controllerLoopThread;
-	delete mainLoopThread;
-
-	std::cout << "on est là" << std::endl;
-
-
-
 	// * * * * fermeture serveur * * * *
 
 	network__close(net);
 	network__free(net);
 
+	// threads
+
+	mainLoopThread->detach(); // trop long avec le timeout
+	routerLoopThread->join();
+	controllerLoopThread->join();
+
+	delete routerLoopThread;
+	delete controllerLoopThread;
+	delete mainLoopThread;
+
 	end(); // windows compatibility
 
-	delete config;
+	free(config);
     delete _name;
     delete exec;
     delete saction;
     delete paction;
-	std::cout << "FINISH" << std::endl;
 }
 
 
@@ -141,7 +134,7 @@ void Router::mainLoop()
 	}
 }
 
-/** \brief 
+/** \brief
  */
 void Router::controllerLoop()
 {
@@ -279,7 +272,7 @@ void Router::parseVector(char* str_orig, char* node_orig)
 				{
 
 					routeTable[s].nextHop() = sourceNode;
-					if(s.compare(sourceNode) != 0)
+					if(!routeTable[s].isNeighbor())
 					{
 						routeTable[s].dist() = dist + routeTable[sourceNode].dist();
 					}
@@ -333,7 +326,7 @@ void Router::parseNeighborhood(char* str_orig)
 		{
 			std::string s(strtok((*i), ","));
 			routerNames.push_back(s);
-			if(s != std::string(getName()))
+			if(s.compare(std::string(getName())) != 0)
 			{
 				if(routeTable.find(s) == routeTable.end())
 				{

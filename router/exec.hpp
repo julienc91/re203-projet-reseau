@@ -10,7 +10,7 @@ extern "C"
 
 }
 
-#include <chrono>
+#include <thread>
 #include <map>
 
 typedef std::chrono::high_resolution_clock hdclock;
@@ -29,6 +29,8 @@ class Exec
 		void prompt_message(Message* m);
 		void sock_message(Message* m, Client* t = 0);
 
+		void timeChecker();
+
 	private:
 		Router* router;
 		Display* disp;
@@ -43,6 +45,10 @@ class Exec
 		int pingMin, pingMax, pingAvg, pingSucc;
 
 		hdclock::time_point messageTime;
+		std::map<int, int> messageTimes; // clef: seqnum; val: temps
+
+		std::thread *timeCheckerThread;
+		bool threadRunning;
 };
 
 #endif

@@ -123,7 +123,12 @@ void Display::routetable(RouteTable& rt)
 	RouteTable::iterator i;
 	for(i = rt.begin(); i != rt.end(); i++)
 	{
-		std::cout << "\t" << (*i).second.name() << "\t|\t" << (*i).second.nextHop() << "\t|\t" << (*i).second.dist() << std::endl;
+		std::cout << "\t" << (*i).second.name() << "\t|\t" << (*i).second.nextHop() << "\t|\t" << (*i).second.secondsInactive() << std::endl;
 	}
 	std::cout << std::endl;
+}
+
+void Display::loginMessage(char* n)
+{
+	std::cout << "Welcome to the network. You logged in as " << n << std::endl << std::endl;
 }
