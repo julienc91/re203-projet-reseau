@@ -26,22 +26,26 @@ void exec__init(void)
 
 int exec__prompt_message(struct Message *m)
 {
-	if(m == NULL)
-	{
-		return 0;
-	}
-
+	if (!m) return 0;
+    
 	Agnode_t *n1, *n2;
 	Agedge_t *e;
+    char *tmp;
 	struct Message reponse;
 
 	switch(m->type)
 	{
 		case LOAD:
 			// actions sur graphe
-			graph = graph__open(mess__unescape(m->s_parameter));
-			if (!graph){
-				fprintf(stderr, "[CONTROLLER] Error while loading '%s'.\n", mess__unescape(m->s_parameter));
+            
+            tmp = mess__unescape(m->s_parameter);
+			graph = graph__open(tmp);
+            free(tmp);
+			if (!graph)
+            {
+                char *message = mess__unescape(m->s_parameter);
+				fprintf(stderr, "[CONTROLLER] Error while loading '%s'.\n", message);
+                free(message);
 				return 0;
 			}
 			
@@ -63,7 +67,9 @@ int exec__prompt_message(struct Message *m)
 		case SAVE:
 			CHECK_GRAPH(graph, GRAPH__UNLOADED_ERROR)
 			// actions sur graphe
-			graph__save(graph, mess__unescape(m->s_parameter));
+            char *tmp = mess__unescape(m->s_parameter);
+			graph__save(graph, tmp);
+            free(tmp);
 			//actions sur réseau
 			/*NONE*/
 			//affichage
@@ -177,7 +183,6 @@ int exec__prompt_message(struct Message *m)
 			break;
 	}
 }
-
 
 struct Message *exec__sock_message(struct Message *m)
 {

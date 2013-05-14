@@ -170,7 +170,9 @@ int network__send(Client *c, const char *message)
   char* mess2 = mess__treatOutput(strcopy(message));
   if(!mess2)
        return NETWORK__SEND_ERROR;
-  return write_client (c->sock, mess2);
+  int r = write_client (c->sock, mess2);
+  free(mess2);
+  return r;
 }
 
 /**

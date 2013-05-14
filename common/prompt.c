@@ -19,7 +19,7 @@ pthread_t* prompt__start(int (*mess_handler) (struct Message*))
 
 void* prompt__main_thread(void* v)
 {
-	char * s = malloc(256);
+	char *s = malloc(256);
 	struct Message* m = NULL;
 	while((s = fgets(s, 255, stdin)) != NULL)
 	{
@@ -29,13 +29,23 @@ void* prompt__main_thread(void* v)
 		//mess__debug(m);
 		if(v != NULL && m != NULL)
 		{
+            int r;
 			#ifdef __cplusplus
-			((void (*)(void*, struct Message*)) v)(m);
+			r = ((int (*)(void*, struct Message*)) v)(m);
 			#else
-			((void (*)(struct Message*)) v)(m);
+			r = ((int (*)(struct Message*)) v)(m);
 			#endif
+            if (r == 1) // 1 is closing
+            {
+                mess__free(&m);
+                free(s);
+                pthread_exit(NULL); 
+            }
 		}
+        
+        mess__free(&m);
 	}
 
+    free(s);
 	return NULL;
 }

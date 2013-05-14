@@ -60,15 +60,18 @@ void connection_event(network *net, Client *client, char *string)
 void disconnection_event(network *net, Client *client)
 {
 	printf("<disconnection from socket '%d' of client '%s'>\n", (int)client->sock, client->id);
-	struct Message *message = mess__parse(mess__treatInput("log out*"));
+    char *tmp = mess__treatInput("log out*");
+	struct Message *message = mess__parse(tmp);
 	strcopy2(&message->node1, client__get_id(client));
 	exec__sock_message(message);
 	
+    free(tmp);
 	mess__free(&message);
 }
 
 void message_event(network *net, Client *client, char *string)
 {
+    if (client != NULL && client->id != NULL)
 		printf("<message from '%s', socket '%d' : '%s'>\n", client->id, (int)client->sock, string);
 
 		//Necessaire pour les tests via telnet

@@ -65,6 +65,8 @@ int main(int argc, char **argv)
     free (prompt_th1);
     free (config);
     mess__base__free();
+    
+    agclose(graph);
 	
     printf("[CONTROLLER] Closed.\n");
     
