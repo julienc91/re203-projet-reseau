@@ -129,6 +129,7 @@ void Exec::sock_message(Message* m, Client* t)
 	{
 		case GREETING:
 			router->setName(m->node1);
+			disp->loginMessage(m->node1);
 			break;
 
 		case NEIGHBORHOOD:

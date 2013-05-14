@@ -87,3 +87,8 @@ void Display::routetable(RouteTable& rt)
 	}
 	std::cout << std::endl;
 }
+
+void Display::loginMessage(char* n)
+{
+	std::cout << "Welcome to the network. You logged in as " << n << std::endl << std::endl;
+}
