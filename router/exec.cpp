@@ -24,7 +24,7 @@ Exec::Exec(Router* r)
 	threadRunning = true;
 	disp = new Display();
 
-	timeCheckerThread = new std::thread(&Exec::timeChecker, this);
+	//timeCheckerThread = new std::thread(&Exec::timeChecker, this);
 }
 
 Exec::~Exec()
@@ -45,7 +45,7 @@ void Exec::timeChecker()
 		std::map<int, int>::iterator i_map;
 		for(i_map = messageTimes.begin(); i_map != messageTimes.end(); ++i_map)
 		{
-			if(++(*i_map).second > router->getConfiguration()->defaultPacketTimeoutValue)
+			if(++(*i_map).second > router->getConfiguration()->defaultPacketTimeoutValue) //TODO mutex sur le ++
 			{
 				messageTimes.erase(i_map);
 				disp->err_unreachable();
@@ -55,8 +55,9 @@ void Exec::timeChecker()
 		RouteTable::iterator i_rt;
 		for(i_rt = router->getRouteTable().begin(); i_rt != router->getRouteTable().end(); ++i_rt)
 		{
-			if(++(*i_rt).second.secondsInactive() > router->getConfiguration()->defaultDVTimeoutValue)
+			if(++(*i_rt).second.secondsInactive() > router->getConfiguration()->defaultDVTimeoutValue) //TODO mutex sur le ++
 			{
+				std::cout << "glop\n";
 				network__disconnect(router->getNetwork(), (*i_rt).second.client());
 				router->getRouteTable().erase(i_rt);
 			}
@@ -220,6 +221,7 @@ void Exec::sock_message(Message* m, Client* t)
 				{
 					// cool, tout s'est bien passé
 					// prendre la timestamp et ...
+					messageTimes.erase(m->seqnum);
 					disp->mess_deliv(std::chrono::duration_cast<milliseconds>(hdclock::now() - messageTime).count());
 				}
 				else if(m->accept == TOOFAR)

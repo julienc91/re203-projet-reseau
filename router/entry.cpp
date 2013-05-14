@@ -12,8 +12,7 @@ Entry::Entry(string name, string nextHop, int dist)
     _dist(dist),
     _neighbor(false),
     _dataComplete(false),
-    _secondsInactive(0),
-    _secondsMutex(new std::mutex())
+    _secondsInactive(0)
 
 {
 }
@@ -21,8 +20,7 @@ Entry::Entry(string name, string nextHop, int dist)
 Entry::Entry()
   : _neighbor(false),
   _dataComplete(false),
-  _secondsInactive(0),
-  _secondsMutex(new std::mutex())
+  _secondsInactive(0)
 {
 }
 
@@ -86,14 +84,10 @@ bool  Entry::isComplete() const
 
 int &Entry::secondsInactive()
 {
-	_secondsMutex->lock();
 	return _secondsInactive;
-	_secondsMutex->unlock();
 }
 
 int Entry::secondsInactive() const
 {
-	_secondsMutex->lock();
 	return _secondsInactive;
-	_secondsMutex->unlock();
 }

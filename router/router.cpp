@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <chrono>
+#include <mutex>
 #include "display.hpp"
 
 Router* glob__router = 0;
@@ -284,7 +285,7 @@ void Router::parseNeighborhood(char* str_orig)
 		{
 			std::string s(strtok((*i), ","));
 			routerNames.push_back(s);
-			if(s != std::string(getName()))
+			if(s.compare(std::string(getName())) != 0)
 			{
 				if(routeTable.find(s) == routeTable.end())
 				{

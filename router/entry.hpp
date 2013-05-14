@@ -42,9 +42,6 @@ private:
   bool _dataComplete;
 
   int _secondsInactive;
-  std::mutex* _secondsMutex;
-
-
 };
 
 #endif
