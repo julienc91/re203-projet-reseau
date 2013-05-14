@@ -9,6 +9,10 @@ extern "C"
 
 class Prompt
 {
+/**	\class Prompt
+ *  \brief manage the prompt
+ */
+ 
 	public:
 		Prompt();
 		~Prompt();
