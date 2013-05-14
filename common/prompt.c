@@ -1,3 +1,11 @@
+/**
+ * \file prompt.c
+ * \brief A prompt system
+ * 
+ * Implements a prompt within a thread.
+ * 
+ */
+
 #include "prompt.h"
 #include "messages.h"
 
@@ -5,6 +13,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ *  \brief Start a prompt function in its own thread
+ *  \param mess_handler Function used for managing the prompt's input.
+ *  \return A pointer to the prompt's pthread.
+ */
 #ifdef __cplusplus
 pthread_t* prompt__start(int (*mess_handler) (void*, struct Message*))
 #else
@@ -17,6 +30,11 @@ pthread_t* prompt__start(int (*mess_handler) (struct Message*))
 	return prompt_thread;
 }
 
+/**
+ *  \brief Prompt function
+ *  \param v Function used for managing the prompt's input.
+ *  \return NULL
+ */
 void* prompt__main_thread(void* v)
 {
 	char * s = malloc(256);
