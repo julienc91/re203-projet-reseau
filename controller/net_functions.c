@@ -1,3 +1,11 @@
+/**
+ * \file net_functions.c
+ * \brief Net functions
+ * 
+ * Event functions used by the net module.
+ * 
+ */
+
 #include "../common/net.h"
 #include "../common/client.h"
 #include "../common/messages.h"
@@ -7,11 +15,22 @@
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ *  \brief Called in case of an input by the user
+ *  \param net The network.
+ *  \param string The user's command.
+ */
 void input_event(network *net, char *string)
 {
 	printf("Evènement clavier \n");//Obsolete
 }
 
+/**
+ *  \brief Called when a new client is connected
+ *  \param net The network.
+ *  \param client The new client.
+ *  \param string The client's command.
+ */
 void connection_event(network *net, Client *client, char *string)
 {
 	printf("<connection on socket '%d' : '%s'>\n", (int)client->sock, string);
@@ -57,6 +76,11 @@ void connection_event(network *net, Client *client, char *string)
 	mess__free_messages(&m);
 }
 
+/**
+ *  \brief Called when a new client is disconnected
+ *  \param net The network.
+ *  \param client The client.
+ */
 void disconnection_event(network *net, Client *client)
 {
 	printf("<disconnection from socket '%d' of client '%s'>\n", (int)client->sock, client->id);
@@ -67,6 +91,12 @@ void disconnection_event(network *net, Client *client)
 	mess__free(&message);
 }
 
+/**
+ *  \brief Called when a new sends a message
+ *  \param net The network.
+ *  \param client The client.
+ *  \param string The client's command.
+ */
 void message_event(network *net, Client *client, char *string)
 {
 		printf("<message from '%s', socket '%d' : '%s'>\n", client->id, (int)client->sock, string);

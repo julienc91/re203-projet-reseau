@@ -1,3 +1,11 @@
+/**
+ * \file exec.c
+ * \brief Message manager
+ * 
+ * Treat the messages' commands.
+ * 
+ */
+
 #include "display.h"
 #include "graphlib.h"
 #include <unistd.h>
@@ -11,12 +19,15 @@
 
 #define CHECK_GRAPH(graph, ret) if (!(graph)) {fprintf(stderr, "[CONTROLLER] Error: No topology loaded.\n"); return ret;}
 
+/**
+ *  \brief Initialization
+ *
+ */
 void exec__init(void)
 {
 	config = config__readController();
 
 	net = network__open(config->controllerPort);
-	//~ net = network__open(12345);
 
 	net->input_event = input_event;
 	net->connection_event = connection_event;
@@ -24,6 +35,13 @@ void exec__init(void)
 	net->message_event = message_event;
 }
 
+/**
+ *  \brief Treat messages from the user
+ *  \param m A message sent by the user.
+ *  \return 1 if everything's good, 0 if an error occured with the message
+ *   content, GRAPH__UNLOADED_ERROR if a message is sent before loading a
+ *   topology.
+ */
 int exec__prompt_message(struct Message *m)
 {
 	if(m == NULL)
@@ -174,9 +192,14 @@ int exec__prompt_message(struct Message *m)
 			printf("ERREUR: Action non reconnue\n");
 			break;
 	}
+	return 1;
 }
 
-
+/**
+ *  \brief Treat messages from a router
+ *  \param m A message sent by a router.
+ *  \return The message modified with new data for the answer.
+ */
 struct Message *exec__sock_message(struct Message *m)
 {
 	Agnode_t *n1, *n2;
