@@ -1,3 +1,12 @@
+/**
+ * \file main.c
+ * \brief The main function
+ * 
+ * Starts the controller and initializes the different modules.
+ * 
+ */
+
+
 #include "graphlib.h"
 #include "../common/prompt.h"
 #include "exec.h"
@@ -14,12 +23,24 @@ void *network_loop(void *net)
 	}
 }
 
+
+/**
+ *  \brief Warning in case of a bad call
+ *  \param bin The name of the binary.
+ */
+
 static void usage(char *bin)
 {
     fprintf(stderr, "%s [<topology>]\n", bin);
     exit(EXIT_FAILURE);
 }
 
+/**
+ *  \brief Starts the controller
+ *  \param argc Number of parameters.
+ *  \param argv Parameters.
+ *  \return 0
+ */
 int main(int argc, char **argv)
 {
     if (argc > 2) usage(argv[0]);

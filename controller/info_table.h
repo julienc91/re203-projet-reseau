@@ -3,6 +3,10 @@
 #include "../common/net.h"
 #include "hashtable.h"
 
+/**
+ * \struct Client_info
+ * \brief Informations needed to communicate with a client
+ */
 typedef struct {
 	char * address;
 	int port;

@@ -52,6 +52,9 @@ static char* regex_strtable[] =
 
 char *str_sub (const char *s, unsigned int start, unsigned int end);
 
+/**
+ *  \brief Initialize the message system
+ */
 void mess__base__init(void)
 {
 	int i;
