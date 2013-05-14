@@ -29,3 +29,4 @@ $(BINARY): $(OBJ) $(COMMONOBJ)
 
 clean:
 	$(RM) *.o $(BINARY)
+	@echo " Cleaned."

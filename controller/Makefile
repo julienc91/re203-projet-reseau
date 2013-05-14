@@ -28,5 +28,5 @@ $(BINARY): $(OBJ) $(COMMONOBJ)
 	@echo  " Done."
 
 clean:
-	$(RM) $(OBJ)
-	@echo "Cleaned."
+	$(RM) $(OBJ) *.o $(BINARY)
+	@echo " Cleaned."
