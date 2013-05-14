@@ -6,8 +6,9 @@ extern "C"
 	#include "../common/messages.h"
 	#include "../common/util.h"
 	#include "../common/client.h"
-}
+    #include "../common/net.h"
 
+}
 
 #include <chrono>
 #include <map>

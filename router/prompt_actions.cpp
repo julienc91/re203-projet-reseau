@@ -45,7 +45,7 @@ void PromptActions::message(Message* mess)
 	if (network__send(c, mess__toString(packet)) < 0)
 	{
 		std::cerr << "[CONTROLLER] Error while sending message '" << mess__toString(packet)
-				  << "' to '" <<  c->id << "' on socket '" << (int)c->sock << "'\n",
+				  << "' to '" <<  c->id << "' on socket '" << (int)c->sock << "'\n";
 		network__debug(router->getNetwork());
 	}
 

@@ -56,7 +56,8 @@ enum MessageType
 
 	//Wildcard
 	NONE,
-	QUIT
+    NETWORK_DEBUG,
+	QUIT,
 };
 
 /**

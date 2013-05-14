@@ -5,6 +5,7 @@
 #include "prompt_actions.hpp"
 #include "sock_actions.hpp"
 
+
 #include <cstring>
 #include <cstdlib>
 #include <climits>
@@ -106,6 +107,10 @@ void Exec::prompt_message(Message* m)
 			//affichage
 			disp->routetable(router->getRouteTable());
 			break;
+
+        case NETWORK_DEBUG:
+            network__debug(router->getNetwork());
+            break;
 
 		case QUIT:
 			router->sockActions()->logout();
