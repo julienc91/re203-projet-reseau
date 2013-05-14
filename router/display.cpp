@@ -16,7 +16,7 @@ void Display::err_unknown()
 	std::cout << "\t-> error: unknown destination !" << std::endl;
 }
 
-/** \brief display repport for a message sending, with the time 
+/** \brief display repport for a message sending, with the time
  */
 void Display::mess_sent()
 {
@@ -30,7 +30,7 @@ void Display::mess_sent()
 }
 
 /** \brief display a repport for a well delivered message
- * 	\param rtt 
+ * 	\param rtt
  */
 void Display::mess_deliv(double rtt)
 {
@@ -119,11 +119,11 @@ void Display::route_result(int qt, double rtt)
  */
 void Display::routetable(RouteTable& rt)
 {
-	std::cout << "\tName\t|\tNext\t|\tDist\t|\tPort" << std::endl;
+	std::cout << "\tName\t|\tNext\t|\tDist" << std::endl;
 	RouteTable::iterator i;
 	for(i = rt.begin(); i != rt.end(); i++)
 	{
-		std::cout << "\t" << (*i).second.name() << "\t|\t" << (*i).second.nextHop() << "\t|\t" << (*i).second.secondsInactive() << std::endl;
+		std::cout << "\t" << (*i).second.name() << "\t|\t" << (*i).second.nextHop() << "\t|\t" << (*i).second.dist() << std::endl;
 	}
 	std::cout << std::endl;
 }
