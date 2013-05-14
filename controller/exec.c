@@ -38,9 +38,9 @@ void exec__init(void)
 /**
  *  \brief Treat messages from the user
  *  \param m A message sent by the user.
- *  \return 1 if everything's good, 0 if an error occured with the message
+ *  \return 0 if everything's good, -1 if an error occured with the message
  *   content, GRAPH__UNLOADED_ERROR if a message is sent before loading a
- *   topology.
+ *   topology, QUIT_SIGNAL if the user asked to quit the program.
  */
 int exec__prompt_message(struct Message *m)
 {
@@ -64,7 +64,7 @@ int exec__prompt_message(struct Message *m)
                 char *message = mess__unescape(m->s_parameter);
 				fprintf(stderr, "[CONTROLLER] Error while loading '%s'.\n", message);
                 free(message);
-				return 0;
+				return -1;
 			}
 			
 			n1 = agfstnode(graph);
@@ -192,7 +192,7 @@ int exec__prompt_message(struct Message *m)
 			//
 			printf("[CONTROLLER] Quitting. \n");
 			network__close(net);
-            return 1;
+			return QUIT_SIGNAL;
             
 			break;
 
@@ -200,7 +200,7 @@ int exec__prompt_message(struct Message *m)
 			printf("ERREUR: Action non reconnue\n");
 			break;
 	}
-	return 1;
+	return 0;
 }
 
 
