@@ -379,6 +379,7 @@ void Router::parseNeighborhood(char* str_orig)
 	{
 		routeTable.clear();
 	}
+	free(str);
 }
 
 network* Router::getNetwork()

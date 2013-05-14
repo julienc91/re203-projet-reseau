@@ -62,9 +62,10 @@ void SockActions::login(int port, char* id)
 	{
 		m->node1 = strcopy(id);
 	}
-
-	network__send(router->getController(), mess__toString(m));
+	char *tmp = mess__toString(m);
+	network__send(router->getController(), tmp);
 	mess__free(&m);
+	free(tmp);
 }
 
 
@@ -74,8 +75,10 @@ void SockActions::poll()
 	mess__init(&m);
 	m->type = POLL;
 
-	network__send(router->getController(), mess__toString(m));
+	char *tmp = mess__toString(m);
+	network__send(router->getController(), tmp);
 	mess__free(&m);
+	free(tmp);
 }
 
 void SockActions::logout()
@@ -84,8 +87,10 @@ void SockActions::logout()
 	mess__init(&m);
 	m->type = LOGOUT;
 
-	network__send(router->getController(), mess__toString(m));
+	char *tmp = mess__toString(m);
+	network__send(router->getController(), tmp);
 	mess__free(&m);
+	free(tmp);
 }
 
 

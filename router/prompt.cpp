@@ -67,6 +67,7 @@ void Prompt::main_thread(void* v)
 			(dat->object->*handler)(m);
 		}
 	}
+	delete[] s;
 
 	delete dat;
 }

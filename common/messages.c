@@ -676,6 +676,7 @@ void mess__free_messages(Messages **m)
 	  if ((*m)->messages[i] != NULL)
 	       mess__free(&((*m)->messages[i]));
      }
+     free((*m)->messages);
      free(*m);
      *m = NULL;
 }

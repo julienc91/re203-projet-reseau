@@ -167,11 +167,13 @@ int network__send(Client *c, const char *message)
 	#ifdef __ROUTER_DEBUG
   fprintf(stderr, "<Sending message to '%s' on socket '%d': '%s'>\n", c->id, (int)c->sock, message);
   #endif
-  char* mess2 = mess__treatOutput(strcopy(message));
+  char* tmp = strcopy(message);
+  char* mess2 = mess__treatOutput(tmp);
   if(!mess2)
        return NETWORK__SEND_ERROR;
   int r = write_client (c->sock, mess2);
   free(mess2);
+  free(tmp);
   return r;
 }
 

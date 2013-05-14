@@ -56,11 +56,12 @@ void Event::message(network *net, Client *c, char *buffer)
     {
       if (m->messages[i] != NULL)
 	{
+	  char *tmp = mess__toString(m->messages[i]);
 	  std::cout << "<message from '" << c->id 
 		    << "' on socket '" << c->sock << "' : '"
-		    << mess__toString(m->messages[i])
+		    << tmp
 		    << "'>" << std::endl;
-
+	  free(tmp);
 	  glob__router->exec->sock_message(m->messages[i], c);
 	}
     }
