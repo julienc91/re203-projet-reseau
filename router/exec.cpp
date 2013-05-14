@@ -17,16 +17,51 @@ Exec::Exec(Router* r)
 	routeCount = 0;
 	pingCount = 0;
 
-	pingMin = INT_MAX;
-	pingMax = INT_MIN;
-	pingAvg = 0;
+	pingMin  = INT_MAX;
+	pingMax  = INT_MIN;
+	pingAvg  = 0;
 	pingSucc = 0;
+	threadRunning = true;
 	disp = new Display();
+
+	timeCheckerThread = new std::thread(&Exec::timeChecker, this);
 }
 
 Exec::~Exec()
 {
+	threadRunning = false;
 	delete disp;
+	timeCheckerThread->join();
+}
+
+void Exec::timeChecker()
+{
+	std::chrono::seconds oneSecond(1);
+
+	while(threadRunning)
+	{
+		std::this_thread::sleep_for(oneSecond);
+		// incrémentation
+		std::map<int, int>::iterator i_map;
+		for(i_map = messageTimes.begin(); i_map != messageTimes.end(); ++i_map)
+		{
+			if(++(*i_map).second > router->getConfiguration()->defaultPacketTimeoutValue)
+			{
+				messageTimes.erase(i_map);
+				disp->err_unreachable();
+			}
+		}
+
+		RouteTable::iterator i_rt;
+		for(i_rt = router->getRouteTable().begin(); i_rt != router->getRouteTable().end(); ++i_rt)
+		{
+			if(++(*i_rt).second.secondsInactive() > router->getConfiguration()->defaultDVTimeoutValue)
+			{
+				network__disconnect(router->getNetwork(), (*i_rt).second.client());
+				router->getRouteTable().erase(i_rt);
+			}
+		}
+	}
 }
 
 void Exec::prompt_message(Message* m)
@@ -38,7 +73,6 @@ void Exec::prompt_message(Message* m)
 
 	switch(m->type)
 	{
-
 		case POLL:
 			router->sockActions()->poll();
 			break;
@@ -47,7 +81,7 @@ void Exec::prompt_message(Message* m)
 			try
 			{
 				messageTime = hdclock::now();
-				router->promptActions()->message(m);
+				router->promptActions()->message(m, messageTimes);
 			}
 			catch(UnknownDest&)
 			{
@@ -56,10 +90,6 @@ void Exec::prompt_message(Message* m)
 			}
 
 			disp->mess_sent();
-
-			//attendre le retour (dans un thread)
-			//while(pas de retour || !timeout dépassé)
-				//disp.mess_not_deliv(router->getConfiguration()->defaultPacketTimeoutValue);
 			break;
 
 		case PING:
@@ -172,10 +202,12 @@ void Exec::sock_message(Message* m, Client* t)
 			if(m->accept == OK) // cool bro
 			{
 				// potentiellement rien à faire
+				router->getRouteTable()[std::string(t->id)].secondsInactive() = 0;
 			}
 			else
 			{
 				router->parseVector(m->s_parameter, t->id);
+				router->sockActions()->vectorAck(t->id);
 			}
 			break;
 
@@ -188,7 +220,7 @@ void Exec::sock_message(Message* m, Client* t)
 				{
 					// cool, tout s'est bien passé
 					// prendre la timestamp et ...
-					disp->mess_deliv(std::chrono::duration_cast<milliseconds>(hdclock::now() - messageTime).count()); // TODO
+					disp->mess_deliv(std::chrono::duration_cast<milliseconds>(hdclock::now() - messageTime).count());
 				}
 				else if(m->accept == TOOFAR)
 				{

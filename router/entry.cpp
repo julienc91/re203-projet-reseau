@@ -2,7 +2,6 @@
 #include <string>
 
 
-
 using namespace std;
 
 
@@ -12,13 +11,18 @@ Entry::Entry(string name, string nextHop, int dist)
     _nextHop(nextHop),
     _dist(dist),
     _neighbor(false),
-    _dataComplete(false)
+    _dataComplete(false),
+    _secondsInactive(0),
+    _secondsMutex(new std::mutex())
+
 {
 }
 
 Entry::Entry()
   : _neighbor(false),
-  _dataComplete(false)
+  _dataComplete(false),
+  _secondsInactive(0),
+  _secondsMutex(new std::mutex())
 {
 }
 
@@ -78,4 +82,18 @@ bool & Entry::isComplete()
 bool  Entry::isComplete() const
 {
 	return _dataComplete;
+}
+
+int &Entry::secondsInactive()
+{
+	_secondsMutex->lock();
+	return _secondsInactive;
+	_secondsMutex->unlock();
+}
+
+int Entry::secondsInactive() const
+{
+	_secondsMutex->lock();
+	return _secondsInactive;
+	_secondsMutex->unlock();
 }

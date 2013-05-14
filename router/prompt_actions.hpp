@@ -14,7 +14,7 @@ class PromptActions
 {
 	public:
 		PromptActions(Router* r);
-		void message(Message* m);
+		void message(Message* m, std::map<int, int>& seqnumTable);
 		void ping(Message* m, std::map<int, hdclock::time_point>& pingTimeTables);
 		void route(Message* m);
 

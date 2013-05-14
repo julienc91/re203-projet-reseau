@@ -29,6 +29,7 @@ class SockActions
 		void linkAck(Client* t);
 
 		void vector(char* id, char * vect);
+		void vectorAck(char* id);
 
 
 	private:

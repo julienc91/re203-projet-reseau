@@ -78,45 +78,38 @@ Router::~Router()
 	// Fermeture stdio
 	prompt.stop();
 
-	std::cout << "Début ~Router" << std::endl;
-	// threads
 	runControllerLoop = false;
 	runRouterLoop = false;
 	runMainLoop = false;
-	//mainLoopThread->join(); // trop long avec le timeout
-	std::cout << "1" << std::endl;
-	//routerLoopThread->join();
-	std::cout << "2" << std::endl;
-	//controllerLoopThread->join();
-	std::cout << "3" << std::endl;
-
-	delete routerLoopThread;
-	delete controllerLoopThread;
-	delete mainLoopThread;
-
-	std::cout << "on est là" << std::endl;
-
-
-
 	// * * * * fermeture serveur * * * *
 
 	network__close(net);
 	network__free(net);
 
+	// threads
+
+	mainLoopThread->detach(); // trop long avec le timeout
+	routerLoopThread->join();
+	controllerLoopThread->join();
+
+	delete routerLoopThread;
+	delete controllerLoopThread;
+	delete mainLoopThread;
+
 	end(); // windows compatibility
 
-	delete config;
+	free(config);
     delete _name;
     delete exec;
     delete saction;
     delete paction;
-	std::cout << "FINISH" << std::endl;
 }
 
 void Router::stop()
 {
 	_isRunning = false;
 }
+
 void Router::mainLoop()
 {
 	// * * * * gestion serveur * * * *
@@ -240,7 +233,7 @@ void Router::parseVector(char* str_orig, char* node_orig)
 				{
 
 					routeTable[s].nextHop() = sourceNode;
-					if(s.compare(sourceNode) != 0)
+					if(!routeTable[s].isNeighbor())
 					{
 						routeTable[s].dist() = dist + routeTable[sourceNode].dist();
 					}

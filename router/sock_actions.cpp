@@ -122,3 +122,14 @@ void SockActions::vector(char* id, char * vect)
 	network__send(router->getRouteTable()[std::string(id)].client(), mess__toString(m));
 	mess__free(&m);
 }
+
+void SockActions::vectorAck(char* id)
+{
+	Message* m;
+	mess__init(&m);
+	m->type = VECTOR;
+	m->accept = OK;
+
+	network__send(router->getRouteTable()[std::string(id)].client(), mess__toString(m));
+	mess__free(&m);
+}
