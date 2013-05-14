@@ -145,10 +145,12 @@ void Exec::prompt_message(Message* m)
 
 		case QUIT:
 			router->sockActions()->logout();
+            std::cerr<<"[ROUTER] Closed."<<std::endl;
+            exit(0);
 			break;
 
 		default:
-			std::cout << "ERREUR: Action non reconnue" << std::endl;
+			std::cout << "[ERREUR] Action non reconnue" << std::endl;
 			break;
 	}
 }

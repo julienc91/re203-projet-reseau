@@ -97,10 +97,17 @@ Router::~Router()
 	network__free(net);
 
 	// threads
+    
+    std::cerr << "#1#" << std::endl;
 
 	mainLoopThread->detach(); // trop long avec le timeout
 	routerLoopThread->join();
+    
+        std::cerr << "#2#" << std::endl;
+        
 	controllerLoopThread->join();
+    
+        std::cerr << "#3#" << std::endl;
 
 	delete routerLoopThread;
 	delete controllerLoopThread;

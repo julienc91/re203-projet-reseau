@@ -43,7 +43,14 @@ void Event::connect(network *net, Client *c, char *buffer)
 
 void Event::disconnect(network *net, Client *c)
 {
-  std::cout << "<disconnection from socket '" << c->sock << "' of client '"<< c->id <<"'>" << std::endl;
+  std::cerr << "<disconnection from socket '" << c->sock << "' of client '"<< c->id <<"'>" << std::endl;
+  if (strcmp(c->id, "controlleur") == 0)
+  {
+    network__close(net);
+    network__free(net);
+    std::cerr << "[ROUTER] Closed by controller." << std::endl;
+    exit(0);
+    }
 }
 
 void Event::message(network *net, Client *c, char *buffer)
