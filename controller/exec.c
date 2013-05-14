@@ -166,8 +166,10 @@ int exec__prompt_message(struct Message *m)
 		
 		case QUIT:
 			//
-			printf("Fin du controleur \n");
+			printf("[CONTROLLER] Quitting. \n");
 			network__close(net);
+            return 1;
+            
 			break;
 
 		default:
