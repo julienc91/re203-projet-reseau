@@ -233,8 +233,10 @@ void Router::parseVector(char* str_orig, char* node_orig)
 			if(routeTable.find(s) != routeTable.end()) // si on le trouve
 			{
 				if((routeTable[s].isNeighbor() && dist < routeTable[s].dist()) ||
-					(!routeTable[s].isNeighbor() && dist + routeTable[sourceNode].dist() < routeTable[s].dist()) ||
-					routeTable[s].dist() < 0)
+                    (!routeTable[s].isNeighbor() && dist + routeTable[sourceNode].dist() < routeTable[s].dist()) ||
+                    (!routeTable[s].isNeighbor() && routeTable[s].nextHop() == sourceNode &&
+                                                    routeTable[s].dist() != dist + routeTable[sourceNode].dist()) ||
+					(routeTable[s].dist() < 0))
 				{
 
 					routeTable[s].nextHop() = sourceNode;
