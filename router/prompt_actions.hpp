@@ -12,6 +12,9 @@ extern "C"
 
 class PromptActions
 {
+/**	\class PromptActions
+ * 	\brief
+ */
 	public:
 		PromptActions(Router* r);
 		void message(Message* m, std::map<int, int>& seqnumTable);

@@ -87,6 +87,7 @@ typedef struct Messages
 #define MESSAGE__MAX_MESSAGES 50
 
 void mess__base__init(void);
+void mess__base__free(void);
 void mess__init(struct Message** mess);
 void mess__free(struct Message** mess);
 void mess__free_messages(Messages **m);

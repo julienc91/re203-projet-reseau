@@ -52,6 +52,9 @@ static char* regex_strtable[] =
 
 char *str_sub (const char *s, unsigned int start, unsigned int end);
 
+/**
+ *  \brief Initialize the message system
+ */
 void mess__base__init(void)
 {
 	int i;
@@ -61,6 +64,17 @@ void mess__base__init(void)
 		trex_regexes[i] = trex_compile(regex_strtable[i], NULL);
 	}
 	isEverythingInitialized = 1;
+}
+
+/**
+ * \brief Free memory.
+ */
+void mess__base__free(void)
+{
+    int i;
+    for (i = 0; i < 32; i++)
+        trex_free(trex_regexes[i]);
+    free (trex_regexes);
 }
 
 /**
@@ -175,7 +189,7 @@ char* mess__unescape(char* mess_src)
      if(!mess_src)
 	  return NULL;
      int count = 0, n = strlen(mess_src);
-     char* mess_unescp = malloc((n+1) * sizeof(char)); // TODO: à affiner
+     char *mess_unescp = malloc((n+1) * sizeof(char)); // TODO: à affiner
 
      for(int i = 0; i <= n; i++)
      {
@@ -226,7 +240,9 @@ Messages *mess__multiline_parse(char *mess_src)
 
 		    break;
 	       }
-	       m->messages[m->nb_messages++] = mess__parse(mess__treatInput(mess_unescp));
+           char *tmp = mess__treatInput(mess_unescp);
+	       m->messages[m->nb_messages++] = mess__parse(tmp);
+           free(tmp);
 	  }
 
      }
@@ -240,7 +256,9 @@ Messages *mess__multiline_parse(char *mess_src)
 	  }
 	  else
 	  {
-	       m->messages[m->nb_messages++] = mess__parse(mess__treatInput(mess_unescp));
+          char *tmp = mess__treatInput(mess_unescp);
+	       m->messages[m->nb_messages++] = mess__parse(tmp);
+           free(tmp);
 	  }
      }
 
@@ -732,7 +750,7 @@ char* mess__treatOutput(char * src)
      src = mess__escape(src);
 
      // On rajoute l'étoile de fin
-     char * final = malloc((strlen(src) + 1) * sizeof(char));
+     char *final = malloc((strlen(src) + 2) * sizeof(char));
      strcpy(final, src);
 
      final[strlen(src)] = '*';

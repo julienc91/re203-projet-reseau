@@ -5,19 +5,19 @@ export CC=@gcc
 export CP=@g++
 export RM=@rm -f
 export CD=-@cd
-export SILENT_MAKE=@$(MAKE) -s
+export SILENT_MAKE=$(MAKE) -s
 
 SRCA=$(wildcard common/*.c)
 SRCB=$(wildcard controller/*.c)
 SRCC=$(wildcard router/*.cpp)
 OBJ=$(SRC:.c=.o)
 
-.PHONY: clean common controller router doc
+.PHONY: clean common controller router doc rapport
 
 all:
-	$(SILENT_MAKE) common
-	$(SILENT_MAKE) controller
-	$(SILENT_MAKE) router
+	@$(SILENT_MAKE) common
+	@$(SILENT_MAKE) controller
+	@$(SILENT_MAKE) router
 
 
 common: $(SRCA)
@@ -38,8 +38,17 @@ router: $(SRCC)
 doc:	doc/doxygen.conf
 	doxygen doc/doxygen.conf
 
+rapport: 
+	$(CD) rapport && pdflatex rapport.tex && pdflatex rapport.tex
+	$(CD) rapport && rm -r *.aux *.log *.out
+
 clean:
-	$(RM) common/*.o
-	$(RM) controller/*.o
-	$(RM) router/*.o
-	@echo "Cleaned."
+	@echo "common/"
+	$(CD) common && $(SILENT_MAKE)	clean
+	@echo ""
+	@echo "router/"
+	$(CD) router && $(SILENT_MAKE) clean
+	@echo ""
+	@echo "controller/"
+	$(CD) controller && $(SILENT_MAKE) clean
+	@echo ""

@@ -1,3 +1,12 @@
+/**
+ * \file main.c
+ * \brief The main function
+ * 
+ * Starts the controller and initializes the different modules.
+ * 
+ */
+
+
 #include "graphlib.h"
 #include "../common/prompt.h"
 #include "exec.h"
@@ -5,12 +14,33 @@
 
 extern network *net;
 
+void *network_loop(void *net)
+{
+    // * * * * gestion serveur * * * *
+	while(network__is_opened((network *)net))
+	{
+        network__update((network *)net);
+	}
+}
+
+
+/**
+ *  \brief Warning in case of a bad call
+ *  \param bin The name of the binary.
+ */
+
 static void usage(char *bin)
 {
     fprintf(stderr, "%s [<topology>]\n", bin);
     exit(EXIT_FAILURE);
 }
 
+/**
+ *  \brief Starts the controller
+ *  \param argc Number of parameters.
+ *  \param argv Parameters.
+ *  \return 0
+ */
 int main(int argc, char **argv)
 {
     if (argc > 2) usage(argv[0]);
@@ -35,21 +65,31 @@ int main(int argc, char **argv)
 	printf("Graph prompt : Ctrl+D pour quitter\n");
 	pthread_t *prompt_th1 = prompt__start(exec__prompt_message);
 	
-	// * * * * gestion serveur * * * *
-	while(network__is_opened(net))
-	{
-        network__update(net);
-	}
-	fprintf(stderr, "exit main loop\n");
+    pthread_t network_thread;
+    pthread_create(&network_thread, NULL, network_loop, (void *)net);
+    
+    pthread_join(*prompt_th1, NULL);
+    
+    pthread_cancel(network_thread);
+    
+    pthread_join(network_thread, NULL);
+
+    printf("[CONTROLLER] Closing network...\n");
 
 	// * * * * fermeture serveur * * * *
-	
 	network__close(net);
 	network__free(net);
 
-	// nettoyage de la table de hachage
+	// Free memory
 	table__delete();
 	graph__delete();
+    free (prompt_th1);
+    free (config);
+    mess__base__free();
+    
+    agclose(graph);
 	
+    printf("[CONTROLLER] Closed.\n");
+    
 	return  0;
 }

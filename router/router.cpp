@@ -12,6 +12,11 @@
 
 Router* glob__router = 0;
 
+/** \brief initialize the instance of Router
+ *  \param name name of the router
+ *  \param conf name of the file to load the configuration
+ */
+
 Router::Router(char* name, char* conf)
 {
 	_isRunning = true;
@@ -69,6 +74,10 @@ Router::Router(char* name, char* conf)
 	routerLoopThread = new std::thread(&Router::routerLoop, this);
 }
 
+/** \brief intitialize the instance of Router by copying data
+ * 	\param source instance of Router
+ */
+
 Router::Router(const Router * data)
 {
     _name   = data->_name;
@@ -106,11 +115,16 @@ Router::~Router()
     delete paction;
 }
 
+
+/** \brief set router to non running state
+ */
 void Router::stop()
 {
 	_isRunning = false;
 }
 
+/** \brief fonction to call to run the router
+ */
 void Router::mainLoop()
 {
 	// * * * * gestion serveur * * * *
@@ -120,9 +134,11 @@ void Router::mainLoop()
 	}
 }
 
+/** \brief
+ */
 void Router::controllerLoop()
 {
-	std::chrono::seconds poll_time( getConfiguration()->controllerUpdateInterval );
+	std::chrono::seconds poll_time(getConfiguration()->controllerUpdateInterval );
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 	while(runControllerLoop)
 	{
@@ -130,6 +146,9 @@ void Router::controllerLoop()
 		std::this_thread::sleep_for(poll_time); // j'aime quand on peut lire le code
 	}
 }
+
+/** \brief
+ */
 
 void Router::routerLoop()
 {
@@ -151,26 +170,39 @@ void Router::routerLoop()
 	}
 }
 
+/** \brief increments the number of seqnum
+ * 	\return new seqnum total
+*/
 int Router::newSeqnum()
 {
 	return ++seqnum;
 }
+
+/** \brief get the name of the router
+ *  \return the name of the router (char *)
+ */
 char* Router::getName()
 {
 	return (char*) _name->c_str();
 }
 
+/** \brief set a new name for the router
+ */
 void Router::setName(char* name)
 {
 	delete _name;
 	_name = new std::string(name);
 }
 
+/** \return the configuration of the router
+ */
 Configuration* Router::getConfiguration()
 {
 	return config;
 }
 
+/** \return the routetable of the router
+ */
 RouteTable& Router::getRouteTable()
 {
 	return routeTable;
@@ -182,6 +214,7 @@ Client* Router::getController()
 	return controller;
 }
 
+
 PromptActions* Router::promptActions()
 {
 	return paction;
@@ -192,6 +225,11 @@ SockActions* Router::sockActions()
 	return saction;
 }
 
+/** \brief parse the str_orig strig to read and save
+ * information about the curent state of the network
+ * 	\param str_orig string to parse (char *)
+ * 	\param node_orig node which sent str_orig
+ */
 void Router::parseVector(char* str_orig, char* node_orig)
 {
 	std::string sourceNode(node_orig);
@@ -254,6 +292,9 @@ void Router::parseVector(char* str_orig, char* node_orig)
 	}
 }
 // [a, b, c]
+
+
+
 void Router::parseNeighborhood(char* str_orig)
 {
 	char *str = strcopy(str_orig + 1); // pour le [

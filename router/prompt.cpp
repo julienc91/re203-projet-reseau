@@ -4,29 +4,41 @@
 #include <cstdio>
 struct ThreadData
 {
+/** \struct ThreadData
+ */
 	void (Exec::*mess_handler) (Message*);
 	Exec *object;
 };
 
 void* main_thread(void* v);
 
+/**	\brief initialize the Propmt instance
+ */
 Prompt::Prompt() :
 	isRunning(true)
 {
 
 }
 
+/**	\brief Set the prompt to non running state
+ */
 void Prompt::stop()
 {
 	isRunning = false;
 }
 
+/**	\brief destoy the instance
+ * 
+ */
 Prompt::~Prompt()
 {
 	thread->join();
 	delete thread;
 }
 
+/** \brief Start the prompt
+ *  \param 
+ */
 void Prompt::start(Exec* object, void (Exec::*mess_handler) (Message*))
 {
 	ThreadData *dat = new ThreadData;
@@ -35,7 +47,9 @@ void Prompt::start(Exec* object, void (Exec::*mess_handler) (Message*))
 
 	thread = new std::thread(&Prompt::main_thread, this, (void*) dat);
 }
-
+/** \brief
+ * 	\param v
+ */
 void Prompt::main_thread(void* v)
 {
 	ThreadData *dat = (ThreadData*) v;

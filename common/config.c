@@ -21,16 +21,16 @@
  * \warning The controller's configuration file must exist before calling
  * this function, and be named "controller.cfg".
  */
-Configuration* config__readController(void)
+Configuration *config__readController(void)
 {
 	FILE * pFile;
 	pFile = fopen ("controller.cfg","r");
 	if (pFile != NULL)
 	{
-		Configuration* conf = (Configuration*) malloc(sizeof(Configuration));
+		Configuration *conf = (Configuration*) malloc(sizeof(Configuration));
 		conf->type = CONTROLLER;
 
-		char * line = NULL;
+		char *line = NULL;
 		size_t len = 0;
 		if(conf == NULL)
 		{
@@ -45,6 +45,7 @@ Configuration* config__readController(void)
 		if (line)
 			free(line);
 
+        fclose(pFile);
 		return conf;
 	}
 	else
@@ -147,7 +148,7 @@ void config__readLine(Configuration* conf, char* mess_src)
 
 	if(match == 0) i = -1;
 
-	char * tmp = (char*) malloc((strlen(mess_src) + 1)* sizeof(char));
+	char *tmp = (char*) malloc((strlen(mess_src) + 1)* sizeof(char));
 
 	switch(i)
 	{
@@ -223,4 +224,5 @@ void config__readLine(Configuration* conf, char* mess_src)
 			}
 			break;
 	}
+    free(tmp);
 }
