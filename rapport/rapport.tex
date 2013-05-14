@@ -70,7 +70,7 @@
     Maxime \textsc{Bellier} \ \ \ Jean-Michaël \textsc{Celerier}\\
     Julien \textsc{Chaumont} \ \ \ Bazire \textsc{Houssin} \ \ \ Sylvain \textsc{Vaglica}\\[1cm]
     \textsc{Groupe 3}\\[1.5cm]
-    \textsc{\large 23/05/2013 }\\[1.5cm] %TODO
+    \textsc{\large 15/05/2013 }\\[1.5cm]
     \includegraphics[width=8cm]{logo.png}
 
   \end{center}
@@ -113,7 +113,7 @@ De cette manière, contrôleur et routeur ont seulement à gérer la fonction de
 \subsection{Traitement des fichiers de configuration}
 
 \begin{tabularx}{\linewidth}{lX}
-\underline{Fichiers :} & \texttt{common/config.c}, \texttt{common/config.h}\\
+\underline{Fichiers :} & \texttt{common/config.c}, \texttt{common/config.h}
 \end{tabularx}\\
 
 Le sujet demandait à ce que routeur comme contrôleur puissent être paramétrés depuis un fichier de configuration. Ce module permet la lecture de ces fichiers. La bibliothèque C \texttt{T-Rex}\footnote{Publiée sous licence libre \textit{zlib} par Alberto Demichelis, consultable à l'adresse \url{http://sourceforge.net/projects/tiny-rex/}}, qui permet la manipulation d'expressions régulières, a été utilisée dans ce cadre afin de faciliter la reconnaissance des différentes lignes possibles dans les fichiers de configuration.
@@ -301,7 +301,7 @@ L'algorithme suivant résume brièvement le fonctionnement du contrôleur. L'int
  close(graph, hash\_table, network)\;
 \end{algorithm}
 
-\section{Les routeurs} %TODO
+\section{Les routeurs}
 
 De même que pour le contrôleur, une partie du code du routeur se base sur le code commun présenté précédemment. Néanmoins, le défi repose dans le fait que le routeur est écrit en C++, et que bien qu'il y ait un fort lien de parenté entre les deux langages, il est parfois nécessaire de connaître quelques astuces pour pouvoir interfacer les deux codes.
 
@@ -417,7 +417,14 @@ Afin de récapituler plus simplement cette partie, le diagramme de classes du ro
 \label{diagclasses}
 \end{center}
 \end{figure}
-\section*{Conclusion} %TODO
+
+
+\section*{Conclusion}
+
+Les programmes proposés répondent aux différents prérequis du sujet, ce qui était à vrai dire l'objectif principal. Durant le développement, l'accent a notamment été mis sur le soin à apporter au code. En conséquence, le code source suit une architecture MVC, est documenté, et même optimisé en ce qui concerne la redondance de code (grâce au code commun aux deux sous-programmes). Cette organisation du code a aussi permis de mieux organiser l'équipe sur les différentes tâches à réaliser, et ce, bien plus finement qu'une simple répartition "routeur-contrôleur".
+
+Par ailleurs, les tests effectués, sur un même ordinateur comme sur plusieurs en réseau, ont démontré la stabilité et la fonctionnalité du projet.
+
 
 %tests, valgrind, réponse au sujet, code propre
 \end{document}
