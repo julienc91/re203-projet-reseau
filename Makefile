@@ -42,7 +42,7 @@ rapport:
 	$(CD) rapport && pdflatex rapport.tex && pdflatex rapport.tex
 	$(CD) rapport && rm -r *.aux *.log *.out
 
-run:
+run:	all
 	./run.sh
 
 clean:
