@@ -196,7 +196,7 @@ La structure de données utilisée ici se nomme \texttt{network}, et représente
 struct network_s{
   short status; //Réseau ouvert ou fermé
   SOCKET server;//Socket du serveur
-  int max;      //Nombre maximum de sockets à ouvrir
+  int max;      //Plus grand identifiant de socket (utilisé par select)
   Client *clients; //Clients connectés
   unsigned int nb_clients; //Taille du tableau précédent
 
