@@ -7,7 +7,7 @@ class Display
 {
 /** \class Display
  * 	\brief diplay class
- * 
+ *
  * */
 	public:
 		void err_unreachable();

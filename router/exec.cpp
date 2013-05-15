@@ -58,8 +58,6 @@ void Exec::timeChecker()
 		{
 			if(++((*i_rt).second.secondsInactive()) > router->getConfiguration()->defaultDVTimeoutValue && (*i_rt).second.isComplete()) //TODO mutex sur le ++
 			{
-				std::cout << "glop\n";
-
 				network__disconnect(router->getNetwork(), (*i_rt).second.client());
 				router->getRouteTable().erase(i_rt);
 			}
@@ -121,6 +119,7 @@ void Exec::prompt_message(Message* m)
 			//actions sur réseau
 			try
 			{
+				routeTime = hdclock::now();
 				routeCount = 0;
 				isWaitingForRoute = true;
 				routeDest = strcopy(m->node1);
@@ -206,26 +205,26 @@ void Exec::sock_message(Message* m, Client* t)
                     strcpy(t->id, m->node1); // nécessaire !
                     e.setClient(t);
 					e.isNeighbor() = true;
-                    
-                    std::cout << "[ROUTER] Received link from ClientId=<" << m->node1 << ">" 
-                            << "ip=<" << client__get_address(t) << ":" << client__get_port(t) <<">\n" ;
+
+                    //std::cout << "[ROUTER] Received link from ClientId=<" << m->node1 << ">"
+                            //<< "ip=<" << client__get_address(t) << ":" << client__get_port(t) <<">\n" ;
 				}
                 router->sockActions()->linkAck(t);
 			}
-            
+
 			break;
 
 		case VECTOR:
 			if(m->accept == OK) // cool bro
 			{
-				// potentiellement rien à faire
-				router->getRouteTable()[std::string(t->id)].secondsInactive() = 0;
+
 			}
 			else
 			{
 				router->parseVector(m->s_parameter, t->id);
 				router->sockActions()->vectorAck(t->id);
 			}
+			router->getRouteTable()[std::string(t->id)].secondsInactive() = 0;
 			break;
 
 		case PACKET:
@@ -256,7 +255,7 @@ void Exec::sock_message(Message* m, Client* t)
 			else // on fait juste transiter un paquet
 			{
 				//dec. TTL
-				if(mess__getAndDecTTL(m) != 0)
+				if(mess__getAndDecTTL(m) != 0 || m->accept == TTLZERO)
 				{
 					// envoyer (p-ê rajouter gestion d'exceptions ici)
 					router->sockActions()->forward(m);
@@ -279,17 +278,20 @@ void Exec::sock_message(Message* m, Client* t)
 			}
 			else // on fait transiter
 			{
-				if(mess__getAndDecTTL(m) != 0)
+				if(mess__getAndDecTTL(m) != 0 || m->accept == TTLZERO)
 				{
 					router->sockActions()->forward(m);
 				}
 				else
 				{
+					m->type = PONG;
 					m->accept = TTLZERO;
+					m->node2 = strcopy(router->getName());
 					//renvoyer dans l'autre sens
 					router->sockActions()->reverse(m);
 				}
 			}
+
 
 			break;
 
@@ -342,13 +344,13 @@ void Exec::sock_message(Message* m, Client* t)
 					if(strcmp(routeDest, m->node1) == 0)
 					{
 						isWaitingForRoute = false;
-						disp->route_result(routeCount, routeTime);
+						disp->route_result(routeCount, std::chrono::duration_cast<milliseconds>(hdclock::now() - routeTime).count());
 					}
 				}
 			}
 			else
 			{
-				if(mess__getAndDecTTL(m) != 0)
+				if(mess__getAndDecTTL(m) != 0  || m->accept == TTLZERO)
 				{
 					router->sockActions()->forward(m);
 				}

@@ -166,7 +166,7 @@ void network__disconnect (network *net, Client *c){
 int network__send(Client *c, const char *message)
 {
 	#ifdef __ROUTER_DEBUG
-  fprintf(stderr, "<Sending message to '%s' on socket '%d': '%s'>\n", c->id, (int)c->sock, message);
+  //fprintf(stderr, "<Sending message to '%s' on socket '%d': '%s'>\n", c->id, (int)c->sock, message);
   #endif
   char* tmp = strcopy(message);
   char* mess2 = mess__treatOutput(tmp);

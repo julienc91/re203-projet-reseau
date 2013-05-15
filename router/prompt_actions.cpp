@@ -102,7 +102,7 @@ void PromptActions::route(Message* mess)
 
 	ll_ping->node1 = strcopy(router->getName());
 	ll_ping->node2 = strcopy(mess->node1);
-
+	ll_ping->n_parameter = 0;
 	// on regarde le next hop dans la table de routage
 	Client* c = 0;
 
@@ -116,7 +116,7 @@ void PromptActions::route(Message* mess)
 		throw;
 	}
 
-	int i = 1;
+	int i = 0;
 	while(i < 10) // max ttl ? temps ? tant qu'on n'a pas reçu de réponse favorable à notre route ?
 	//peut être exécuter dans un thread avec incrémentation et comparaison d'une variable dans la classe (mutex)
 	{

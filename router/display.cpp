@@ -2,6 +2,8 @@
 #include <ctime>
 #include "display.hpp"
 
+
+
 /** \brief display the following messge: "error: host unreachable"
  */
 void Display::err_unreachable()

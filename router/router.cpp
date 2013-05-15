@@ -97,16 +97,16 @@ Router::~Router()
 	network__free(net);
 
 	// threads
-    
+
     std::cerr << "#1#" << std::endl;
 
 	mainLoopThread->detach(); // trop long avec le timeout
 	routerLoopThread->join();
-    
+
         std::cerr << "#2#" << std::endl;
-        
+
 	controllerLoopThread->join();
-    
+
         std::cerr << "#3#" << std::endl;
 
 	delete routerLoopThread;
@@ -169,8 +169,7 @@ void Router::routerLoop()
 			{
 				char * vect_str = routeTable.vector((*i).first);
 				//std::cout << "\nici\n" << (*i).first << " " << (*i).second.client()->id << "\n";
-				if(strcmp(vect_str, "[]") != 0)
-					sockActions()->vector((char*) (*i).first.c_str(), vect_str);
+				sockActions()->vector((char*) (*i).first.c_str(), vect_str);
 			}
 		}
 		std::this_thread::sleep_for(vect_time);
@@ -261,6 +260,17 @@ void Router::parseVector(char* str_orig, char* node_orig)
 
 	std::vector<char*>::iterator i;
 
+	RouteTable::iterator i_rte;
+	for(i_rte = routeTable.begin(); i_rte != routeTable.end(); ++i_rte)
+	{
+
+		if((*i_rte).second.name() != (*i_rte).second.nextHop()
+			&& (*i_rte).second.nextHop() == sourceNode)
+		{
+			routeTable.erase(i_rte);
+		}
+	}
+
 	// On ajoute ceux qui ne sont pas dans la table
 	for(i = v.begin(); i != v.end(); ++i)
 	{
@@ -321,7 +331,6 @@ void Router::parseNeighborhood(char* str_orig)
 		}
 
 
-
 		// à ce moment, on a dans v : | a,b,c:d  | e,f,g:h |  par ex.
 		// (si vect = [a,b,c,d;e,f,g,h;...])
 
@@ -338,7 +347,7 @@ void Router::parseNeighborhood(char* str_orig)
 				if(routeTable.find(s) == routeTable.end())
 				{
                     routeTable[s] = Entry(s, s, atoi(strtok(NULL, ",")));
-					
+
                     char * ip = strtok(strtok(NULL, ","), ":");
 					int port = atoi(strtok(NULL, ":"));
 					Client *c = network__connect(net, ip, port);
@@ -373,12 +382,16 @@ void Router::parseNeighborhood(char* str_orig)
 		// On enlève ceux qui n'y sont plus
 		for(k = routeTable.begin(); k != routeTable.end(); k++)
 		{
-			if(std::find(routerNames.begin(), routerNames.end(), (*k).first) == routerNames.end() && routeTable[(*k).first].isNeighbor())
+			if(std::find(routerNames.begin(), routerNames.end(), (*k).first) == routerNames.end() && (*k).second.isNeighbor())
 			{
 				network__disconnect(net, (*k).second.client());
 				routeTable.erase(k);
 			}
-			// TODO enlever ceux qui ont en first hop un de ceux qui viennent d'être enlevés
+
+			if(std::find(routerNames.begin(), routerNames.end(), (*k).second.nextHop()) == routerNames.end() && !(*k).second.isNeighbor())
+			{
+				routeTable.erase(k);
+			}
 		}
 	}
 	else // on vide la table de routage
