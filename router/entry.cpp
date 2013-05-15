@@ -12,15 +12,16 @@ Entry::Entry(string name, string nextHop, int dist)
     _dist(dist),
     _neighbor(false),
     _dataComplete(false),
-    _secondsInactive(0)
-
+    _secondsInactive(0),
+    _client(NULL)
 {
 }
 
 Entry::Entry()
   : _neighbor(false),
   _dataComplete(false),
-  _secondsInactive(0)
+  _secondsInactive(0),
+    _client(NULL)
 {
 }
 
@@ -31,6 +32,7 @@ Entry::Entry(const Entry *data)
     _nextHop    = data->_nextHop;
     _dist       = data->_dist;
     _neighbor   = data->_neighbor;
+    _client = NULL;
 }
 
 string &Entry::name(){

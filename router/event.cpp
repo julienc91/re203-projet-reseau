@@ -36,7 +36,7 @@ void Event::connect(network *net, Client *c, char *buffer)
   for (unsigned int i = 0; i < m->nb_messages; i++)
     {
       if (m->messages[i] != NULL)
-	glob__router->exec->sock_message(m->messages[i], c);
+     	glob__router->exec->sock_message(m->messages[i], c);
     }
   mess__free_messages(&m);
 }

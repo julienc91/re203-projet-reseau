@@ -3,6 +3,8 @@
 #include "exceptions.hpp"
 
 #include <sstream>
+#include <iostream>
+#include <string.h>
 
 RouteTable::RouteTable()
 	: std::map<std::string, Entry>()
@@ -49,4 +51,19 @@ char* RouteTable::vector(std::string client)
 	s << "]";
 
 	return (char*) s.str().c_str();
+}
+
+void RouteTable::debug()
+{
+    std::cerr << "[ROUTETABLE] " << size() << " element(s)" << std::endl;
+    int n = 0; char s[256];
+    for(RouteTable::iterator i = begin(); i != end(); i++)
+	{
+        Client *c = (*i).second.client();
+        if (c != NULL && c->id != NULL)
+            strcpy(s, c->id);
+        else
+            strcpy(s, "NULL");
+        std::cerr << "[ROUTETABLE(" << n++ << ")] Key=<" << (*i).first << "> ClientId=<" << s << ">" << std::endl;
+	}
 }

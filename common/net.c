@@ -134,6 +134,7 @@ void network__free(network *net){
  * The new Client is added to the network array.
  */
 Client *network__connect(network *net, const char *address, const unsigned int port){
+    fprintf(stderr, "[NETWORK] Outgoing connection to %s on %d.\n", address, port);
   Client c;
   c.sock = init_client_connection(address, port);
 
@@ -245,6 +246,7 @@ void network__update(network *net){
     return;
   }
   else if(FD_ISSET(net->server, &rdfs)){
+      fprintf(stderr, "[NETWORK] Incomming connection.\n");
     /* new client */
     SOCKADDR_IN csin = { 0 };
     size_t sinsize = sizeof csin;

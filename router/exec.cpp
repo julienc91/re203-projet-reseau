@@ -141,6 +141,7 @@ void Exec::prompt_message(Message* m)
 			break;
 
         case NETWORK_DEBUG:
+            router->getRouteTable().debug();
             network__debug(router->getNetwork());
             break;
 
@@ -200,10 +201,10 @@ void Exec::sock_message(Message* m, Client* t)
 				if(router->getRouteTable().find(s) == router->getRouteTable().end())
 				{
 					router->getRouteTable()[s] = Entry(s, s, INT_MIN);
-					std::cout << "nom du client dans link " << m->node1 << " ip : " << client__get_address(t) << ":" << client__get_port(t) <<"\n" ;
+					std::cout << "[ROUTER] Received link from ClientId=<" << m->node1 << "> ip=<" << client__get_address(t) << ":" << client__get_port(t) <<">\n" ;
 					strcpy(t->id, m->node1);
 					router->getRouteTable()[s].isNeighbor() = true;
-					//router->getRouteTable()[s].setClient(t);
+					router->getRouteTable()[s].setClient(t);
 				}
 				router->sockActions()->linkAck(t);
 			}
