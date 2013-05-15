@@ -16,7 +16,6 @@ Entry::Entry(string name, string nextHop, int dist)
     _dataComplete(false),
     _secondsInactive(0)
 {
-    std::cerr << "[ENTRY] (New) "  << name << std::endl;
 }
 
 Entry::Entry()
@@ -29,7 +28,6 @@ Entry::Entry()
     _secondsInactive(0)
     
 {
-    std::cerr << "[ENTRY] (New) empty" << std::endl;
 }
 
 
@@ -43,13 +41,10 @@ Entry::Entry(const Entry *data)
     
     _dataComplete = data->_dataComplete;
     _secondsInactive = data->_dataComplete;
-    
-    std::cerr << "[ENTRY] (New) "  << _name << std::endl;
 }
 
 Entry &Entry::operator=(const Entry &e)
 {
-    std::cerr << "operator=" ;
     _name       = e._name;
     _nextHop    = e._nextHop;
     _dist       = e._dist;
@@ -100,7 +95,6 @@ Client *Entry::client(){
 void Entry::setClient(Client* c)
 {
 	_client = c;
-    std::cerr << "[ENTRY] (" << _name << ") set client to '"<< _client->id <<"'"<< std::endl;
 }
 
 bool & Entry::isComplete()
