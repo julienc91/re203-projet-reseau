@@ -5,6 +5,7 @@
 #include "../common/config.h"
 
 #define GRAPH__UNLOADED_ERROR -1
+#define QUIT_SIGNAL 1
 
 network *net;
 static Configuration *config;
