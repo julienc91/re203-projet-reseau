@@ -12,7 +12,7 @@ SRCB=$(wildcard controller/*.c)
 SRCC=$(wildcard router/*.cpp)
 OBJ=$(SRC:.c=.o)
 
-.PHONY: clean common controller router doc rapport
+.PHONY: clean common controller router doc rapport run
 
 all:
 	@$(SILENT_MAKE) common
@@ -41,6 +41,9 @@ doc:	doc/doxygen.conf
 rapport: 
 	$(CD) rapport && pdflatex rapport.tex && pdflatex rapport.tex
 	$(CD) rapport && rm -r *.aux *.log *.out
+
+run:
+	./run.sh
 
 clean:
 	@echo "common/"
