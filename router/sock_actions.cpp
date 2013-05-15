@@ -29,7 +29,9 @@ void SockActions::reverse(Message* m)
 		throw;
 	}
 
-	network__send(c, mess__toString(m)); //segfault tant qu'on a pas un vrai c
+	char *tmp2 = mess__toString(m);
+	network__send(c, tmp2); //segfault tant qu'on a pas un vrai c
+	free(tmp2);
 }
 
 void SockActions::forward(Message* m)
@@ -45,8 +47,9 @@ void SockActions::forward(Message* m)
 	{
 		throw;
 	}
-
-	network__send(c, mess__toString(m)); //segfault tant qu'on a pas un vrai c
+	char *tmp = mess__toString(m);
+	network__send(c, tmp); //segfault tant qu'on a pas un vrai c
+	free(tmp);
 }
 
 
@@ -102,8 +105,10 @@ void SockActions::link(Client *t)
 
 	m->node1 = strcopy(router->getName());
 
-	network__send(t, mess__toString(m));
+	char *tmp = mess__toString(m);
+	network__send(t, tmp);
 	mess__free(&m);
+	free(tmp);
 }
 
 void SockActions::linkAck(Client* t)
@@ -113,8 +118,10 @@ void SockActions::linkAck(Client* t)
 	m->type = LINK;
 	m->accept = OK;
 
-	network__send(t, mess__toString(m));
+	char *tmp = mess__toString(m);
+	network__send(t, tmp);
 	mess__free(&m);
+	free(tmp);
 }
 
 void SockActions::vector(char* id, char * vect)
@@ -124,8 +131,10 @@ void SockActions::vector(char* id, char * vect)
 	m->type = VECTOR;
 	m->s_parameter = strcopy(vect);
 
-	network__send(router->getRouteTable()[std::string(id)].client(), mess__toString(m));
+	char *tmp = mess__toString(m);
+	network__send(router->getRouteTable()[std::string(id)].client(), tmp);
 	mess__free(&m);
+	free(tmp);
 }
 
 void SockActions::vectorAck(char* id)
@@ -135,6 +144,8 @@ void SockActions::vectorAck(char* id)
 	m->type = VECTOR;
 	m->accept = OK;
 
-	network__send(router->getRouteTable()[std::string(id)].client(), mess__toString(m));
+	char *tmp = mess__toString(m);
+	network__send(router->getRouteTable()[std::string(id)].client(), tmp);
 	mess__free(&m);
+	free(tmp);
 }
