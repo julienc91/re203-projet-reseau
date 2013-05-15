@@ -206,7 +206,7 @@ void Exec::sock_message(Message* m, Client* t)
 					router->getRouteTable()[s].isNeighbor() = true;
 					router->getRouteTable()[s].setClient(t);
 				}
-				router->sockActions()->linkAck(t);
+                router->sockActions()->linkAck(t);
 			}
 			break;
 

@@ -26,6 +26,7 @@ Entry::Entry()
   _secondsInactive(0)
     
 {
+    std::cerr << "[ENTRY] (New) empty" << std::endl;
 }
 
 
@@ -35,7 +36,8 @@ Entry::Entry(const Entry *data)
     _nextHop    = data->_nextHop;
     _dist       = data->_dist;
     _neighbor   = data->_neighbor;
-    _client = NULL;
+    _client = data->_client;
+    std::cerr << "[ENTRY] (New) "  << _name << std::endl;
 }
 
 string &Entry::name(){
@@ -75,6 +77,7 @@ Client *Entry::client(){
 
 void Entry::setClient(Client* c)
 {
+    std::cerr << "[ENTRY] (" << _name << ") set client to '"<< c->id <<"'"<< std::endl;
 	_client = c;
 }
 
