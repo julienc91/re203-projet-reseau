@@ -1,3 +1,2 @@
 #!/bin/sh
-cd controller && ./exec.sh &
-cd router && ./exec.sh
+cd controller && ./exec.sh && cd ../router && ./exec.sh

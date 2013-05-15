@@ -1,6 +1,7 @@
 #include "entry.hpp"
 #include <string>
 
+#include <iostream>
 
 using namespace std;
 
@@ -11,17 +12,19 @@ Entry::Entry(string name, string nextHop, int dist)
     _nextHop(nextHop),
     _dist(dist),
     _neighbor(false),
+    _client(NULL),
     _dataComplete(false),
-    _secondsInactive(0),
-    _client(NULL)
+    _secondsInactive(0)
 {
+    std::cerr << "[ENTRY] (New) "  << name << std::endl;
 }
 
 Entry::Entry()
   : _neighbor(false),
+  _client(NULL),
   _dataComplete(false),
-  _secondsInactive(0),
-    _client(NULL)
+  _secondsInactive(0)
+    
 {
 }
 
