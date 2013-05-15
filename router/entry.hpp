@@ -15,6 +15,8 @@ public:
   Entry(std::string name, std::string nextHop, int dist = -1);
   Entry(const Entry *data);
 
+  Entry &operator=(const Entry &e);
+
   std::string &name();
   std::string name() const;
   std::string &nextHop();

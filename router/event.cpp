@@ -36,7 +36,15 @@ void Event::connect(network *net, Client *c, char *buffer)
   for (unsigned int i = 0; i < m->nb_messages; i++)
     {
       if (m->messages[i] != NULL)
-     	glob__router->exec->sock_message(m->messages[i], c);
+     	{
+            char *tmp = mess__toString(m->messages[i]);
+            std::cout << "<connection from '" << c->id 
+                    << "' on socket '" << c->sock << "' : '"
+                    << tmp
+                    << "'>" << std::endl;
+            free(tmp);
+            glob__router->exec->sock_message(m->messages[i], c);
+        }
     }
   mess__free_messages(&m);
 }

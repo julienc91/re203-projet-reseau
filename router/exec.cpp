@@ -200,14 +200,22 @@ void Exec::sock_message(Message* m, Client* t)
 				std::string s(m->node1);
 				if(router->getRouteTable().find(s) == router->getRouteTable().end())
 				{
-					router->getRouteTable()[s] = Entry(s, s, INT_MIN);
+                    router->getRouteTable()[s] = Entry();
+                    Entry &e = (Entry &)((*(router->getRouteTable().find(s))).second);
+					e = Entry(s, s, INT_MIN);
+                    e.setClient(t);
+                    
 					std::cout << "[ROUTER] Received link from ClientId=<" << m->node1 << "> ip=<" << client__get_address(t) << ":" << client__get_port(t) <<">\n" ;
 					strcpy(t->id, m->node1);
 					router->getRouteTable()[s].isNeighbor() = true;
-					router->getRouteTable()[s].setClient(t);
+                    std::cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$\n";
+                    router->getRouteTable().debug();
+					//~ router->getRouteTable()[s].setClient(t);
+                    router->getRouteTable().debug();
 				}
                 router->sockActions()->linkAck(t);
 			}
+            
 			break;
 
 		case VECTOR:

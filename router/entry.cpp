@@ -20,10 +20,13 @@ Entry::Entry(string name, string nextHop, int dist)
 }
 
 Entry::Entry()
-  : _neighbor(false),
-  _client(NULL),
-  _dataComplete(false),
-  _secondsInactive(0)
+  : _name(""),
+    _nextHop(""),
+    _dist(-1),
+    _neighbor(false),
+    _client(NULL),
+    _dataComplete(false),
+    _secondsInactive(0)
     
 {
     std::cerr << "[ENTRY] (New) empty" << std::endl;
@@ -37,7 +40,26 @@ Entry::Entry(const Entry *data)
     _dist       = data->_dist;
     _neighbor   = data->_neighbor;
     _client = data->_client;
+    
+    _dataComplete = data->_dataComplete;
+    _secondsInactive = data->_dataComplete;
+    
     std::cerr << "[ENTRY] (New) "  << _name << std::endl;
+}
+
+Entry &Entry::operator=(const Entry &e)
+{
+    std::cerr << "operator=" ;
+    _name       = e._name;
+    _nextHop    = e._nextHop;
+    _dist       = e._dist;
+    _neighbor   = e._neighbor;
+    _client     = e._client;
+    
+    _dataComplete = e._dataComplete;
+    _secondsInactive = e._dataComplete;
+    
+    return *this;
 }
 
 string &Entry::name(){
@@ -77,8 +99,8 @@ Client *Entry::client(){
 
 void Entry::setClient(Client* c)
 {
-    std::cerr << "[ENTRY] (" << _name << ") set client to '"<< c->id <<"'"<< std::endl;
 	_client = c;
+    std::cerr << "[ENTRY] (" << _name << ") set client to '"<< _client->id <<"'"<< std::endl;
 }
 
 bool & Entry::isComplete()

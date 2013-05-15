@@ -373,7 +373,6 @@ void Router::parseNeighborhood(char* str_orig)
 			}
 		}
 
-
 		RouteTable::iterator k;
 		// On enlève ceux qui n'y sont plus
 		for(k = routeTable.begin(); k != routeTable.end(); k++)

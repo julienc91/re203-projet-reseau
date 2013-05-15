@@ -266,9 +266,8 @@ void network__update(network *net){
     c.sock = csock;
 
     // client connection
-    net->connection_event(net, &c, buffer);
+    net->connection_event(net, add_client(net, &c), buffer);
 
-    add_client(net, &c);
     FD_SET(csock, &rdfs);
   }
   else{
