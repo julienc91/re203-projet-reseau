@@ -58,8 +58,6 @@ void Exec::timeChecker()
 		{
 			if(++((*i_rt).second.secondsInactive()) > router->getConfiguration()->defaultDVTimeoutValue && (*i_rt).second.isComplete()) //TODO mutex sur le ++
 			{
-				std::cout << "glop\n";
-
 				network__disconnect(router->getNetwork(), (*i_rt).second.client());
 				router->getRouteTable().erase(i_rt);
 			}
@@ -219,13 +217,13 @@ void Exec::sock_message(Message* m, Client* t)
 			if(m->accept == OK) // cool bro
 			{
 				// potentiellement rien à faire
-				router->getRouteTable()[std::string(t->id)].secondsInactive() = 0;
 			}
 			else
 			{
 				router->parseVector(m->s_parameter, t->id);
 				router->sockActions()->vectorAck(t->id);
 			}
+			router->getRouteTable()[std::string(t->id)].secondsInactive() = 0;
 			break;
 
 		case PACKET:

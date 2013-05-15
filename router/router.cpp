@@ -169,7 +169,7 @@ void Router::routerLoop()
 			{
 				char * vect_str = routeTable.vector((*i).first);
 				//std::cout << "\nici\n" << (*i).first << " " << (*i).second.client()->id << "\n";
-				if(strcmp(vect_str, "[]") != 0)
+				//~ if(strcmp(vect_str, "[]") != 0)
 					sockActions()->vector((char*) (*i).first.c_str(), vect_str);
 			}
 		}
@@ -260,7 +260,15 @@ void Router::parseVector(char* str_orig, char* node_orig)
 	// sinon l'ajouter et mettre en next hop sourceNode
 
 	std::vector<char*>::iterator i;
-
+	RouteTable::iterator i_rte;
+	for(i_rte = routeTable.begin(); i_rte != routeTable.end(); ++i_rte)
+	{
+	if((*i_rte).second.name() != (*i_rte).second.nextHop()
+		&& (*i_rte).second.nextHop() == sourceNode)
+		{
+		routeTable.erase(i_rte);
+		}
+		}
 	// On ajoute ceux qui ne sont pas dans la table
 	for(i = v.begin(); i != v.end(); ++i)
 	{
@@ -379,6 +387,11 @@ void Router::parseNeighborhood(char* str_orig)
 				routeTable.erase(k);
 			}
 			// TODO enlever ceux qui ont en first hop un de ceux qui viennent d'être enlevés
+			
+			if(std::find(routerNames.begin(), routerNames.end(), (*k).second.nextHop()) == routerNames.end() && !(*k).second.isNeighbor())
+			{
+				routeTable.erase(k);
+			}
 		}
 	}
 	else // on vide la table de routage
