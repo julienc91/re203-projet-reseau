@@ -16,8 +16,8 @@ void SockActions::reverse(Message* m)
 	m->node1 = m->node2; //on inverse les pointeurs
 	m->node2 = tmp;
 
-	//m->n_parameter = router->getConfiguration()->defaultTTLValue;
-	m->accept = TTLZERO;
+	m->n_parameter = router->getConfiguration()->defaultTTLValue;
+
 
 	// on regarde le next hop dans la table de routage
 	Client* c = 0;

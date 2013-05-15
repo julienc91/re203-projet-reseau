@@ -274,6 +274,7 @@ void Exec::sock_message(Message* m, Client* t)
 			{
 				//envoyer pong
 				m->type = PONG;
+
 				router->sockActions()->reverse(m);
 			}
 			else // on fait transiter
