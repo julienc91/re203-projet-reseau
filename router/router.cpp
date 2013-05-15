@@ -337,6 +337,7 @@ void Router::parseNeighborhood(char* str_orig)
 			{
 				if(routeTable.find(s) == routeTable.end())
 				{
+                    std::cerr << "CLIENT DANS NEIGHBORHOOD ET PAS DANS LA TABLE !!!"<< std::endl;
 					routeTable[s] = Entry(s, s, atoi(strtok(NULL, ",")));
 
 					char * ip = strtok(strtok(NULL, ","), ":");
@@ -351,12 +352,13 @@ void Router::parseNeighborhood(char* str_orig)
 				}
 				else if(!routeTable[s].isComplete())
 				{
+                    std::cerr << "CLIENT DANS NEIGHBORHOOD, DANS LA TABLE MAIS INCOMPLET!!!"<< std::endl;
 					routeTable[s].dist() = atoi(strtok(NULL, ","));
 					char * ip = strtok(strtok(NULL, ","), ":");
 					int port = atoi(strtok(NULL, ":"));
-					Client *c = network__connect(net, ip, port);
-					strcpy(c->id, s.c_str());
-					routeTable[s].setClient(c);
+					//~ Client *c = network__connect(net, ip, port);
+					//~ strcpy(c->id, s.c_str());
+					//~ routeTable[s].setClient(c);
 					routeTable[s].isNeighbor() = true;
 					routeTable[s].isComplete() = true;
 				}
