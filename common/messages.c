@@ -1,7 +1,7 @@
 /**
  * \file messages.c
  * \brief Data structure for messages between controller/router/user
- * 
+ *
  */
 
 #include <stddef.h>
@@ -541,7 +541,7 @@ struct Message* mess__parse(char* mess_src)
 
      default:
 	  mess_dest->type = NONE;
-	  fprintf(stderr, "ERREUR: Message invalide.\n");
+	  fprintf(stderr, "ERREUR: Message invalide : '%s'.\n", mess_src);
 
 	  break;
      }
@@ -725,7 +725,7 @@ void mess__debug(struct Message* m)
 /**
  * \brief Treat an input message
  * \param src The message received.
- * \return A new string containing the unescaped message and without 
+ * \return A new string containing the unescaped message and without
  *  the final '*'.
  */
 char* mess__treatInput(char * src)
@@ -746,7 +746,7 @@ char* mess__treatInput(char * src)
 /**
  * \brief Treat an output message
  * \param src The message to send.
- * \return A new string containing the escaped message and with 
+ * \return A new string containing the escaped message and with
  *  the final '*'.
  */
 char* mess__treatOutput(char * src)
