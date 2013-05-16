@@ -19,7 +19,7 @@ class PromptActions
 		PromptActions(Router* r);
 		void message(Message* m, std::map<int, int>& seqnumTable);
 		void ping(Message* m, std::map<int, hdclock::time_point>& pingTimeTables);
-		void route(Message* m);
+		void route(Message*, bool& waitingForRoute);
 
 	private:
 		Router* router;

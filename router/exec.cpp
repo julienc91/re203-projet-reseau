@@ -124,7 +124,7 @@ void Exec::prompt_message(Message* m)
 				isWaitingForRoute = true;
 				routeDest = strcopy(m->node1);
 				disp->route_init(router->getName(), m->node1);
-				router->promptActions()->route(m);
+				router->promptActions()->route(m, isWaitingForRoute);
 			}
 			catch(UnknownDest&)
 			{
