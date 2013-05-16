@@ -351,7 +351,9 @@ void Exec::sock_message(Message* m, Client* t)
 					if(strcmp(routeDest, m->node1) == 0)
 					{
 						isWaitingForRoute = false;
-						disp->route_result(routeCount, std::chrono::duration_cast<milliseconds>(hdclock::now() - routeTime).count());
+
+						disp->route_result(routeCount, std::chrono::duration_cast<milliseconds>(hdclock::now() - routeTime - std::chrono::seconds(routeCount)).count());
+						routeCount = 0;
 					}
 				}
 			}
