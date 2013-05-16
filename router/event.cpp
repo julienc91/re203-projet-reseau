@@ -58,7 +58,14 @@ void Event::disconnect(network *net, Client *c)
     network__free(net);
     std::cerr << "[ROUTER] Closed by controller." << std::endl;
     exit(0);
-    }
+  }
+  //~ else
+  //~ {
+	//~ if(glob__router->getRouteTable().find(c->id) != glob__router->getRouteTable().end())
+	//~ {
+		//~ glob__router->getRouteTable()[c->id].setClient(0);
+	//~ }
+  //~ }
 }
 
 void Event::message(network *net, Client *c, char *buffer)

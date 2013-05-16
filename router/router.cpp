@@ -282,21 +282,31 @@ void Router::parseVector(char* str_orig, char* node_orig)
 
 			if(routeTable.find(s) != routeTable.end()) // si on le trouve
 			{
-				if((routeTable[s].isNeighbor() && dist < routeTable[s].dist()) ||
-                    (!routeTable[s].isNeighbor() && dist + routeTable[sourceNode].dist() < routeTable[s].dist()) ||
-                    (!routeTable[s].isNeighbor() && routeTable[s].nextHop() == sourceNode &&
+				if((dist + routeTable[sourceNode].dist() < routeTable[s].dist()) ||
+                    (routeTable[s].nextHop() == sourceNode &&
                                                     routeTable[s].dist() != dist + routeTable[sourceNode].dist()) ||
 					(routeTable[s].dist() < 0))
 				{
 
 					routeTable[s].nextHop() = sourceNode;
-					if(!routeTable[s].isNeighbor())
-					{
+					
+					//~ if(!routeTable[s].isNeighbor())
+					//~ {
 						routeTable[s].dist() = dist + routeTable[sourceNode].dist();
-					}
-					else
+					//~ }
+					//~ else
+					//~ {
+						//~ routeTable[s].dist() = dist;
+					//~ }
+					if(routeTable[s].isNeighbor())
 					{
-						routeTable[s].dist() = dist;
+					 for(i_rte = routeTable.begin(); i_rte != routeTable.end(); ++i_rte)
+					 {
+						 if((*i_rte).second.nextHop() == s)
+							(*i_rte).second.dist() = -1;
+							 
+					
+					  }
 					}
 
 				}
@@ -360,28 +370,14 @@ void Router::parseNeighborhood(char* str_orig)
 
 					this->saction->link(c);
 				}
-				//~ else if(!routeTable[s].isComplete())
-				//~ {
-					//~ routeTable[s].dist() = atoi(strtok(NULL, ","));
-					//~ char * ip = strtok(strtok(NULL, ","), ":");
-					//~ int port = atoi(strtok(NULL, ":"));
-					//~ Client *c = network__connect(net, ip, port); // OBSOLETE !
-					//~ strcpy(c->id, s.c_str());
-					//~ routeTable[s].setClient(c);
-					//~ routeTable[s].isNeighbor() = true;
-					//~ routeTable[s].isComplete() = true;
-				//~ }
 				else
 				{
-					
-					
 					if(routeTable[s].client() == 0)
 					{                    
 
 						Client *c = network__connect(net, ip, port);
 						strcpy(c->id, s.c_str());
 						routeTable[s].setClient(c);
-						routeTable[s].nextHop() = s;
 						
 						routeTable[s].isNeighbor() = true;
 						routeTable[s].isComplete() = true;
@@ -389,6 +385,8 @@ void Router::parseNeighborhood(char* str_orig)
 						this->saction->link(c);
 
 					}
+					routeTable[s].nextHop() = s;
+
 					routeTable[s].isNeighbor() = true;
 					routeTable[s].isComplete() = true;
 					routeTable[s].dist() = distance;
@@ -402,14 +400,18 @@ void Router::parseNeighborhood(char* str_orig)
 		{
 			if(std::find(routerNames.begin(), routerNames.end(), (*k).first) == routerNames.end() && routeTable[(*k).first].isNeighbor())
 			{
-				network__disconnect(net, (*k).second.client());
-				routeTable.erase(k);
+				if((*k).second.client() !=0 )
+				{
+					network__disconnect(net, (*k).second.client());
+					routeTable.erase(k);
+				}
 			}
 			// TODO enlever ceux qui ont en first hop un de ceux qui viennent d'être enlevés
 			
 			if(std::find(routerNames.begin(), routerNames.end(), (*k).second.nextHop()) == routerNames.end() && !(*k).second.isNeighbor())
 			{
-				routeTable.erase(k);
+				(*k).second.dist() = -1;
+				//~ routeTable.erase(k);
 			}
 		}
 	}

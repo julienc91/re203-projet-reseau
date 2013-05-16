@@ -208,6 +208,14 @@ void Exec::sock_message(Message* m, Client* t)
                     std::cout << "[ROUTER] Received link from ClientId=<" << m->node1 << ">" 
                             << "ip=<" << client__get_address(t) << ":" << client__get_port(t) <<">\n" ;
 				}
+				else if(((*(router->getRouteTable().find(s))).second).client() ==0)
+				{
+					strcpy(t->id, m->node1); // nécessaire !
+                    ((*(router->getRouteTable().find(s))).second).setClient(t);
+					((*(router->getRouteTable().find(s))).second).isNeighbor() = true;
+					std::cout << "[ROUTER](already in table) Received link from ClientId=<" << m->node1 << ">" 
+                            << "ip=<" << client__get_address(t) << ":" << client__get_port(t) <<">\n" ;
+				}
                 router->sockActions()->linkAck(t);
 			}
             
