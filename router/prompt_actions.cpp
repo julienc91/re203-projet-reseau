@@ -93,7 +93,7 @@ void PromptActions::ping(Message* mess, std::map<int, hdclock::time_point>& ping
 }
 
 
-void PromptActions::route(Message* mess)
+void PromptActions::route(Message* mess, bool& waitingForRoute)
 {
 	struct Message* ll_ping; // ping de bas niveau (low level)
 	mess__init(&ll_ping);
@@ -116,8 +116,8 @@ void PromptActions::route(Message* mess)
 		throw;
 	}
 
-	int i = 1;
-	while(i < 10) // max ttl ? temps ? tant qu'on n'a pas reçu de réponse favorable à notre route ?
+	int i = 0;
+	while(waitingForRoute && i < 50) // max ttl ? temps ? tant qu'on n'a pas reçu de réponse favorable à notre route ?
 	//peut être exécuter dans un thread avec incrémentation et comparaison d'une variable dans la classe (mutex)
 	{
 		ll_ping->n_parameter = i++;
