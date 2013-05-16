@@ -247,7 +247,6 @@ Messages *mess__multiline_parse(char *mess_src)
 	       m->messages[m->nb_messages++] = mess__parse(tmp);
            free(tmp);
 	  }
-
      }
 
      if (count > 0)
@@ -541,7 +540,7 @@ struct Message* mess__parse(char* mess_src)
 
      default:
 	  mess_dest->type = NONE;
-	  fprintf(stderr, "ERREUR: Message invalide.\n");
+	  fprintf(stderr, "ERREUR: Message invalide : '%s'.\n", mess_src);
 
 	  break;
      }
@@ -634,7 +633,8 @@ char* mess__toString(struct Message* mess)
 	  break;
 
      default:
-	  fprintf(stderr, "ERREUR: Message invalide.\n");
+	  fprintf(stderr, "ERREUR: Message invalide (envoi).\n");
+	  mess__debug(mess);
 	  break;
 
      }
@@ -699,7 +699,7 @@ void mess__debug(struct Message* m)
 	if(!isEverythingInitialized) mess__base__init();
      if(m != NULL)
      {
-	  printf("Message: %d %d %d\n", m->type, m->n_parameter, m->accept);
+	  printf("Message (type, nparam, accept, seqnum): %d %d %d %d\n", m->type, m->n_parameter, m->accept, m->seqnum);
 
 	  if(m->s_parameter != NULL)
 	  {

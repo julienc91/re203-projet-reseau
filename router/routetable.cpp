@@ -6,6 +6,9 @@
 #include <iostream>
 #include <string.h>
 
+extern "C" {
+	#include "../common/util.h"
+}
 RouteTable::RouteTable()
 	: std::map<std::string, Entry>()
 {
@@ -38,7 +41,7 @@ char* RouteTable::vector(std::string client)
 	s << "[";
 	for(RouteTable::iterator i = begin(); i != end(); i++)
 	{
-		if (client.compare((*i).first) != 0 && (*i).second.isComplete())
+		if (client.compare((*i).first) != 0 && (*i).second.dist()>=0 )//&& (*i).second.isComplete())
 		{
 			if (added)
 				s << ";";
@@ -50,7 +53,8 @@ char* RouteTable::vector(std::string client)
 
 	s << "]";
 
-	return (char*) s.str().c_str();
+	char* tmp = strcopy(s.str().c_str());
+	return tmp;
 }
 
 void RouteTable::debug()

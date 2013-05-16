@@ -168,7 +168,7 @@ void Router::routerLoop()
 			if((*i).second.isNeighbor() && (*i).second.isComplete())
 			{
 				char * vect_str = routeTable.vector((*i).first);
-				//std::cout << "\nici\n" << (*i).first << " " << (*i).second.client()->id << "\n";
+				//~ std::cout << "\nici\n" << (*i).first << " " << (*i).second.client()->id << "\n";
 				//~ if(strcmp(vect_str, "[]") != 0)
 					sockActions()->vector((char*) (*i).first.c_str(), vect_str);
 			}
@@ -268,7 +268,7 @@ void Router::parseVector(char* str_orig, char* node_orig)
 		{
 		routeTable.erase(i_rte);
 		}
-		}
+	}
 	// On ajoute ceux qui ne sont pas dans la table
 	for(i = v.begin(); i != v.end(); ++i)
 	{
