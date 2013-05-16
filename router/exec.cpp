@@ -119,6 +119,7 @@ void Exec::prompt_message(Message* m)
 			//actions sur réseau
 			try
 			{
+				routeTime = hdclock::now();
 				routeCount = 0;
 				isWaitingForRoute = true;
 				routeDest = strcopy(m->node1);
@@ -204,8 +205,8 @@ void Exec::sock_message(Message* m, Client* t)
                     strcpy(t->id, m->node1); // nécessaire !
                     e.setClient(t);
 					e.isNeighbor() = true;
-                    
-                    std::cout << "[ROUTER] Received link from ClientId=<" << m->node1 << ">" 
+
+                    std::cout << "[ROUTER] Received link from ClientId=<" << m->node1 << ">"
                             << "ip=<" << client__get_address(t) << ":" << client__get_port(t) <<">\n" ;
 				}
 				else if(((*(router->getRouteTable().find(s))).second).client() ==0)
@@ -213,12 +214,12 @@ void Exec::sock_message(Message* m, Client* t)
 					strcpy(t->id, m->node1); // nécessaire !
                     ((*(router->getRouteTable().find(s))).second).setClient(t);
 					((*(router->getRouteTable().find(s))).second).isNeighbor() = true;
-					std::cout << "[ROUTER](already in table) Received link from ClientId=<" << m->node1 << ">" 
+					std::cout << "[ROUTER](already in table) Received link from ClientId=<" << m->node1 << ">"
                             << "ip=<" << client__get_address(t) << ":" << client__get_port(t) <<">\n" ;
 				}
                 router->sockActions()->linkAck(t);
 			}
-            
+
 			break;
 
 		case VECTOR:
@@ -291,7 +292,9 @@ void Exec::sock_message(Message* m, Client* t)
 				}
 				else
 				{
+					m->type = PONG;
 					m->accept = TTLZERO;
+					m->node2 = strcopy(router->getName());
 					//renvoyer dans l'autre sens
 					router->sockActions()->reverse(m);
 				}
@@ -348,7 +351,7 @@ void Exec::sock_message(Message* m, Client* t)
 					if(strcmp(routeDest, m->node1) == 0)
 					{
 						isWaitingForRoute = false;
-						disp->route_result(routeCount, routeTime);
+						disp->route_result(routeCount, std::chrono::duration_cast<milliseconds>(hdclock::now() - routeTime).count());
 					}
 				}
 			}

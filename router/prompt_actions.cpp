@@ -116,7 +116,7 @@ void PromptActions::route(Message* mess)
 		throw;
 	}
 
-	int i = 1;
+	int i = 0;
 	while(i < 10) // max ttl ? temps ? tant qu'on n'a pas reçu de réponse favorable à notre route ?
 	//peut être exécuter dans un thread avec incrémentation et comparaison d'une variable dans la classe (mutex)
 	{
