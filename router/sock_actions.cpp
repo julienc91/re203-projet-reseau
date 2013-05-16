@@ -131,10 +131,8 @@ void SockActions::vector(char* id, char * vect)
 	m->type = VECTOR;
 
 	m->s_parameter = strcopy(vect);
-	//~ std::cout << "\n s_param :" << m->s_parameter << std::endl;
-
 	char *tmp = mess__toString(m);
-	//~ std::cout << "vector :" << tmp << std::endl;
+	
 	network__send(router->getRouteTable()[std::string(id)].client(), tmp);
 	mess__free(&m);
 	free(tmp);
@@ -148,7 +146,6 @@ void SockActions::vectorAck(char* id)
 	m->accept = OK;
 
 	char *tmp = mess__toString(m);
-	//~ std::cout << "vector ack:" << tmp << std::endl;
 	network__send(router->getRouteTable()[std::string(id)].client(), tmp);
 	mess__free(&m);
 	free(tmp);

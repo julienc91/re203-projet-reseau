@@ -167,12 +167,8 @@ void Router::routerLoop()
 		{
 			if((*i).second.isNeighbor() && (*i).second.isComplete())
 			{
-				//~ std::cout << "\nici\n" << (*i).first << " " << (*i).second.client()->id << "\n";
-
 				char * vect_str = routeTable.vector((*i).first);
-				//~ std::cout << "\nlà\n" << (*i).first << " " << (*i).second.client()->id << "\n";
-				//~ if(strcmp(vect_str, "[]") != 0)
-					sockActions()->vector((char*) (*i).first.c_str(), vect_str);
+				sockActions()->vector((char*) (*i).first.c_str(), vect_str);
 			}
 		}
 		std::this_thread::sleep_for(vect_time);
@@ -269,7 +265,6 @@ void Router::parseVector(char* str_orig, char* node_orig)
 			&& (*i_rte).second.nextHop() == sourceNode)
 			{
 				(*i_rte).second.dist() = -1;
-			//~ routeTable.erase(i_rte);
 			}
 	}
 	// On ajoute ceux qui ne sont pas dans la table
@@ -289,24 +284,15 @@ void Router::parseVector(char* str_orig, char* node_orig)
 				{
 
 					routeTable[s].nextHop() = sourceNode;
-					
-					//~ if(!routeTable[s].isNeighbor())
-					//~ {
-						routeTable[s].dist() = dist + routeTable[sourceNode].dist();
-					//~ }
-					//~ else
-					//~ {
-						//~ routeTable[s].dist() = dist;
-					//~ }
+					routeTable[s].dist() = dist + routeTable[sourceNode].dist();
+
 					if(routeTable[s].isNeighbor())
 					{
-					 for(i_rte = routeTable.begin(); i_rte != routeTable.end(); ++i_rte)
-					 {
-						 if((*i_rte).second.nextHop() == s)
-							(*i_rte).second.dist() = -1;
-							 
-					
-					  }
+						for(i_rte = routeTable.begin(); i_rte != routeTable.end(); ++i_rte)
+						{
+							 if((*i_rte).second.nextHop() == s)
+								(*i_rte).second.dist() = -1;
+						}
 					}
 
 				}
@@ -411,7 +397,6 @@ void Router::parseNeighborhood(char* str_orig)
 			if(std::find(routerNames.begin(), routerNames.end(), (*k).second.nextHop()) == routerNames.end() && !(*k).second.isNeighbor())
 			{
 				(*k).second.dist() = -1;
-				//~ routeTable.erase(k);
 			}
 		}
 	}

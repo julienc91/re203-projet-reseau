@@ -33,7 +33,7 @@ void input_event(network *net, char *string)
  */
 void connection_event(network *net, Client *client, char *string)
 {
-	printf("<connection on socket '%d' : '%s'>\n", (int)client->sock, string);
+	//~ printf("<connection on socket '%d' : '%s'>\n", (int)client->sock, string);
 
 	//Necessaire pour les tests via telnet
 	int i = strlen(string);
@@ -83,7 +83,7 @@ void connection_event(network *net, Client *client, char *string)
  */
 void disconnection_event(network *net, Client *client)
 {
-	printf("<disconnection from socket '%d' of client '%s'>\n", (int)client->sock, client->id);
+	//~ printf("<disconnection from socket '%d' of client '%s'>\n", (int)client->sock, client->id);
     char *tmp = mess__treatInput("log out*");
 	struct Message *message = mess__parse(tmp);
 	strcopy2(&message->node1, client__get_id(client));
@@ -101,8 +101,8 @@ void disconnection_event(network *net, Client *client)
  */
 void message_event(network *net, Client *client, char *string)
 {
-    if (client != NULL && client->id != NULL)
-		printf("<message from '%s', socket '%d' : '%s'>\n", client->id, (int)client->sock, string);
+    //~ if (client != NULL && client->id != NULL)
+		//~ printf("<message from '%s', socket '%d' : '%s'>\n", client->id, (int)client->sock, string);
 
 		//Necessaire pour les tests via telnet
 		int i = strlen(string);
