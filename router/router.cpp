@@ -167,8 +167,10 @@ void Router::routerLoop()
 		{
 			if((*i).second.isNeighbor() && (*i).second.isComplete())
 			{
-				char * vect_str = routeTable.vector((*i).first);
 				//~ std::cout << "\nici\n" << (*i).first << " " << (*i).second.client()->id << "\n";
+
+				char * vect_str = routeTable.vector((*i).first);
+				//~ std::cout << "\nlà\n" << (*i).first << " " << (*i).second.client()->id << "\n";
 				//~ if(strcmp(vect_str, "[]") != 0)
 					sockActions()->vector((char*) (*i).first.c_str(), vect_str);
 			}
@@ -263,11 +265,12 @@ void Router::parseVector(char* str_orig, char* node_orig)
 	RouteTable::iterator i_rte;
 	for(i_rte = routeTable.begin(); i_rte != routeTable.end(); ++i_rte)
 	{
-	if((*i_rte).second.name() != (*i_rte).second.nextHop()
-		&& (*i_rte).second.nextHop() == sourceNode)
-		{
-		routeTable.erase(i_rte);
-		}
+		if((*i_rte).second.name() != (*i_rte).second.nextHop()
+			&& (*i_rte).second.nextHop() == sourceNode)
+			{
+				(*i_rte).second.dist() = -1;
+			//~ routeTable.erase(i_rte);
+			}
 	}
 	// On ajoute ceux qui ne sont pas dans la table
 	for(i = v.begin(); i != v.end(); ++i)
@@ -328,8 +331,6 @@ void Router::parseNeighborhood(char* str_orig)
 			v.push_back(r);
 		}
 
-
-
 		// à ce moment, on a dans v : | a,b,c:d  | e,f,g:h |  par ex.
 		// (si vect = [a,b,c,d;e,f,g,h;...])
 
@@ -340,15 +341,17 @@ void Router::parseNeighborhood(char* str_orig)
 		for(i = v.begin(); i != v.end(); ++i)
 		{
 			std::string s(strtok((*i), ","));
+			int distance = atoi(strtok(NULL, ","));
+			char * ip = strtok(strtok(NULL, ","), ":");
+			int port = atoi(strtok(NULL, ":"));
 			routerNames.push_back(s);
+			
 			if(s.compare(std::string(getName())) != 0)
 			{
 				if(routeTable.find(s) == routeTable.end())
 				{
-                    routeTable[s] = Entry(s, s, atoi(strtok(NULL, ",")));
+                    routeTable[s] = Entry(s, s, distance);
 					
-                    char * ip = strtok(strtok(NULL, ","), ":");
-					int port = atoi(strtok(NULL, ":"));
 					Client *c = network__connect(net, ip, port);
 					strcpy(c->id, s.c_str());
 					routeTable[s].setClient(c);
@@ -357,22 +360,38 @@ void Router::parseNeighborhood(char* str_orig)
 
 					this->saction->link(c);
 				}
-				else if(!routeTable[s].isComplete())
-				{
-					routeTable[s].dist() = atoi(strtok(NULL, ","));
+				//~ else if(!routeTable[s].isComplete())
+				//~ {
+					//~ routeTable[s].dist() = atoi(strtok(NULL, ","));
 					//~ char * ip = strtok(strtok(NULL, ","), ":");
 					//~ int port = atoi(strtok(NULL, ":"));
 					//~ Client *c = network__connect(net, ip, port); // OBSOLETE !
 					//~ strcpy(c->id, s.c_str());
 					//~ routeTable[s].setClient(c);
-					routeTable[s].isNeighbor() = true;
-					routeTable[s].isComplete() = true;
-				}
+					//~ routeTable[s].isNeighbor() = true;
+					//~ routeTable[s].isComplete() = true;
+				//~ }
 				else
 				{
-					routeTable[s].dist() = atoi(strtok(NULL, ","));
-					strtok(strtok(NULL, ","), ":");
-					strtok(NULL, ":");
+					
+					
+					if(routeTable[s].client() == 0)
+					{                    
+
+						Client *c = network__connect(net, ip, port);
+						strcpy(c->id, s.c_str());
+						routeTable[s].setClient(c);
+						routeTable[s].nextHop() = s;
+						
+						routeTable[s].isNeighbor() = true;
+						routeTable[s].isComplete() = true;
+						
+						this->saction->link(c);
+
+					}
+					routeTable[s].isNeighbor() = true;
+					routeTable[s].isComplete() = true;
+					routeTable[s].dist() = distance;
 				}
 			}
 		}
