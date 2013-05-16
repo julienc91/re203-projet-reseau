@@ -1,0 +1,11 @@
+INSTRUCTIONS
+
+Les commandes sont à exécuter depuis la racine.
+* Compilation   : make
+* Nettoyage     : make clean
+* Documentation : make doc
+* Exécution     : "<x>" désigne un paramètre obligatoire
+                  "[x]" désigne un paramètre facultatif
+  > Pour le contrôleur : cd controller && ./controller [topo.dot]
+  > Pour routeur       : cd routeur && ./router <id> [config_file]
+* Exécution d'un exemple rapide : make run
