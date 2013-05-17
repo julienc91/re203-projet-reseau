@@ -1,6 +1,6 @@
 CC=@g++
 RM=@rm -f
-CFLAGS=-std=c++11 -Wall -Wextra -g -Wno-unused-parameter
+CFLAGS=-std=c++11 -Wall -Wextra -g -Wno-unused-parameter -D__ROUTER_DEBUG
 LFLAGS=-lpthread
 
 BINARY=router

@@ -37,7 +37,7 @@ void Event::connect(network *net, Client *c, char *buffer)
      	{
 #ifdef __ROUTER_DEBUG
             char *tmp = mess__toString(m->messages[i]);
-            std::cout << "<connection from '" << c->id 
+            std::cout << "<connection from '" << c->id
                     << "' on socket '" << c->sock << "' : '"
                     << tmp
                     << "'>" << std::endl;
@@ -78,12 +78,14 @@ void Event::message(network *net, Client *c, char *buffer)
     {
       if (m->messages[i] != NULL)
 	{
+#ifdef __ROUTER_DEBUG
 	  char *tmp = mess__toString(m->messages[i]);
-	  //~ std::cout << "<message from '" << c->id 
-		    //~ << "' on socket '" << c->sock << "' : '"
-		    //~ << tmp
-		    //~ << "'>" << std::endl;
+	   std::cout << "<message from '" << c->id
+		     << "' on socket '" << c->sock << "' : '"
+		     << tmp
+		     << "'>" << std::endl;
 	  free(tmp);
+#endif
 	  glob__router->exec->sock_message(m->messages[i], c);
 	}
     }

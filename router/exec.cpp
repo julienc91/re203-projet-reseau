@@ -206,7 +206,7 @@ void Exec::sock_message(Message* m, Client* t)
                     e.setClient(t);
 					e.isNeighbor() = true;
 
-                    //~ std::cout << "[ROUTER] Received link from ClientId=<" << m->node1 << ">" 
+                    //~ std::cout << "[ROUTER] Received link from ClientId=<" << m->node1 << ">"
                     //~ << "ip=<" << client__get_address(t) << ":" << client__get_port(t) <<">\n" ;
 				}
 				else if(((*(router->getRouteTable().find(s))).second).client() ==0)
@@ -215,7 +215,7 @@ void Exec::sock_message(Message* m, Client* t)
                     ((*(router->getRouteTable().find(s))).second).setClient(t);
 					((*(router->getRouteTable().find(s))).second).isNeighbor() = true;
 
-					//~ std::cout << "[ROUTER](already in table) Received link from ClientId=<" << m->node1 << ">" 
+					//~ std::cout << "[ROUTER](already in table) Received link from ClientId=<" << m->node1 << ">"
 						//~ << "ip=<" << client__get_address(t) << ":" << client__get_port(t) <<">\n" ;
 
 				}
@@ -342,6 +342,7 @@ void Exec::sock_message(Message* m, Client* t)
 						pingMin = INT_MAX;
 						pingMax = INT_MIN;
 						pingAvg = 0;
+						pingSucc = 0;
 					}
 				}
 				else if(isWaitingForRoute)
